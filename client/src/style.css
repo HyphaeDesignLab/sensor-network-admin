@@ -1,0 +1,21 @@
+* {
+    margin: 0;
+    box-sizing: border-box;
+}
+div {
+    margin-bottom: 2px;
+}
+div div {
+    margin-left: 10px;
+}
+
+.text-length-measurable {
+    display: inline-block;
+    padding: 0 10px;
+}
+
+span, div, input {
+    font-size: 12px;
+    font-family: Verdana, sans-serif;
+    line-height: 14px;
+}
