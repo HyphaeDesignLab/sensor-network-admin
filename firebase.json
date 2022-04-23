@@ -46,6 +46,9 @@
     },
     "pubsub": {
       "port": "8085"
+    },
+    "hosting": {
+      "port": 5002
     }
 
   }
