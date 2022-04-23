@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useDebugValue} from 'react';
 import Map from './Map';
-import { collection, getDocs, addDoc, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, getDoc, deleteDoc } from 'firebase/firestore';
 
 const Dashboard = ({db}) => {
     const [projects, setProjects] = useState([]);
@@ -12,16 +12,14 @@ const Dashboard = ({db}) => {
         .then(querySnapshot => {
             let p = [];
             querySnapshot.forEach((doc) => {
-                console.log(doc.id, '=>', doc.data());
-                // setProjects([...projects, doc.data()]);
-                p.push(doc.data());
+                // console.log(doc.id, '=>', doc.data());
+                let project = doc.data();
+                project.projectId = doc.id;
+                p.push(project);
             })
-            console.log(p);
             setProjects(p);
-
         })
         .catch((error) => {
-            console.log('wtf');
             if (error) {
                 console.log('error at getDoc');
             } else {
@@ -72,11 +70,32 @@ const Dashboard = ({db}) => {
         });
     }
 
+    const deleteProject = (projectId) => {
+        deleteDoc(doc(db, "projects", projectId))
+        .then(() => {
+            console.log(`projectId: ${projectId} deleted`)
+            setProjects(projects.filter(p => p.projectId !== projectId));
+        })
+        .catch((error) => {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('will this ever run?');
+            }
+        })
+    }
+
     return <div>
         <h1>Dashboard</h1>
 
         <h3>Projects</h3>
-        {projects.map(project => <div>{project.someProp}</div>)}
+        {projects.map(project =>
+        <aside>
+            <div>{project.someProp}
+                <span style={{'textDecoration': 'underline'}} onClick={deleteProject.bind(null, project.projectId)}>delete</span>
+            </div>
+
+        </aside>)}
 
         <button type='button' onClick={addProject}>Add Project</button>
     </div>;
