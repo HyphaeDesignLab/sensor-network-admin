@@ -1,9 +1,10 @@
 import React, {useState, useEffect, useDebugValue} from 'react';
-import Map from './Map';
+import DashboardProject from './DashboardProject';
 import { collection, getDocs, addDoc, doc, getDoc, deleteDoc } from 'firebase/firestore';
 
 const Dashboard = ({db}) => {
     const [projects, setProjects] = useState([]);
+    const [currentProject, setCurrentProject] = useState(null);
     // useDebugValue(projects, 'those damn prjs');
 
     useEffect(() => {
@@ -59,7 +60,7 @@ const Dashboard = ({db}) => {
 
     const addProject = () => {
         const sampleData = {
-            someProp: "Ada "+(new Date()).toLocaleString()
+            name: "A project "+(new Date()).toLocaleString()
         };
 
         addDoc(collection(db, "projects"), sampleData).then(docRef => {
@@ -72,7 +73,7 @@ const Dashboard = ({db}) => {
     }
 
     const deleteProject = (projectId) => {
-        if (window.confirm(`Are you certain you want to delete project: ${projects.find(project => project.projectId === projectId).someProp} ?`)) {
+        if (window.confirm(`Are you certain you want to delete project: ${projects.find(project => project.projectId === projectId).name} ?`)) {
             deleteDoc(doc(db, "projects", projectId))
             .then(() => {
                 // console.log(`projectId: ${projectId} deleted`)
@@ -88,16 +89,25 @@ const Dashboard = ({db}) => {
         }
     }
 
+    const editProject = (project) => {
+        // show edit panel
+        // maybe highlight project in list? as "currently open/editing"
+        // ... gory details...
+    }
+
     return <div>
         <h1>Dashboard</h1>
 
         <h3>Projects</h3>
         {projects.map(project =>
-            <div>{project.someProp}
+            <div>
+                <a href='#' onClick={editProject}>{project.name}</a>
                 <span style={{'textDecoration': 'underline'}} onClick={deleteProject.bind(null, project.projectId)}>delete</span>
             </div>)}
 
         <button type='button' onClick={addProject}>Add Project</button>
+
+        {!!currentProject && <DashboardProject project={currentProject} />}
     </div>;
 };
 

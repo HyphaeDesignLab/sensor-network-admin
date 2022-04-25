@@ -3,11 +3,11 @@ export default {
     "style": "mapbox://styles/hyphae-lab/cl0lex1tp000115qtikua1z4e",
     "user": "hyphae-lab",
     "token": "pk.eyJ1IjoiaHlwaGFlLWxhYiIsImEiOiJjazN4czF2M2swZmhkM25vMnd2MXZrYm11In0.LS_KIw8THi2qIethuAf2mw",
+    zoom: 15,
     "center": [
       -85.7797288176198,
       38.191476417647806
     ],
-    zoom: 15,
     projects: [
       {
         default: true,
