@@ -72,7 +72,7 @@ const Dashboard = ({db}) => {
     }
 
     const deleteProject = (projectId) => {
-        if (window.confirm(`Are you certain you want to delete project: ${projectId} ?`)) {
+        if (window.confirm(`Are you certain you want to delete project: ${projects.find(project => project.projectId === projectId).someProp} ?`)) {
             deleteDoc(doc(db, "projects", projectId))
             .then(() => {
                 // console.log(`projectId: ${projectId} deleted`)
