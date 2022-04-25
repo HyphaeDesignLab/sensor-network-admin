@@ -19,3 +19,16 @@ span, div, input {
     font-family: Verdana, sans-serif;
     line-height: 14px;
 }
+
+.projects {
+
+}
+.projects .link {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.projects .project.current {
+    background: rgb(191, 245, 116);
+    font-weight: bold;
+}
