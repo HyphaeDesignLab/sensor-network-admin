@@ -15,7 +15,7 @@ const Dashboard = ({db}) => {
             querySnapshot.forEach((doc) => {
                 // console.log(doc.id, '=>', doc.data());
                 let project = doc.data();
-                project.projectId = doc.id;
+                project.id = doc.id;
                 p.push(project);
             })
             setProjects(p);
@@ -60,24 +60,31 @@ const Dashboard = ({db}) => {
 
     const addProject = () => {
         const sampleData = {
-            name: "A project "+(new Date()).toLocaleString()
+            name: "A project "+(new Date()).toLocaleString(),
+            style: "mapbox://styles/hyphae-lab/cl0lex1tp000115qtikua1z4e",
+            user: "hyphae-lab",
+            token: "pk.eyJ1IjoiaHlwaGFlLWxhYiIsImEiOiJjazN4czF2M2swZmhkM25vMnd2MXZrYm11In0.LS_KIw8THi2qIethuAf2mw",
+            zoom: 14
         };
 
         addDoc(collection(db, "projects"), sampleData).then(docRef => {
             console.log("Document written with ID: ", docRef.id);
-            sampleData.projectId = docRef.id;
+            sampleData.id = docRef.id;
             setProjects([...projects, sampleData]);
         }).catch(e => {
             console.error("Error adding document: ", e);
         });
     }
 
-    const deleteProject = (projectId) => {
-        if (window.confirm(`Are you certain you want to delete project: ${projects.find(project => project.projectId === projectId).name} ?`)) {
-            deleteDoc(doc(db, "projects", projectId))
+    const deleteProject = (id) => {
+        if (!window.confirm(`Are you certain you want to delete project: ${projects.find(project => project.id === id).name} ?`)) {
+            return;
+        }
+
+        deleteDoc(doc(db, "projects", id))
             .then(() => {
-                // console.log(`projectId: ${projectId} deleted`)
-                setProjects(projects.filter(p => p.projectId !== projectId));
+                // console.log(`id: ${id} deleted`)
+                setProjects(projects.filter(p => p.id !== id));
             })
             .catch((error) => {
                 if (error) {
@@ -86,13 +93,26 @@ const Dashboard = ({db}) => {
                     console.log('will this ever run?');
                 }
             })
-        }
+            .finally(() => {
+                setCurrentProject(null); // in case we were editing; let's set current to none after delete
+            })
+
     }
 
     const editProject = (project) => {
-        // show edit panel
-        // maybe highlight project in list? as "currently open/editing"
-        // ... gory details...
+        if (!!currentProject && currentProject.id === project.id) {
+            return;
+        }
+        setCurrentProject(project);
+    }
+
+
+    const saveProject = (project) => {
+        // save the data to sb
+        // do something with with project data
+
+        // set current project to nothing
+        setCurrentProject(null);
     }
 
     return <div>
@@ -100,14 +120,14 @@ const Dashboard = ({db}) => {
 
         <h3>Projects</h3>
         {projects.map(project =>
-            <div>
-                <a href='#' onClick={editProject}>{project.name}</a>
-                <span style={{'textDecoration': 'underline'}} onClick={deleteProject.bind(null, project.projectId)}>delete</span>
+            <div key={project.id}>
+                <a href='#' onClick={editProject.bind(null, project)}>{project.name}</a> &nbsp;
+                <span style={{'textDecoration': 'underline'}} onClick={deleteProject.bind(null, project.id)}>delete</span>
             </div>)}
 
         <button type='button' onClick={addProject}>Add Project</button>
 
-        {!!currentProject && <DashboardProject project={currentProject} />}
+        {!!currentProject && <DashboardProject project={currentProject} saveProject={saveProject} deleteProject={deleteProject} />}
     </div>;
 };
 

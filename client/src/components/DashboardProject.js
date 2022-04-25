@@ -6,7 +6,7 @@ const sampleData = {
     "token": "pk.eyJ1IjoiaHlwaGFlLWxhYiIsImEiOiJjazN4czF2M2swZmhkM25vMnd2MXZrYm11In0.LS_KIw8THi2qIethuAf2mw",
 };
 
-const DashboardProject = ({project, deleteProject}) => {
+const DashboardProject = ({project, saveProject, deleteProject}) => {
     const styleInputEl = useRef(project.style);
     const userInputEl = useRef(project.user);
     const tokenInputEl = useRef(project.token);
@@ -18,7 +18,9 @@ const DashboardProject = ({project, deleteProject}) => {
         <label>User: <input ref={userInputEl}/></label>
         <label>Token: <input ref={tokenInputEl}/></label>
 
-        <span style={{'textDecoration': 'underline'}} onClick={deleteProject.bind(null, project.projectId)}>delete</span>
+        <button button='button' onClick={saveProject.bind(null, project)}>save</button>
+
+        <button button='button' onClick={deleteProject.bind(null, project.id)}>delete</button>
     </div>;
 };
 
