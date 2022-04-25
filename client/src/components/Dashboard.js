@@ -64,6 +64,7 @@ const Dashboard = ({db}) => {
 
         addDoc(collection(db, "projects"), sampleData).then(docRef => {
             console.log("Document written with ID: ", docRef.id);
+            sampleData.projectId = docRef.id;
             setProjects([...projects, sampleData]);
         }).catch(e => {
             console.error("Error adding document: ", e);
@@ -73,7 +74,7 @@ const Dashboard = ({db}) => {
     const deleteProject = (projectId) => {
         deleteDoc(doc(db, "projects", projectId))
         .then(() => {
-            console.log(`projectId: ${projectId} deleted`)
+            // console.log(`projectId: ${projectId} deleted`)
             setProjects(projects.filter(p => p.projectId !== projectId));
         })
         .catch((error) => {
