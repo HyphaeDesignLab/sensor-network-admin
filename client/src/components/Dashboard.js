@@ -72,20 +72,20 @@ const Dashboard = ({db}) => {
     }
 
     const deleteProject = (projectId) => {
-        deleteDoc(doc(db, "projects", projectId))
-        .then(() => {
-            // console.log(`projectId: ${projectId} deleted`)
-            if (window.confirm(`Are you certain you want to delete project: ${projectId} ?`)) {
+        if (window.confirm(`Are you certain you want to delete project: ${projectId} ?`)) {
+            deleteDoc(doc(db, "projects", projectId))
+            .then(() => {
+                // console.log(`projectId: ${projectId} deleted`)
                 setProjects(projects.filter(p => p.projectId !== projectId));
-              }
-        })
-        .catch((error) => {
-            if (error) {
-                console.log(error);
-            } else {
-                console.log('will this ever run?');
-            }
-        })
+            })
+            .catch((error) => {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('will this ever run?');
+                }
+            })
+        }
     }
 
     return <div>
@@ -93,12 +93,9 @@ const Dashboard = ({db}) => {
 
         <h3>Projects</h3>
         {projects.map(project =>
-        <aside>
             <div>{project.someProp}
                 <span style={{'textDecoration': 'underline'}} onClick={deleteProject.bind(null, project.projectId)}>delete</span>
-            </div>
-
-        </aside>)}
+            </div>)}
 
         <button type='button' onClick={addProject}>Add Project</button>
     </div>;
