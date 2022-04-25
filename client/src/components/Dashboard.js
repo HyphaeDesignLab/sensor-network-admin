@@ -75,7 +75,9 @@ const Dashboard = ({db}) => {
         deleteDoc(doc(db, "projects", projectId))
         .then(() => {
             // console.log(`projectId: ${projectId} deleted`)
-            setProjects(projects.filter(p => p.projectId !== projectId));
+            if (window.confirm(`Are you certain you want to delete project: ${projectId} ?`)) {
+                setProjects(projects.filter(p => p.projectId !== projectId));
+              }
         })
         .catch((error) => {
             if (error) {
