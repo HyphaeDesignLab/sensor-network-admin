@@ -6,6 +6,8 @@ const sampleData = {
     "token": "pk.eyJ1IjoiaHlwaGFlLWxhYiIsImEiOiJjazN4czF2M2swZmhkM25vMnd2MXZrYm11In0.LS_KIw8THi2qIethuAf2mw",
 };
 
+// create a state in dashboardproject to hold all info and and use saveproject to save any changes
+
 const DashboardProject = ({project, saveProject, deleteProject}) => {
     const styleInputEl = useRef(project.style);
     const userInputEl = useRef(project.user);
