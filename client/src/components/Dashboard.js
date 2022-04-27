@@ -82,25 +82,23 @@ const Dashboard = ({db}) => {
     }
 
 
-    const saveProject = (project) => {
-        // save the data to sb
-        const docRef = doc(db, "projects", project.id);
-        const projectSafeCopy = {...project};
-
-        updateDoc(docRef, projectSafeCopy)
+    const saveProject = (projectFragment) => {
+        if (!currentProject) {
+            return;
+        }
+        
+        const docRef = doc(db, "projects", currentProject.id);
+        updateDoc(docRef, projectFragment)
             .then(response => {
                 console.log(response)
-                const updateProjects = [...projects];
-                const index = updateProjects.findIndex(p => p.id === project.id);
-                updateProjects[index] = projectSafeCopy;
-                setProjects(updateProjects);
+                const projectsCopy = [...projects];
+                const index = projectsCopy.findIndex(p => p.id === currentProject.id);
+                projectsCopy[index] = {...currentProject, ...projectFragment};
+                setProjects(projectsCopy);
             })
             .catch(error => {
                 console.log('project update error '+error.message);
             });
-
-        // set current project to nothing
-        setCurrentProject(null);
     }
 
     return <div>

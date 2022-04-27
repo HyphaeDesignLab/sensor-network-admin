@@ -1,6 +1,18 @@
 import React, {useState, useEffect, useRef} from "react";
 
-export default function InputNumber({value, name}) {
+export default function InputString({value, name, onSave}) {
+    const [newValue, setNewValue] = useState(value);
+    const [oldValue, setOldValue] = useState(value);
+    useEffect(() => {
+        setOldValue(value);
+        setNewValue(value);
+    }, [value]);
+
+    const [isChanged, setIsChanged] = useState(false);
+    useEffect(() => {
+        setIsChanged(newValue !== oldValue);
+    }, [oldValue, newValue]);
+
     const inputRef = useRef(null);
 
     const [isEditable, setEditable] = useState(false);
@@ -10,23 +22,33 @@ export default function InputNumber({value, name}) {
         }
     }, [isEditable]);
 
-
     const handleEditClick = e => {
         setEditable(true);
     }
-    const handleInputBlur = e => {
-        setEditable(false);
-    }
+
     const handleKeyUp = e => {
-        console.log(e.code);
         if (e.code === 'Escape') {
             setEditable(false);
+            setNewValue(oldValue);
         }
     }
     const handleCancelClick = e => {
         e.preventDefault();
-        setEditable(false)
+        setEditable(false);
+        setNewValue(oldValue);
     }
+
+    const handleChange = e => {
+        setNewValue(e.target.value);
+    };
+
+    const handleSaveClick = () => {
+        // e.g. name=style or center.0  center.1  or someProps.nestedProp
+        onSave( {[name]: newValue} );
+        setOldValue(newValue);
+        setEditable(false);
+    };
+
 
     const textElRef = useRef(null);
     const [inputLength, setInputLength] = useState('auto');
@@ -40,16 +62,17 @@ export default function InputNumber({value, name}) {
             {isEditable ?
                 <span>
                     <input ref={inputRef}
-                           value={value}
+                           value={newValue}
                            onChange={handleChange}
-                           onBlur={handleInputBlur}
                            onKeyUp={handleKeyUp}
-                           style={{width: inputLength}}/>
-                    <a href='#' onClick={handleCancelClick}>cancel</a>
+                           style={{width: inputLength}} />
                 </span>
                 :
-                <span ref={textElRef} className='text-length-measurable' onClick={handleEditClick}>{value}</span>
+                <span ref={textElRef} className='text-length-measurable' onClick={handleEditClick}>{oldValue}</span>
             }
+            {isEditable && <span>&nbsp;<a href='#' onClick={handleCancelClick}>cancel</a></span>}
+            {isChanged && <span>&nbsp;<a href='#' onClick={handleSaveClick}>save</a></span>}
+
         </div>
     );
 };
