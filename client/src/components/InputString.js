@@ -51,10 +51,19 @@ export default function InputString({value, name, onSave}) {
 
 
     const textElRef = useRef(null);
-    const [inputLength, setInputLength] = useState('auto');
+    const [newInputLength, setNewInputLength] = useState('auto');
+    const [oldInputLength, setOldInputLength] = useState('auto');
+    const resetInputLength = () => {
+        const width = window.getComputedStyle(textElRef.current).width;
+        setNewInputLength(width);
+        setOldInputLength(width);
+    }
+    useEffect(resetInputLength, [oldValue]);
+
     useEffect(() => {
-        setInputLength(window.getComputedStyle(textElRef.current).width);
-    }, []);
+        const deltaPercent = 1 + (parseInt(newValue.length) - parseInt(oldValue.length)) / parseInt(oldValue.length);
+        setNewInputLength((parseInt(oldInputLength) * deltaPercent) + 'px');
+    }, [newValue]);
 
     return (
         <div>
@@ -65,7 +74,7 @@ export default function InputString({value, name, onSave}) {
                            value={newValue}
                            onChange={handleChange}
                            onKeyUp={handleKeyUp}
-                           style={{width: inputLength}} />
+                           style={{width: newInputLength}} />
                 </span>
                 :
                 <span ref={textElRef} className='text-length-measurable' onClick={handleEditClick}>{oldValue}</span>
