@@ -1,12 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react';
 import InputString from "./InputString";
 
-const sampleData = {
-    "style": "mapbox://styles/hyphae-lab/cl0lex1tp000115qtikua1z4e",
-    "user": "hyphae-lab",
-    "token": "pk.eyJ1IjoiaHlwaGFlLWxhYiIsImEiOiJjazN4czF2M2swZmhkM25vMnd2MXZrYm11In0.LS_KIw8THi2qIethuAf2mw",
-};
-
 const DashboardProject = ({project, saveProject, deleteProject}) => {
     const [projectInternal, setProjectInternal] = useState(project);
     useEffect(() => {
