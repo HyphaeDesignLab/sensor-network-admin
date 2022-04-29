@@ -9,7 +9,7 @@ export default function Input({schema, name=''}) {
     const [schemaType, setSchemaType] = useState(false);
     const [value, setValue] = useState(schema);
 
-    const onChangeHandler = (name, value) => {
+    const saveHandler = (name, value) => {
         console.log(`saving ${name}: new value ${value}`);
         setValue(value);
     };
@@ -37,11 +37,11 @@ export default function Input({schema, name=''}) {
     }, []);
     return (
         <div>
-            {schemaType === 'array' && <InputArray arr={value} name={name} onChange={onChangeHandler} />}
+            {schemaType === 'array' && <InputArray arr={value} name={name} onSave={saveHandler} />}
             {schemaType === 'hash' && <InputHash hash={value} name={name}  />}
-            {schemaType === 'number' && <InputNumber value={value} name={name} onChange={onChangeHandler} />}
-            {schemaType === 'string' && <InputString value={value} name={name} onChange={onChangeHandler} />}
-            {schemaType === 'boolean' && <InputBoolean value={value} name={name} onChange={onChangeHandler} />}
+            {schemaType === 'number' && <InputNumber value={value} name={name} onSave={saveHandler} />}
+            {schemaType === 'string' && <InputString value={value} name={name} onSave={saveHandler} />}
+            {schemaType === 'boolean' && <InputBoolean value={value} name={name} onSave={saveHandler} />}
         </div>
     );
 };
