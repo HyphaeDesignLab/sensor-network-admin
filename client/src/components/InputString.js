@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from "react";
 
-export default function InputString({value, name, onSave}) {
+export default function InputString({value, name, onSave, type}) {
     const [newValue, setNewValue] = useState(value);
     const [oldValue, setOldValue] = useState(value);
     useEffect(() => {
@@ -70,11 +70,12 @@ export default function InputString({value, name, onSave}) {
             {!!name && <strong>{name}: </strong>}
             {isEditable ?
                 <span>
-                    <input ref={inputRef}
+                    <input type={type}
+                           ref={inputRef}
                            value={newValue}
                            onChange={handleChange}
                            onKeyUp={handleKeyUp}
-                           style={{width: newInputLength}} />
+                           style={{width: newInputLength, minWidth: '60px'}} />
                 </span>
                 :
                 <span ref={textElRef} className='text-length-measurable' onClick={handleEditClick}>{oldValue}</span>
