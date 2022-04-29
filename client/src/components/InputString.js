@@ -24,10 +24,13 @@ export default function InputString({value, name, onSave, type, isOnlyEditMode=f
 
     const [isEditable, setEditable] = useState(isOnlyEditMode);
     useEffect(() => {
+        if (!inputRef.current) {
+            return;
+        }
         if (isEditable) {
             inputRef.current.focus();
         }
-    }, [isEditable]);
+    }, [isEditable, inputRef]);
 
     const handleEditClick = e => {
         setEditable(true);
