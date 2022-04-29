@@ -22,7 +22,7 @@ export default function InputString({value, name, onSave, type, isOnlyEditMode=f
 
     const inputRef = useRef(null);
 
-    const [isEditable, setEditable] = useState(false);
+    const [isEditable, setEditable] = useState(isOnlyEditMode);
     useEffect(() => {
         if (isEditable) {
             inputRef.current.focus();
@@ -33,16 +33,25 @@ export default function InputString({value, name, onSave, type, isOnlyEditMode=f
         setEditable(true);
     }
 
+    const resetValue = () => {
+        if (!isOnlyEditMode) {
+            setEditable(false);
+        }
+
+        setNewValue(oldValue);
+
+        if (onCancel) {
+            onCancel();
+        }
+    }
     const handleKeyUp = e => {
         if (e.code === 'Escape') {
-            setEditable(false);
-            setNewValue(oldValue);
+            resetValue();
         }
     }
     const handleCancelClick = e => {
         e.preventDefault();
-        setEditable(false);
-        setNewValue(oldValue);
+        resetValue();
     }
 
     const handleChange = e => {
