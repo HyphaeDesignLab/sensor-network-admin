@@ -32,3 +32,9 @@ span, div, input {
     background: rgb(191, 245, 116);
     font-weight: bold;
 }
+
+.measure-text-length {
+    position: fixed;
+    top: -1000vh;
+    left: -1000vw;
+}
