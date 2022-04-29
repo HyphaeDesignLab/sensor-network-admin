@@ -1,6 +1,13 @@
 import React, {useState, useEffect, useRef} from "react";
 
-export default function InputString({value, name, onSave, type}) {
+const EditIcon = () => {
+    return <svg style={{height: '15px'}} version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="m59.875 5.0312c-1.6133 0.039062-3.1875 0.875-4.0312 2.3438l-34.031 59.375c-0.22266 0.40234-0.35156 0.85156-0.375 1.3125l-1.4375 23.75c-0.070312 1.1367 0.50781 2.2188 1.4961 2.7891 0.98438 0.57031 2.2109 0.53125 3.1602-0.10156l19.75-13.125c0.38672-0.25781 0.70703-0.59766 0.9375-1l34.031-59.344c1.2852-2.2422 0.48828-5.1992-1.75-6.5l-15.281-8.875c-0.55859-0.32422-1.168-0.51953-1.7812-0.59375-0.23047-0.027344-0.45703-0.035156-0.6875-0.03125zm0.5625 6.4688 13.125 7.5938-4.0312 7.0312-13.125-7.5938zm-7 12.219 13.094 7.5938-24.906 43.438-13.125-7.5938zm-26.312 49.562 9.9375 5.75-10.719 7.125z"/>
+    </svg>;
+};
+const minInputWidth = 30;
+
+export default function InputString({value, name, onSave, type, isOnlyEditMode=false, onCancel=null, }) {
     const [newValue, setNewValue] = useState(value);
     const [oldValue, setOldValue] = useState(value);
     useEffect(() => {
@@ -50,20 +57,13 @@ export default function InputString({value, name, onSave, type}) {
     };
 
 
-    const textElRef = useRef(null);
-    const [newInputLength, setNewInputLength] = useState('auto');
-    const [oldInputLength, setOldInputLength] = useState('auto');
+    const measureTextLengthElRef = useRef(null);
+    const [inputLength, setInputLength] = useState('auto');
     const resetInputLength = () => {
-        const width = window.getComputedStyle(textElRef.current).width;
-        setNewInputLength(width);
-        setOldInputLength(width);
+        let width = parseInt(window.getComputedStyle(measureTextLengthElRef.current).width) * 1.1;
+        setInputLength(width+'px');
     }
-    useEffect(resetInputLength, [oldValue]);
-
-    useEffect(() => {
-        const deltaPercent = 1 + (parseInt(newValue.length) - parseInt(oldValue.length)) / parseInt(oldValue.length);
-        setNewInputLength((parseInt(oldInputLength) * deltaPercent) + 'px');
-    }, [newValue]);
+    useEffect(resetInputLength, [newValue]);
 
     return (
         <div>
@@ -75,14 +75,14 @@ export default function InputString({value, name, onSave, type}) {
                            value={newValue}
                            onChange={handleChange}
                            onKeyUp={handleKeyUp}
-                           style={{width: newInputLength, minWidth: '60px'}} />
+                           style={{width: inputLength, minWidth: '60px'}} />
                 </span>
                 :
-                <span ref={textElRef} className='text-length-measurable' onClick={handleEditClick}>{oldValue}</span>
+                <span onClick={handleEditClick}>{oldValue} <EditIcon /></span>
             }
             {isEditable && <span>&nbsp;<a href='#' onClick={handleCancelClick}>cancel</a></span>}
             {isChanged && <span>&nbsp;<a href='#' onClick={handleSaveClick}>save</a></span>}
-
+            <div className='measure-text-length' ref={measureTextLengthElRef}>{newValue}</div>
         </div>
     );
 };
