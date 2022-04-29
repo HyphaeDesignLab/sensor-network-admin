@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 
-export default function InputBoolean({value, name, onChange}) {
+export default function InputBoolean({value, name, onSave}) {
     const [isEditable, setEditable] = useState(false);
     const [internalValue, setInternalValue] = useState(value);
 
@@ -9,7 +9,7 @@ export default function InputBoolean({value, name, onChange}) {
     };
 
     const onSaveHandler = () => {
-        onChange(name, internalValue);
+        onSave( {[name]: internalValue} );
         setEditable(false);
     };
 
