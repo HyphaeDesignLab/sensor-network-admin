@@ -33,7 +33,7 @@ span, div, input {
     font-weight: bold;
 }
 
-.measure-text-length {
+.measure-text-length-offpage {
     position: fixed;
     top: -1000vh;
     left: -1000vw;

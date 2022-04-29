@@ -71,11 +71,10 @@ export default function InputString({value, name, onSave, type, isOnlyEditMode=f
 
     const measureTextLengthElRef = useRef(null);
     const [inputLength, setInputLength] = useState('auto');
-    const resetInputLength = () => {
+    useEffect(() => {
         let width = parseInt(window.getComputedStyle(measureTextLengthElRef.current).width) * 1.1;
         setInputLength(width+'px');
-    }
-    useEffect(resetInputLength, [newValue]);
+    }, [newValue]);
 
     return (
         <div>
@@ -94,7 +93,8 @@ export default function InputString({value, name, onSave, type, isOnlyEditMode=f
             }
             {isEditable && <span>&nbsp;<a href='#' onClick={handleCancelClick}>cancel</a></span>}
             {isChanged && <span>&nbsp;<a href='#' onClick={handleSaveClick}>save</a></span>}
-            <div className='measure-text-length' ref={measureTextLengthElRef}>{newValue}</div>
+
+            <div className='measure-text-length-offpage' ref={measureTextLengthElRef}>{newValue}</div>
         </div>
     );
 };
