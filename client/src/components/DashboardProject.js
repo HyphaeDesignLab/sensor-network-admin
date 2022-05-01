@@ -4,7 +4,7 @@ import MapProjects from "./MapProjects";
 import InputNumber from "./InputNumber";
 import InputBoolean from "./InputBoolean";
 
-const DashboardProject = ({project, saveProject, deleteProject}) => {
+const DashboardProject = ({project, saveProject, deleteProject, setCurrentProject}) => {
     const [projectInternal, setProjectInternal] = useState(project);
     useEffect(() => {
         setProjectInternal(project);
@@ -17,6 +17,7 @@ const DashboardProject = ({project, saveProject, deleteProject}) => {
         <label><InputNumber onSave={saveProject} value={projectInternal.zoom} name='zoom' type='number' /></label>
         <label><InputBoolean onSave={saveProject} value={projectInternal.default} name='default' /></label>
 
+        <button onClick={setCurrentProject.bind(null, null)}>Close Current Project</button>
         <button type='button' onClick={deleteProject.bind(null, project.id)}>delete</button>
     </div>;
 };

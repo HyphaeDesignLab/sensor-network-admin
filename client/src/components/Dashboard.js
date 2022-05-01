@@ -86,7 +86,7 @@ const Dashboard = ({db}) => {
         if (!currentProject) {
             return;
         }
-        
+
         const docRef = doc(db, "projects", currentProject.id);
         updateDoc(docRef, projectFragment)
             .then(response => {
@@ -113,7 +113,7 @@ const Dashboard = ({db}) => {
 
         <button type='button' onClick={addProject}>Add Project</button>
 
-        {!!currentProject && <DashboardProject project={currentProject} saveProject={saveProject} deleteProject={deleteProject} />}
+        {!!currentProject && <DashboardProject project={currentProject} saveProject={saveProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject}/>}
     </div>;
 };
 
