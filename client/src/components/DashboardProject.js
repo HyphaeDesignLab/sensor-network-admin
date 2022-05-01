@@ -14,7 +14,7 @@ const DashboardProject = ({project, saveProject, deleteProject, setCurrentProjec
         <label><InputString onSave={saveProject} value={projectInternal.name} name='name' type='string' /></label>
         <label><InputString onSave={saveProject} value={projectInternal.style} name='style' type='string' /></label>
         <label><MapProjects values={projectInternal.map} onSave={saveProject} name={'map.projects'} /></label>
-        <label><InputNumber onSave={saveProject} value={projectInternal.zoom} name='zoom' type='number' /></label>
+        <label><InputString onSave={saveProject} value={projectInternal.zoom} name='zoom' type='number' /></label>
         <label><InputBoolean onSave={saveProject} value={projectInternal.default} name='default' /></label>
 
         <button onClick={setCurrentProject.bind(null, null)}>Close Current Project</button>
