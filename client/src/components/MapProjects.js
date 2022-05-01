@@ -1,12 +1,12 @@
+// Need rethinking of how map.projects looks like
+
+
 import React, {useState, useEffect} from 'react';
 import InputString from './InputString';
 
 const MapProjects = ({values, onSave, name}) => {
     const [internalValues, setInternalValues] = useState([]);
     useEffect(() => {
-        console.log('values:', values);
-        console.log('type?:', typeof values);
-        console.log('array?:' instanceof Array);
         if (!values || typeof values.projects !== 'object' ) {
             setInternalValues([]);
         } else {
@@ -15,11 +15,6 @@ const MapProjects = ({values, onSave, name}) => {
                 a.push(values.projects[keys]);
             }
             setInternalValues(a);
-        // } else if (!values || !(values instanceof Array)) {
-        //     setInternalValues([]);
-        // } else {
-        //     setInternalValues(values);
-        // }
         }
     }, [values]);
 
