@@ -4,10 +4,22 @@ import InputString from './InputString';
 const MapProjects = ({values, onSave, name}) => {
     const [internalValues, setInternalValues] = useState([]);
     useEffect(() => {
-        if (!values || !(values instanceof Array)) {
+        console.log('values:', values);
+        console.log('type?:', typeof values);
+        console.log('array?:' instanceof Array);
+        if (!values || typeof values.projects !== 'object' ) {
             setInternalValues([]);
         } else {
-            setInternalValues(values);
+            let a =[];
+            for (let keys in values.projects) {
+                a.push(values.projects[keys]);
+            }
+            setInternalValues(a);
+        // } else if (!values || !(values instanceof Array)) {
+        //     setInternalValues([]);
+        // } else {
+        //     setInternalValues(values);
+        // }
         }
     }, [values]);
 
@@ -25,9 +37,11 @@ const MapProjects = ({values, onSave, name}) => {
     };
     return <div>
         {!!name && <strong>{name}: </strong>}
-        {internalValues.map((item,i) => <div>
+        {internalValues.map((item,i) =>
+        <div>
             <InputString value={item} name={`${name}.${i}`} onSave={onSave} />
-        </div>)}
+        </div>
+        )}
         <div>
             {isAddingNew ?
                 <span>
