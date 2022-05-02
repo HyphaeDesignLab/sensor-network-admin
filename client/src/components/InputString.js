@@ -7,7 +7,7 @@ const EditIcon = () => {
 };
 const minInputWidth = 30;
 
-export default function InputString({value, name, onSave, type, isOnlyEditMode=false, onCancel=null, }) {
+export default function InputString({value, path, onSave, type, isOnlyEditMode=false, onCancel=null, }) {
     const [newValue, setNewValue] = useState(value);
     const [oldValue, setOldValue] = useState(value);
     useEffect(() => {
@@ -63,7 +63,7 @@ export default function InputString({value, name, onSave, type, isOnlyEditMode=f
 
     const handleSaveClick = () => {
         // e.g. name=style or center.0  center.1  or someProps.nestedProp
-        onSave( {[name]: newValue} );
+        onSave( {[path]: newValue} );
         setOldValue(newValue);
         setEditable(false);
     };
@@ -78,7 +78,7 @@ export default function InputString({value, name, onSave, type, isOnlyEditMode=f
 
     return (
         <div>
-            {!!name && <strong>{name}: </strong>}
+            {!!path && <strong>{path}: </strong>}
             {isEditable ?
                 <span>
                     <input type={type}

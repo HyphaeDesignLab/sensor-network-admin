@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 
-export default function InputBoolean({value, name, onSave}) {
+export default function InputBoolean({value, path, onSave}) {
     const [isEditable, setEditable] = useState(false);
     const [internalValue, setInternalValue] = useState(value);
 
@@ -9,7 +9,7 @@ export default function InputBoolean({value, name, onSave}) {
     };
 
     const onSaveHandler = () => {
-        onSave( {[name]: internalValue} );
+        onSave( {[path]: internalValue} );
         setEditable(false);
     };
 
@@ -22,7 +22,7 @@ export default function InputBoolean({value, name, onSave}) {
     }
     return (
         <div>
-            {!!name && <strong>{name}: </strong>}
+            {!!path && <strong>{path}: </strong>}
             {isEditable ?
                 <span>
                     <button disabled={internalValue} onClick={onChangeHandler}>Yes</button>

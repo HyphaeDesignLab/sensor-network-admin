@@ -4,7 +4,7 @@
 import React, {useState, useEffect} from 'react';
 import InputString from './InputString';
 
-const MapProjects = ({values, onSave, name}) => {
+const MapProjects = ({values, onSave, path}) => {
     const [internalValues, setInternalValues] = useState([]);
     useEffect(() => {
         if (!values || typeof values.projects !== 'object' ) {
@@ -31,17 +31,17 @@ const MapProjects = ({values, onSave, name}) => {
         onSave(itemFragment);
     };
     return <div>
-        {!!name && <strong>{name}: </strong>}
+        {!!path && <strong>{path}: </strong>}
         {internalValues.map((item,i) =>
         <div>
-            <InputString value={item} name={`${name}.${i}`} onSave={onSave} />
+            <InputString value={item} path={`${path}.${i}`} onSave={onSave} />
         </div>
         )}
         <div>
             {isAddingNew ?
                 <span>
                     New Value:
-                    <InputString value={'new value'} name={`${name}.${internalValues.length}`} onSave={handleAddNew} isOnlyEditMode={true} onCancel={handleNewClick}/>
+                    <InputString value={'new value'} path={`${path}.${internalValues.length}`} onSave={handleAddNew} isOnlyEditMode={true} onCancel={handleNewClick}/>
                 </span> :
                 <button type='button' onClick={handleNewClick}>+ New</button>
             }
