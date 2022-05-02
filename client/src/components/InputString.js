@@ -1,5 +1,7 @@
 import React, {useState, useEffect, useRef} from "react";
 
+import { humanReadableTitle } from './../helpers.js';
+
 const EditIcon = () => {
     return <svg style={{height: '15px'}} version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <path d="m59.875 5.0312c-1.6133 0.039062-3.1875 0.875-4.0312 2.3438l-34.031 59.375c-0.22266 0.40234-0.35156 0.85156-0.375 1.3125l-1.4375 23.75c-0.070312 1.1367 0.50781 2.2188 1.4961 2.7891 0.98438 0.57031 2.2109 0.53125 3.1602-0.10156l19.75-13.125c0.38672-0.25781 0.70703-0.59766 0.9375-1l34.031-59.344c1.2852-2.2422 0.48828-5.1992-1.75-6.5l-15.281-8.875c-0.55859-0.32422-1.168-0.51953-1.7812-0.59375-0.23047-0.027344-0.45703-0.035156-0.6875-0.03125zm0.5625 6.4688 13.125 7.5938-4.0312 7.0312-13.125-7.5938zm-7 12.219 13.094 7.5938-24.906 43.438-13.125-7.5938zm-26.312 49.562 9.9375 5.75-10.719 7.125z"/>
@@ -78,7 +80,7 @@ export default function InputString({value, path, onSave, type, isOnlyEditMode=f
 
     return (
         <div>
-            {!!path && <strong>{path}: </strong>}
+            {!!path && <strong>{humanReadableTitle(path)}: </strong>}
             {isEditable ?
                 <span>
                     <input type={type}

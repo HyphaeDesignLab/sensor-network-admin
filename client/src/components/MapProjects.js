@@ -2,7 +2,9 @@
 
 
 import React, {useState, useEffect} from 'react';
+
 import InputString from './InputString';
+import { humanReadableTitle } from './../helpers.js';
 
 const MapProjects = ({values, onSave, path}) => {
     const [internalValues, setInternalValues] = useState([]);
@@ -31,7 +33,7 @@ const MapProjects = ({values, onSave, path}) => {
         onSave(itemFragment);
     };
     return <div>
-        {!!path && <strong>{path}: </strong>}
+        {!!path && <strong>{humanReadableTitle(path)}: </strong>}
         {internalValues.map((item,i) =>
         <div>
             <InputString value={item} path={`${path}.${i}`} onSave={onSave} />

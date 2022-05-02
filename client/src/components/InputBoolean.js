@@ -1,5 +1,8 @@
 import React, {useState, useEffect} from "react";
 
+
+import { humanReadableTitle } from './../helpers.js';
+
 export default function InputBoolean({value, path, onSave}) {
     const [isEditable, setEditable] = useState(false);
     const [internalValue, setInternalValue] = useState(value);
@@ -22,7 +25,7 @@ export default function InputBoolean({value, path, onSave}) {
     }
     return (
         <div>
-            {!!path && <strong>{path}: </strong>}
+            {!!path && <strong>{humanReadableTitle(path)}: </strong>}
             {isEditable ?
                 <span>
                     <button disabled={internalValue} onClick={onChangeHandler}>Yes</button>
