@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GeoLocation</title>
+</head>
+<body>
+Location
+<a href="#" target="_blank"></a>
+<script>
+  const locationEl = document.querySelector('a');
+  navigator.geolocation.getCurrentPosition(res => {
+    const longitude = res.coords.longitude;
+    const latitude = res.coords.latitude;
+    const accuracy = res.coords.accuracy;
+    locationEl.innerHTML = `${longitude}, ${latitude}, ${accuracy}`;
+    locationEl.href=`https://www.google.com/maps/place/${decimalToDegAndSec(latitude)}N+${decimalToDegAndSec(longitude)}W/@${latitude},${longitude},16z/`;
+  }, err => {
+      locationEl.innerHTML = ({1: 'permission deined', 2: 'position unavailable', 3: 'timeout'})[err.code]  + ' ' + err.message;
+  }, {
+      maximumAge: 0,
+      timeout: 1000 * 60,
+      enableHighAccuracy: true
+  });
+
+  function decimalToDegAndSec(coord) {
+    const absoluteCoord = Math.abs(coord)
+    const degrees = Math.floor(absoluteCoord);
+    const decimal = absoluteCoord % 1;
+    const minutes = Math.floor(decimal * 60);
+    const minuteDecimal = (decimal * 60) % 1;
+    let secondsWithTenths = Math.floor( (minuteDecimal * 60) * 10) / 10;
+    if (secondsWithTenths < 10) { secondsWithTenths = '0' + secondsWithTenths; }
+    return `${degrees}%C2%B0${minutes}'${secondsWithTenths}%22`;
+  }
+</script>
+</body>
+</html>
