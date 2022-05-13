@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Photo Capture</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        button, input {
+            margin: 20px;
+            font-size: 20px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id='results'>
+    <div>
+        <input type="file" /><br/>
+        <button id='ocrBtn' disabled>OCR</button>
+        <button id='clearLog'>Clear Log</button>
+        <div id="log"></div>
+        <canvas id='takePhotoCanvas' style="height: 480px; width: 600px; display: none;"></canvas>
+        <img style="max-width: 100%;"/>
+    </div>
+</div>
+<script>
+  const errorLog = document.querySelector('div#log');
+  const log = (...data) => {
+      Array.from(data).forEach(datum => {
+          errorLog.innerHTML = errorLog.innerHTML + '<br/>' + JSON.stringify(datum, null, 2).replaceAll(/\\[rn]/g, '<br/>');
+      })
+
+  }
+  const clearLogBtn = document.querySelector('#clearLog');
+  clearLogBtn.addEventListener('click', () => { errorLog.innerHTML = ''; });
+
+  let lastPhotoData = '';
+  const ocrBtn = document.querySelector('#ocrBtn');
+  const ocrOptions = {
+      detectOrientation: false,
+      scale: true,
+      OCREngine: 2
+  }
+  ocrBtn.addEventListener('click', () => {
+      const formData = new FormData();
+      formData.append('apikey', 'K83508668988957')
+      formData.append('base64Image', lastPhotoData)
+
+      Object.entries(ocrOptions).forEach(e => formData.append(e[0], e[1]));
+      ocrBtn.innerText = 'OCR loading...';
+      ocrBtn.disabled = true;
+
+      fetch('https://api.ocr.space/parse/image', {
+          method: 'post',
+          body: formData
+      })
+          .then(response => response.json())
+          .then(json => {
+              if (json.ErrorMessage) {
+                  log(json.ErrorMessage);
+              } else {
+                  log(json.ParsedResults[0].ParsedText);
+              }
+          }, error => {
+              log(error instanceof Error ? error.message : error);
+          })
+          .catch(error => {
+              log(error instanceof Error ? error.message : error);
+          })
+          .finally(() => {
+              ocrBtn.innerText = 'OCR';
+              ocrBtn.disabled = false;
+          })
+  })
+
+  const getImgDimensionsFitInBox = (img, MAX_WIDTH, MAX_HEIGHT) => {
+      var width = img.width;
+      var height = img.height;
+      if (width > height) {
+          if (width > MAX_WIDTH) {
+              height = height * (MAX_WIDTH / width);
+              width = MAX_WIDTH;
+          }
+      } else {
+          if (height > MAX_HEIGHT) {
+              width = width * (MAX_HEIGHT / height);
+              height = MAX_HEIGHT;
+          }
+      }
+      return [width, height];
+  }
+
+  let imgInput = document.querySelector('input');
+  var imgResized = document.querySelector('img');
+  imgResized.style.display='none';
+  imgInput.addEventListener('change', function (e) {
+      if (e.target.files) {
+          let imgFile = e.target.files[0];
+
+          var imgOriginal = document.createElement('img');
+          imgOriginal.onload = function (event) {
+              // RESIZE TO FIT IN BOX
+              const [width, height] = getImgDimensionsFitInBox(imgOriginal, 3600, 3600);
+
+              // Dynamically create a canvas element
+              var canvas = document.createElement("canvas");
+              canvas.width = width;
+              canvas.height = height;
+
+              var canvasContext = canvas.getContext("2d");
+              canvasContext.drawImage(imgOriginal, 0, 0, width, height);
+
+              const dataUrl = canvas.toDataURL(imgFile.type); // get base64
+              imgResized.src = dataUrl;
+              imgResized.style.display='';
+              lastPhotoData = dataUrl;
+              ocrBtn.disabled = false;
+          }
+
+          var reader = new FileReader();
+          reader.onload = function (e) {
+              console.log(e.target);
+              imgOriginal.src = e.target.result;
+          }
+          reader.readAsDataURL(imgFile);
+      }
+  });
+
+  const ocrSample = [
+      {
+          "ParsedResults": [
+              {
+                  "TextOverlay": {
+                      "Lines": [],
+                      "HasOverlay": false,
+                      "Message": "Text overlay is not provided as it is not requested"
+                  },
+                  "TextOrientation": "0",
+                  "FileParseExitCode": 1,
+                  "ParsedText": "sweetsmill\r\napp-donations\r\napp-registration\r\n",
+                  "ErrorMessage": "",
+                  "ErrorDetails": ""
+              }
+          ],
+          "OCRExitCode": 1,
+          "IsErroredOnProcessing": false,
+          "ProcessingTimeInMilliseconds": "312",
+          "SearchablePDFURL": "Searchable PDF not generated as it was not requested."
+      }
+  ]
+</script>
+</body>
+</html>
