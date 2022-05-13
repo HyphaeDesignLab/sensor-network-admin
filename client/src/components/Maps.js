@@ -1,12 +1,10 @@
 // Need rethinking of how map.projects looks like
-
-
 import React, {useState, useEffect} from 'react';
 
 import InputString from './InputString';
-import { humanReadableTitle } from './../helpers.js';
+import { humanReadableTitle } from '../helpers.js';
 
-const MapProjects = ({values, onSave, path}) => {
+const Maps = ({values, onSave, onAdd, path}) => {
     const [internalValues, setInternalValues] = useState([]);
     useEffect(() => {
         if (!values || typeof values.projects !== 'object' ) {
@@ -51,4 +49,4 @@ const MapProjects = ({values, onSave, path}) => {
     </div>;
 };
 
-export default MapProjects;
+export default Maps;

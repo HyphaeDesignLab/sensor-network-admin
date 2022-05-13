@@ -35,13 +35,21 @@ const Dashboard = ({db}) => {
             style: "mapbox://styles/hyphae-lab/cl0lex1tp000115qtikua1z4e",
             user: "hyphae-lab",
             token: "pk.eyJ1IjoiaHlwaGFlLWxhYiIsImEiOiJjazN4czF2M2swZmhkM25vMnd2MXZrYm11In0.LS_KIw8THi2qIethuAf2mw",
-            zoom: 14
+            zoom: 14,
+            clientId: Math.floor(Math.random() * 1000 * 1000 * 1000).toString(16)
         };
 
         addDoc(collection(db, "projects"), sampleData).then(docRef => {
             console.log("Document written with ID: ", docRef.id);
             sampleData.id = docRef.id;
             setProjects([...projects, sampleData]);
+
+            // call the backend to export to file
+            // dev:
+            const backendUrlBase = 'http://localhost:5001/geo-dashboard-347901/us-central1';
+            // prod:
+            //const backendUrlBase = 'http://???/geo-dashboard-347901/us-central1';
+            axios(backendUrlBase + '/export-project?projectId='+sampleData.id);
         }).catch(e => {
             console.error("Error adding document: ", e);
         });
