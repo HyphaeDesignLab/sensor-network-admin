@@ -42,10 +42,9 @@ const Dashboard = ({db}) => {
 
         getDocs(collection(db, "sensor_networks"))
         .then(querySnapshot => {
-          console.log(querySnapshot);
             let p = [];
             querySnapshot.forEach((doc) => {
-                console.log(doc.id, '=>', doc.data());
+                // console.log(doc.id, '=>', doc.data());
                 let project = doc.data();
                 project.id = doc.id;
                 p.push(project);
@@ -128,10 +127,13 @@ const Dashboard = ({db}) => {
             return;
         }
 
-        const docRef = doc(db, "projects", currentProject.id);
+        const docRef = doc(db, "sensor_networks", currentProject.id);
+        console.log('docRef:', docRef);
+        console.log('id:', currentProject.id);
+        console.log('projectGragment:', projectFragment);
         updateDoc(docRef, projectFragment)
             .then(response => {
-                console.log(response)
+                console.log(response);
                 const projectsCopy = [...projects];
                 const index = projectsCopy.findIndex(p => p.id === currentProject.id);
                 projectsCopy[index] = {...currentProject, ...projectFragment};

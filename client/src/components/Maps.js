@@ -7,13 +7,10 @@ import { humanReadableTitle } from '../helpers.js';
 const Maps = ({values, onSave, onAdd, path}) => {
     const [internalValues, setInternalValues] = useState([]);
     useEffect(() => {
-        console.log('hi');
         if (!values || typeof values !== 'object' ) {
-        console.log('lol');
             setInternalValues([]);
         } else if (Array.isArray(values)) {
             setInternalValues(values);
-            console.log(values)
             // below: values.projects will most likely need to be changed to be values, and change where Maps is implemeted and the inputs being values.projects instraed of values, if applicable
         } else {
             let a =[];
