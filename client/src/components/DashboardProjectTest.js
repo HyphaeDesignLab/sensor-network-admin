@@ -31,7 +31,7 @@ const DashboardProject = ({project, saveProject, deleteProject, setCurrentProjec
 
         <button onClick={setStep.bind(null, 'addSensor')}>Add New Sensor</button>
         {addingSensor ? <AddSensor /> : null}
-        <button onClick={closeProjecte}>Close Current Project</button>
+        <button onClick={closeProject}>Close Current Project</button>
         <button type='button' onClick={deleteProject.bind(null, project.id)}>delete</button>
 
         <button type='button' onClick={() => setExportShown(s => !s)}>export</button>
