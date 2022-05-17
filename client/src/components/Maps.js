@@ -7,8 +7,14 @@ import { humanReadableTitle } from '../helpers.js';
 const Maps = ({values, onSave, onAdd, path}) => {
     const [internalValues, setInternalValues] = useState([]);
     useEffect(() => {
-        if (!values || typeof values.projects !== 'object' ) {
+        console.log('hi');
+        if (!values || typeof values !== 'object' ) {
+        console.log('lol');
             setInternalValues([]);
+        } else if (Array.isArray(values)) {
+            setInternalValues(values);
+            console.log(values)
+            // below: values.projects will most likely need to be changed to be values, and change where Maps is implemeted and the inputs being values.projects instraed of values, if applicable
         } else {
             let a =[];
             for (let keys in values.projects) {
@@ -32,12 +38,18 @@ const Maps = ({values, onSave, onAdd, path}) => {
     };
     return <div>
         {!!path && <strong>{humanReadableTitle(path)}: </strong>}
-        {internalValues.map((item,i) =>
+        {/* {internalValues.map((item,i) =>
         <div>
             <InputString value={item} path={`${path}.${i}`} onSave={onSave} />
         </div>
+        )} */}
+        {internalValues.map((item, i) =>
+        // console.log(item, i)
+            <div>
+                <InputString value={item.label} onSave={onSave} />
+            </div>
         )}
-        <div>
+        {/* <div>
             {isAddingNew ?
                 <span>
                     New Value:
@@ -45,7 +57,7 @@ const Maps = ({values, onSave, onAdd, path}) => {
                 </span> :
                 <button type='button' onClick={handleNewClick}>+ New</button>
             }
-        </div>
+        </div> */}
     </div>;
 };
 
