@@ -154,7 +154,7 @@ const Dashboard = ({db}) => {
                 <a href='#delete' onClick={deleteProject.bind(null, project.id)}>delete</a>
             </div>) : null }
 
-        <button type='button' onClick={addProject}>Add Project</button>
+        {step === 'projects' ? <button type='button' onClick={addProject}>Add Project</button> : null}
 
         {step === 'project' ? <DashboardProject project={currentProject} saveProject={saveProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject} setStep={setStep}/> : null}
 
