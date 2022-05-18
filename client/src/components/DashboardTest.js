@@ -1,6 +1,8 @@
-import React, {useState, useEffect, useDebugValue} from 'react';
-import DashboardProject from './DashboardProjectTest';
+import React, { useState, useEffect, useDebugValue } from 'react';
 import { collection, getDocs, addDoc, doc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
+
+import DashboardProject from './DashboardProjectTest';
+import AddProject from './AddProject';
 import AddSensor from './AddSensor';
 
 const dummyData = [
@@ -60,27 +62,11 @@ const Dashboard = ({db}) => {
         });
     }, []);
 
-    const addProject = () => {
-        const sampleData = {
-            name: "A project "+(new Date()).toLocaleString(),
-            style: "mapbox://styles/hyphae-lab/cl0lex1tp000115qtikua1z4e",
-            user: "hyphae-lab",
-            token: "pk.eyJ1IjoiaHlwaGFlLWxhYiIsImEiOiJjazN4czF2M2swZmhkM25vMnd2MXZrYm11In0.LS_KIw8THi2qIethuAf2mw",
-            zoom: 14,
-            clientId: Math.floor(Math.random() * 1000 * 1000 * 1000).toString(16)
-        };
-
-        addDoc(collection(db, "projects"), sampleData).then(docRef => {
+    const addProject = (project) => {
+        addDoc(collection(db, "sensor_networks"), project).then(docRef => {
             console.log("Document written with ID: ", docRef.id);
-            sampleData.id = docRef.id;
-            setProjects([...projects, sampleData]);
-
-            // call the backend to export to file
-            // dev:
-            const backendUrlBase = 'http://localhost:5001/geo-dashboard-347901/us-central1';
-            // prod:
-            //const backendUrlBase = 'http://???/geo-dashboard-347901/us-central1';
-            axios(backendUrlBase + '/export-project?projectId='+sampleData.id);
+            project.id = docRef.id;
+            setProjects([...projects, project]);
         }).catch(e => {
             console.error("Error adding document: ", e);
         });
@@ -154,9 +140,11 @@ const Dashboard = ({db}) => {
                 <a href='#delete' onClick={deleteProject.bind(null, project.id)}>delete</a>
             </div>) : null }
 
-        {step === 'projects' ? <button type='button' onClick={addProject}>Add Project</button> : null}
+        {step === 'projects' ? <button type='button' onClick={setStep.bind(null, 'addProject')}>Add Project</button> : null}
 
-        {step === 'project' ? <DashboardProject project={currentProject} saveProject={saveProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject} setStep={setStep}/> : null}
+        {step === 'addProject' ? <AddProject setStep={setStep} setCurrentProject={setCurrentProject} addProject={addProject}/> : null}
+
+        {step === 'project' ? <DashboardProject project={currentProject} addProject={addProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject} setStep={setStep}/> : null}
 
         {step === 'addSensor' ? <AddSensor setStep={setStep}/> : null}
     </div>;
