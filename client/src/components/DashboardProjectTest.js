@@ -37,7 +37,7 @@ const DashboardProject = ({project, saveProject, deleteProject, setCurrentProjec
         <button type='button' onClick={() => setExportShown(s => !s)}>export</button>
 
         {isExportShown && <div>
-            <textarea>{JSON.stringify(projectInternal)}</textarea>
+            <textarea value={JSON.stringify(projectInternal)} readOnly></textarea>
         </div>}
     </div>;
 };

@@ -41,7 +41,6 @@ const Maps = ({values, onSave, onAdd, path}) => {
         </div>
         )} */}
         {internalValues.map((item, i) =>
-        // console.log(item, i)
             <div>
                 <InputString value={item.label} onSave={onSave} />
             </div>
