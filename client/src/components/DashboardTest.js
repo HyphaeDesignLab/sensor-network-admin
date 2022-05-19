@@ -67,9 +67,15 @@ const Dashboard = ({db}) => {
             console.log("Document written with ID: ", docRef.id);
             project.id = docRef.id;
             setProjects([...projects, project]);
+            console.log(project);
+            setCurrentProject(project);
         }).catch(e => {
             console.error("Error adding document: ", e);
-        });
+        }).finally(() => {
+          setStep('project');
+        }
+
+        );
     }
 
     const deleteProject = (id, e) => {
@@ -79,7 +85,7 @@ const Dashboard = ({db}) => {
             return;
         }
 
-        deleteDoc(doc(db, "projects", id))
+        deleteDoc(doc(db, "sensor_networks", id))
             .then(() => {
                 // console.log(`id: ${id} deleted`)
                 setProjects(projects.filter(p => p.id !== id));
@@ -92,7 +98,8 @@ const Dashboard = ({db}) => {
                 }
             })
             .finally(() => {
-                setCurrentProject(null); // in case we were editing; let's set current to none after delete
+              setStep('projects');
+              setCurrentProject(null); // in case we were editing; let's set current to none after delete
             })
 
     }

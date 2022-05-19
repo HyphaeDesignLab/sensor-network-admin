@@ -20,9 +20,7 @@ const AddProject = ({ setStep, setCurrentProject, addProject }) => {
   }
 
   const handleSave = () => {
-    setCurrentProject({name, description});
     addProject({name, description});
-    setStep('project');
   }
 
   return <div>
