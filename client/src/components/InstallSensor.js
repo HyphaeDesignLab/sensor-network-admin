@@ -1,15 +1,15 @@
 import React, {useEffect, useState, useRef} from 'react';
 
-const InstallSensor = ({setRegister, setStep}) => {
-
-  const saveSensor = () => {
-    setRegister(false);
-    setStep('project');
-  }
+const InstallSensor = ({setEditStep}) => {
 
   return <div>
-    Install Sensor On-Site!
-    <button onClick={saveSensor}>Save / Return to Sensors</button>
+    <div>Install Sensor On-Site!</div>
+    <div>Enter Coordinates of Sensor!</div>
+    {/* a link or just show googlemaps location of coordinates */}
+    <div>Confirm Coordinates!</div>
+    <div>Add Photos of Sensor!</div>
+
+    <button onClick={setEditStep.bind(null, '')}>Save</button>
   </div>
 }
 

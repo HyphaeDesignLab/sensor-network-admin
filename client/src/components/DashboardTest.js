@@ -3,7 +3,6 @@ import { collection, getDocs, addDoc, doc, getDoc, deleteDoc, updateDoc } from '
 
 import DashboardProject from './DashboardProjectTest';
 import AddProject from './AddProject';
-import AddSensor from './AddSensor';
 
 const dummyData = [
   {
@@ -36,7 +35,6 @@ const Dashboard = ({db}) => {
     const [step, setStep] = useState('projects');
     const [projects, setProjects] = useState([]);
     const [currentProject, setCurrentProject] = useState(null);
-    // useDebugValue(projects, 'those damn prjs');
 
     useEffect(() => {
 
@@ -152,8 +150,6 @@ const Dashboard = ({db}) => {
         {step === 'addProject' ? <AddProject setStep={setStep} setCurrentProject={setCurrentProject} addProject={addProject}/> : null}
 
         {step === 'project' ? <DashboardProject project={currentProject} addProject={addProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject} setStep={setStep}/> : null}
-
-        {step === 'addSensor' ? <AddSensor setStep={setStep}/> : null}
     </div>;
 };
 

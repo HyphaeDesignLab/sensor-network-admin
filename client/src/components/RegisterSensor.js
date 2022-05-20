@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react';
 
-const RegisterSensor = ({setRegister}) => {
+const RegisterSensor = ({setEditStep}) => {
 
   return <div>
     {/* to add ORC component here */}
@@ -9,7 +9,7 @@ const RegisterSensor = ({setRegister}) => {
     <div>Check to see if the sensor code is correct!</div>
     {/* send device id and show either a success of error to the user*/}
     <div>Register with sensor with AWS!</div>
-    <button onClick={setRegister.bind(null, false)}>Next</button>
+    <button onClick={setEditStep.bind(null, '')}>Save</button>
   </div>
 }
 
