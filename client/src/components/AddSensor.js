@@ -3,14 +3,13 @@ import React, { useEffect, useState } from 'react';
 import RegisterSensor from './RegisterSensor';
 import InstallSensor from './InstallSensor';
 
-const AddSensor = ({setStep}) => {
+const AddSensor = ({setSensorStep}) => {
   const [register, setRegister] = useState(true);
-  // const [install, setInstall] = useState(false);
 
   return <div>
     {register ? <RegisterSensor setRegister={setRegister}/> : null}
-    {!register ? <InstallSensor setRegister={setRegister} setStep={setStep}/> : null}
-    <button onClick={setStep.bind(null, 'project')}>Cancel</button>
+    {!register ? <InstallSensor setRegister={setRegister} setSensorStep={setSensorStep}/> : null}
+    <button onClick={setSensorStep.bind(null, '')}>Cancel</button>
   </div>
 }
 
