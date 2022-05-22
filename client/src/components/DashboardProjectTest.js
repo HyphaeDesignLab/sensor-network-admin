@@ -32,9 +32,9 @@ const DashboardProject = ({project, saveProject, deleteProject, setCurrentProjec
                 <label><InputString onSave={saveProject} value={projectInternal.description} path='description' type='string' /></label>
                 <label>
                     <strong>Sensors:</strong>
-                    {project.sensors.map(sensor =>
+                    {project.sensors ? project.sensors.map(sensor =>
                         <div>{sensor.label}<a href='#edit' onClick={setSensorStep.bind(null, 'edit')}>edit</a></div>
-                        )}
+                        ) : null}
                 </label>
                 <button onClick={addNewSensor}>Add New Sensor</button>
                 <button onClick={closeProject}>Close Current Project</button>
@@ -43,7 +43,7 @@ const DashboardProject = ({project, saveProject, deleteProject, setCurrentProjec
                 <button type='button' onClick={() => setExportShown(s => !s)}>export</button>
 
                 {isExportShown && <div>
-                    <textarea value={JSON.stringify(projectInternal)} readOnly></textarea>
+                    <textarea value={JSON.stringify(projectInternal)} rows={'15'} cols={'40'} readOnly></textarea>
                 </div>}
             </div>
         : null }
