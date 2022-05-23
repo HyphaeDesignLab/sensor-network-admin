@@ -137,9 +137,10 @@ const SensorOcrParser = ({onConfirmed}) => {
         }
     };
 
-    const onConfirmIds = () => {
+    const onConfirmClick = () => {
       onConfirmed(sensorIds);
     };
+
     return <div>
         <h2>Upload/Take a Photo of Sensor Registration Keys</h2>
         <form>
@@ -171,7 +172,7 @@ const SensorOcrParser = ({onConfirmed}) => {
             </div>)}
         </div>}
 
-        <button type='button' onClick={save}>Confirm</button>
+        <button type='button' onClick={onConfirmClick}>Confirm</button>
     </div>;
 };
 
