@@ -47,6 +47,7 @@ const SensorOcrParser = () => {
 
                 const dataUrl = canvas.toDataURL(imgFile.type); // get base64
                 setImageData(dataUrl);
+                setOcrText('');
                 setImageDataLoading(false);
             }
 
@@ -143,13 +144,12 @@ const SensorOcrParser = () => {
         </form>
         {!!imageData && <div>
             <div style={{maxHeight: '400px', overflowY: 'scroll'}}><img src={imageData} style={{width: '90%', maxWidth: '920px'}} /></div>
-            <button type='button' onClick={onOcrParseClick}>Parse Text from Image</button>
+            {!ocrText && <button type='button' onClick={onOcrParseClick} disabled={isOcrTextLoading}>Parse Text from Image</button>}
             {isOcrTextLoading && <div>Parsing text via OCR...</div>}
             {!!ocrTextError && <div>{ocrTextError}</div>}
         </div>}
         {!!ocrText && <div>
-            <h3>Parsed Sensor IDs</h3>
-            <div>Please review and edit</div>
+            <h3>Parsed Sensor IDs (Please review/edit)</h3>
             {Object.keys(sensorIdProps).map(sensorId =>
             <div key={sensorId}>
                 <span>{sensorIdProps[sensorId].title}</span>:
