@@ -22,9 +22,9 @@ const ocrOptions = {
     OCREngine: 2
 }
 
-const addOcrAmbigiousCharsMarkup = text => text.replace(/[450]/g, m => `<span style="color: red; font-weight: bold; ">${m[0]}</span>`);
+const addOcrAmbigiousCharsMarkup = text => text.replace(/[4s0]/ig, m => `<span style="color: red; font-weight: bold; ">${m[0]}</span>`);
 
-const SensorOcrParser = () => {
+const SensorOcrParser = ({onConfirmed}) => {
     const [imageData, setImageData] = useState('');
     const [isImageDataLoading, setImageDataLoading] = useState('');
     const onImageChange = event => {
@@ -112,7 +112,7 @@ const SensorOcrParser = () => {
         while(!match.done) {
             const id = match.value[1];
             const value = match.value[2];
-            ids[id] = value;
+            ids[id] = value.toUpperCase();
             sensorIdProps[id].ref.current.innerHTML = addOcrAmbigiousCharsMarkup(value);
             match=matches.next()
         }
@@ -135,6 +135,10 @@ const SensorOcrParser = () => {
             setEditableId(sensorId);
             el.focus();
         }
+    };
+
+    const onConfirmIds = () => {
+      onConfirmed(sensorIds);
     };
     return <div>
         <h2>Upload/Take a Photo of Sensor Registration Keys</h2>
@@ -159,12 +163,15 @@ const SensorOcrParser = () => {
                           border: editableId === sensorId ? '1px solid black' : 'none',
                           padding: '5px',
                           fontSize: '140%',
-                          fontFamily: 'monospace, sans-serif'
+                          fontFamily: 'monospace, sans-serif',
+                          letterSpacing: '3px'
                         }}
                 ></span>
                 <button type='button' onClick={onSaveOrEdit.bind(null, sensorId)}>{editableId === sensorId ? 'save' : 'edit'}</button>
             </div>)}
         </div>}
+
+        <button type='button' onClick={save}>Confirm</button>
     </div>;
 };
 
