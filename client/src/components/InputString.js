@@ -9,7 +9,9 @@ const EditIcon = () => {
 };
 const minInputWidth = 30;
 
-export default function InputString({value, path, onSave, type, isOnlyEditMode=false, onCancel=null, }) {
+export default function InputString({value, path, onSave, type='text',
+                                        hasLabel=true, isOnlyEditMode=false, onCancel=null,
+                                        inputStyle= {}}) {
     const [newValue, setNewValue] = useState(value);
     const [oldValue, setOldValue] = useState(value);
     useEffect(() => {
@@ -80,7 +82,7 @@ export default function InputString({value, path, onSave, type, isOnlyEditMode=f
 
     return (
         <div>
-            {!!path && <strong>{humanReadableTitle(path)}: </strong>}
+            {hasLabel && !!path && <strong>{humanReadableTitle(path)}: </strong>}
             {isEditable ?
                 <span>
                     <input type={type}
@@ -88,15 +90,15 @@ export default function InputString({value, path, onSave, type, isOnlyEditMode=f
                            value={newValue}
                            onChange={handleChange}
                            onKeyUp={handleKeyUp}
-                           style={{width: inputLength, minWidth: '60px'}} />
+                           style={{width: inputLength, minWidth: '60px', ...inputStyle}} />
                 </span>
                 :
-                <span onClick={handleEditClick}>{oldValue} <EditIcon /></span>
+                <span onClick={handleEditClick} style={inputStyle}>{oldValue} <EditIcon /></span>
             }
             {isEditable && <span>&nbsp;<a href='#' onClick={handleCancelClick}>cancel</a></span>}
             {isChanged && <span>&nbsp;<a href='#' onClick={handleSaveClick}>save</a></span>}
 
-            <div className='measure-text-length-offpage' ref={measureTextLengthElRef}>{newValue}</div>
+            <div className='measure-text-length-offpage' ref={measureTextLengthElRef} style={{...inputStyle}}>{newValue}</div>
         </div>
     );
 };
