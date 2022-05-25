@@ -22,6 +22,7 @@ const DashboardProject = ({project, saveProject, deleteProject, setCurrentProjec
 
     const closeProject = () => {
       setCurrentProject(null);
+      setIsNewSensor(false);
       setStep('projects');
     }
 
@@ -47,7 +48,7 @@ const DashboardProject = ({project, saveProject, deleteProject, setCurrentProjec
                 </div>}
             </div>
         : null }
-        {sensorStep === 'edit' ? <EditSensor  setSensorStep={setSensorStep} isNewSensor={isNewSensor}/> : null}
+        {sensorStep === 'edit' ? <EditSensor saveProject={saveProject} setSensorStep={setSensorStep} isNewSensor={isNewSensor} setIsNewSensor={setIsNewSensor}/> : null}
     </div>;
 };
 
