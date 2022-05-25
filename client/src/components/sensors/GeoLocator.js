@@ -10,12 +10,12 @@ const GeoLocator = ({setLocation}) => {
 
   const handleClick = () => {
     navigator.geolocation.getCurrentPosition(res => {
-      const longitude = res.coords.longitude;
-      const latitude = res.coords.latitude;
+      const lng = res.coords.longitude;
+      const lat = res.coords.latitude;
       const accuracy = res.coords.accuracy;
-      let href = `https://www.google.com/maps/embed/v1/place?key=${googleAPIKey}&q=${latitude},${longitude}&zoom=15`
+      let href = `https://www.google.com/maps/embed/v1/place?key=${googleAPIKey}&q=${lat},${lng}&zoom=15`
       setHref(href);
-      setLocation({latitude, longitude});
+      setLocation({lat, lng});
     }, err => {
       let error = ({1: 'permission deined', 2: 'position unavailable', 3: 'timeout'})[err.code]  + ' ' + err.message;
       console.log(error);
