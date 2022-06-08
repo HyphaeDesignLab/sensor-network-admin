@@ -10,6 +10,9 @@ export const humanReadableTitle = (s) => {
       str[i] = ' ';
       nextCap = true;
     }
+    if (str[i] === ' ') {
+      nextCap = true;
+    }
   }
   return str.join('');
 }
