@@ -2,27 +2,38 @@ import React, {useEffect, useState} from 'react';
 
 import GeoLocator from './sensors/GeoLocator';
 
-const InstallSensor = ({setEditStep, saveProject}) => {
+const InstallSensor = ({sensor, onSave, onCancel}) => {
 
-  const [location, setLocation] = useState({});
+  const [location, setLocation] = useState(null);
+  const [isEditLocation, setEditLocation] = useState(false);
 
-  const handleCoordinateConfirmation = () => {
-    console.log('aaaaaaaaaaaaaahgasdfgjioge')
-    // saveProject(location);
-  }
+  const handleLocationSet = (lngLat) => {
+    setLocation(lngLat);
+    setEditLocation(false);
+  };
 
-  const handleSave = () => {
-    // also deal with saving when how to save it is decided
-    setEditStep('');
-  }
+  useEffect(() => {
+    if (location) {
+      onSave({...sensor, ...location}); // spread the lng/lat into the sensor copy
+    }
+  }, [location]);
+
+
+  const handleLocationEdit = () => {
+    setEditLocation(s=>!s);
+  };
+
+  const handlePhotoAdd = () => {};
 
   return <div>
-    <div>Sensor Installation</div>
-    <GeoLocator setLocation={setLocation}/>
-    <button onClick={handleCoordinateConfirmation}>Confirm Coordinates</button>
-    <div>Add Photos of Sensor!</div>
+    <h2>Sensor Installation</h2>
 
-    <button onClick={handleSave}>Save</button>
+    <h3>Location</h3>
+    <div>{!!location && <span>Longitude: {location.lng}, Latitude: {location.lat}</span>} <a href='#' onClick={handleLocationEdit}>{!!location ? 'Edit':'Add Location'}</a></div>
+    {isEditLocation && <GeoLocator onDone={handleLocationSet} initialValue={location}/>}
+
+    <h3>Photos of Sensor as Installed</h3>
+    <button onClick={handlePhotoAdd}>Add Photo</button>
   </div>
 }
 
