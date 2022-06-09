@@ -12,5 +12,8 @@ service cloud.firestore {
     match /sensor_networks/{uid} {
       allow create, read, update, delete: if request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
+    match /sensors/{uid} {
+      allow create, read, update, delete: if request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
   }
 }

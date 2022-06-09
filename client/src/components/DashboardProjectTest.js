@@ -4,30 +4,56 @@ import Maps from "./Maps";
 import InputNumber from "./InputNumber";
 import InputBoolean from "./InputBoolean";
 import EditSensor from './EditSensor';
+import {addDoc, updateDoc, deleteDoc, doc, collection} from "firebase/firestore";
 
-const DashboardProject = ({project, saveProject, deleteProject, setCurrentProject, setStep}) => {
+const DashboardProject = ({db, project, saveProject, deleteProject, setCurrentProject, setStep}) => {
     const [projectInternal, setProjectInternal] = useState(project);
-    const [sensorStep, setSensorStep] = useState('');
-    const [isNewSensor, setIsNewSensor] = useState(false);
+    const [sensorToEdit, setSensorToEdit] = useState(false);
     const [isExportShown, setExportShown] = useState(false);
 
+    const [sensors, setSensors] = useState([]);
     useEffect(() => {
         setProjectInternal(project);
     }, [project]);
 
     const addNewSensor = () => {
-        setIsNewSensor(true);
-        setSensorStep('edit');
+        setSensorToEdit({});
     }
 
     const closeProject = () => {
       setCurrentProject(null);
-      setIsNewSensor(false);
+      setSensorToEdit(false);
       setStep('projects');
     }
 
+    const saveSensor = (sensor) => {
+        sensor.network = project.id;
+        if (!sensor.id) {
+            addDoc(collection(db, "sensors"), sensor).then(docRef => {
+                console.log("Sensor written with ID: ", docRef.id);
+                sensor.id = docRef.id;
+                setSensors([...sensors, sensor]);
+            }).catch(e => {
+                console.error("Error adding sensor: ", e);
+            });
+        } else {
+            const sensorDoc = doc(db, "sensors", sensor.id);
+            updateDoc(sensorDoc, sensor).then(response => {
+                console.log(response);
+                const sensorsCopy = sensors.map(s => s.id === sensor.id ? {...sensor}:s);
+                setSensors(sensorsCopy);
+            }).catch(e => {
+                console.error("Error editing sensor: ", e.message);
+            });
+        }
+    }
+
+    const cancelSaveSensor = () => {
+        setSensorToEdit(false);
+    };
+
     return <div>
-        {!sensorStep ?
+        {!sensorToEdit ?
             <div>
                 <label><InputString onSave={saveProject} value={projectInternal.name} path='name' type='string' /></label>
                 <label><InputString onSave={saveProject} value={projectInternal.description} path='description' type='string' /></label>
@@ -47,8 +73,7 @@ const DashboardProject = ({project, saveProject, deleteProject, setCurrentProjec
                     <textarea value={JSON.stringify(projectInternal)} rows={'15'} cols={'40'} readOnly></textarea>
                 </div>}
             </div>
-        : null }
-        {sensorStep === 'edit' ? <EditSensor saveProject={saveProject} setSensorStep={setSensorStep} isNewSensor={isNewSensor} setIsNewSensor={setIsNewSensor}/> : null}
+        : <EditSensor sensor={sensorToEdit} onSave={saveSensor} onCancel={cancelSaveSensor} />}
     </div>;
 };
 

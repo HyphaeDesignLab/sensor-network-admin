@@ -3,23 +3,24 @@ import React, { useEffect, useState } from 'react';
 import RegisterSensor from './RegisterSensor';
 import InstallSensor from './InstallSensor';
 
-const EditSensor = ({setSensorStep, isNewSensor, setIsNewSensor, saveProject}) => {
-  const [editStep, setEditStep] = useState('');
+const EditSensor = ({sensor, onSave, onCancel}) => {
+  const [step, setStep] = useState(null);
 
   useEffect(() => {
-    isNewSensor ? setEditStep('register') : null;
+    if (sensor.id) {
+        setStep('register');
+    }
   }, []);
 
   return <div>
-    {!editStep ?
+    {!step &&
       <div>
-        <button onClick={setEditStep.bind(null, 'register')}>Register Sensor</button>
-        <button onClick={setEditStep.bind(null, 'install')}>Install Sensor</button>
-      </div>
-      : null}
-    {editStep === 'register' ? <RegisterSensor setEditStep={setEditStep} isNewSensor={isNewSensor} setIsNewSensor={setIsNewSensor}/> : null}
-    {editStep === 'install' ? <InstallSensor  setEditStep={setEditStep} saveProject={saveProject}/> : null}
-    <button onClick={setSensorStep.bind(null, '')}>Return to Project</button>
+        <button onClick={setStep.bind(null, 'register')}>Register Sensor</button>
+        <button onClick={setStep.bind(null, 'install')}>Install Sensor</button>
+      </div>}
+    {step === 'register' && <RegisterSensor sensor={sensor} onSave={onSave}/>}
+    {step === 'install' && <InstallSensor sensor={sensor} onSave={onSave} />}
+    <button onClick={onCancel}>Return to Project</button>
   </div>
 }
 

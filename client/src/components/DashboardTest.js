@@ -149,7 +149,7 @@ const Dashboard = ({db}) => {
 
         {step === 'addProject' ? <AddProject setStep={setStep} setCurrentProject={setCurrentProject} addProject={addProject}/> : null}
 
-        {step === 'project' ? <DashboardProject project={currentProject} addProject={addProject} saveProject={saveProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject} setStep={setStep}/> : null}
+        {step === 'project' ? <DashboardProject db={db} project={currentProject} addProject={addProject} saveProject={saveProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject} setStep={setStep}/> : null}
     </div>;
 };
 

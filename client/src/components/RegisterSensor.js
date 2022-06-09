@@ -2,11 +2,8 @@ import React, {useEffect, useState, useRef} from 'react';
 
 import SensorIds from './sensors/SensorIds';
 
-const RegisterSensor = ({setEditStep, setIsNewSensor}) => {
-
+const RegisterSensor = ({sensor, onSave, onCancel}) => {
   const handleSave = () => {
-    setIsNewSensor(false);
-    setEditStep('');
   }
 
   return <div>
