@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 import GeoLocator from './sensors/GeoLocator';
+import SensorPhotos from "./sensors/SensorPhotos";
 
 const InstallSensor = ({sensor, onSave, onCancel}) => {
 
@@ -23,7 +24,11 @@ const InstallSensor = ({sensor, onSave, onCancel}) => {
     setEditLocation(s=>!s);
   };
 
-  const handlePhotoAdd = () => {};
+  const handlePhotoUpdate = (photos) => {
+    if (!!photos) {
+      onSave({...sensor, photos}); // spread the lng/lat into the sensor copy
+    }
+  };
 
   return <div>
     <h2>Sensor Installation</h2>
@@ -33,7 +38,7 @@ const InstallSensor = ({sensor, onSave, onCancel}) => {
     {isEditLocation && <GeoLocator onDone={handleLocationSet} initialValue={location}/>}
 
     <h3>Photos of Sensor as Installed</h3>
-    <button onClick={handlePhotoAdd}>Add Photo</button>
+    <SensorPhotos photos={sensor.photos} onUpdated={handlePhotoUpdate} />
   </div>
 }
 
