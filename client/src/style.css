@@ -2,11 +2,21 @@
     margin: 0;
     box-sizing: border-box;
 }
-div {
-    margin-bottom: 2px;
+
+div, p {
+    margin: 2px 0;
+    padding: 1px;
+}
+span, div, p {
+    font-family: Verdana, sans-serif;
 }
 div div {
-    margin-left: 10px;
+    margin-left: 5px;
+}
+
+h1, h2, h3, h4, h5 {
+    margin: 5px 0;
+    padding: 1px;
 }
 
 .text-length-measurable {
@@ -14,10 +24,13 @@ div div {
     padding: 0 10px;
 }
 
-span, div, input {
-    font-size: 12px;
+input {
     font-family: Verdana, sans-serif;
-    line-height: 14px;
+    line-height: 1;
+    font-size: inherit;
+}
+h2 > input, h3 > input, h4 > input {
+    font-size: inherit;
 }
 
 .projects {
@@ -37,4 +50,24 @@ span, div, input {
     position: fixed;
     top: -1000vh;
     left: -1000vw;
+}
+
+.spinning-loader {
+    display: block;
+    height: 20px;
+    width: 20px;
+    border: 4px dotted grey;
+    border-radius: 10px;
+    animation-name: spinningLoaderSpin;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes spinningLoaderSpin {
+    from {
+        transform: rotateZ(0);
+    }
+    to {
+        transform: rotateZ(360deg);
+    }
 }

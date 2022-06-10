@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 // import Dashboard from './Dashboard';
-import Dashboard from './DashboardTest';
+import Dashboard from './Dashboard';
 import AuthUI from "./AuthUI";
 
 import {initializeApp} from "firebase/app";
@@ -34,7 +34,7 @@ const App = () => {
     }, []);
     return (
         <div className='app'>
-            <h1>Dashboard App</h1>
+            <h1>Sensor Networks Dashboard</h1>
             <main>
                 <AuthUI auth={auth}/>
                 {!!authUser && <Dashboard db={db} /> }

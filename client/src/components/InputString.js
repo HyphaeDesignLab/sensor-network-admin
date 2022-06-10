@@ -11,7 +11,7 @@ const minInputWidth = 30;
 
 export default function InputString({value, path, onSave, type='text',
                                         hasLabel=true, isOnlyEditMode=false, onCancel=null,
-                                        inputStyle= {}}) {
+                                        inputStyle= {}, wrapEl=null}) {
     const [newValue, setNewValue] = useState(value);
     const [oldValue, setOldValue] = useState(value);
     useEffect(() => {
@@ -80,25 +80,24 @@ export default function InputString({value, path, onSave, type='text',
         setInputLength(width+'px');
     }, [newValue]);
 
+    const WrappingTag = wrapEl ? wrapEl : 'div';
     return (
-        <div>
+        <WrappingTag>
             {hasLabel && !!path && <strong>{humanReadableTitle(path)}: </strong>}
             {isEditable ?
-                <span>
-                    <input type={type}
-                           ref={inputRef}
-                           value={newValue}
-                           onChange={handleChange}
-                           onKeyUp={handleKeyUp}
-                           style={{width: inputLength, minWidth: '60px', ...inputStyle}} />
-                </span>
+                <input type={type}
+                       ref={inputRef}
+                       value={newValue}
+                       onChange={handleChange}
+                       onKeyUp={handleKeyUp}
+                       style={{width: inputLength, minWidth: '60px', ...inputStyle}} />
                 :
                 <span onClick={handleEditClick} style={inputStyle}>{oldValue} <EditIcon /></span>
             }
             {isEditable && <span>&nbsp;<a href='#' onClick={handleCancelClick}>cancel</a></span>}
             {isChanged && <span>&nbsp;<a href='#' onClick={handleSaveClick}>save</a></span>}
 
-            <div className='measure-text-length-offpage' ref={measureTextLengthElRef} style={{...inputStyle}}>{newValue}</div>
-        </div>
+            <WrappingTag className='measure-text-length-offpage' ref={measureTextLengthElRef} style={{...inputStyle}}>{newValue}</WrappingTag>
+        </WrappingTag>
     );
 };

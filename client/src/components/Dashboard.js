@@ -1,57 +1,42 @@
-import React, {useState, useEffect, useDebugValue} from 'react';
-import DashboardProject from './DashboardProject';
+import React, { useState, useEffect, useDebugValue } from 'react';
 import { collection, getDocs, addDoc, doc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 
+import Project from './Project';
+import AddProject from './AddProject';
+
 const Dashboard = ({db}) => {
+    const [step, setStep] = useState('projects');
     const [projects, setProjects] = useState([]);
+    const [isProjectsLoading, setProjectsLoading] = useState(false);
     const [currentProject, setCurrentProject] = useState(null);
-    // useDebugValue(projects, 'those damn prjs');
 
     useEffect(() => {
-
-        getDocs(collection(db, "projects"))
+        setProjectsLoading(true);
+        getDocs(collection(db, "sensor_networks"))
         .then(querySnapshot => {
             let p = [];
             querySnapshot.forEach((doc) => {
-                // console.log(doc.id, '=>', doc.data());
                 let project = doc.data();
                 project.id = doc.id;
                 p.push(project);
             })
             setProjects(p);
+            setProjectsLoading(false);
         })
         .catch((error) => {
-            if (error) {
-                console.log('error at getDoc');
-            } else {
-                console.log('no error at getDoc');
-            }
+            console.log('Error getting project', error);
         });
     }, []);
 
-    const addProject = () => {
-        const sampleData = {
-            name: "A project "+(new Date()).toLocaleString(),
-            style: "mapbox://styles/hyphae-lab/cl0lex1tp000115qtikua1z4e",
-            user: "hyphae-lab",
-            token: "pk.eyJ1IjoiaHlwaGFlLWxhYiIsImEiOiJjazN4czF2M2swZmhkM25vMnd2MXZrYm11In0.LS_KIw8THi2qIethuAf2mw",
-            zoom: 14,
-            clientId: Math.floor(Math.random() * 1000 * 1000 * 1000).toString(16)
-        };
-
-        addDoc(collection(db, "projects"), sampleData).then(docRef => {
-            console.log("Document written with ID: ", docRef.id);
-            sampleData.id = docRef.id;
-            setProjects([...projects, sampleData]);
-
-            // call the backend to export to file
-            // dev:
-            const backendUrlBase = 'http://localhost:5001/geo-dashboard-347901/us-central1';
-            // prod:
-            //const backendUrlBase = 'http://???/geo-dashboard-347901/us-central1';
-            axios(backendUrlBase + '/export-project?projectId='+sampleData.id);
+    const addProject = (project) => {
+        addDoc(collection(db, "sensor_networks"), project).then(docRef => {
+            project.id = docRef.id;
+            setProjects([...projects, project]);
+            setCurrentProject(project);
         }).catch(e => {
-            console.error("Error adding document: ", e);
+            console.error("Error adding project", e);
+        }).finally(() => {
+          setStep('project');
         });
     }
 
@@ -62,23 +47,44 @@ const Dashboard = ({db}) => {
             return;
         }
 
-        deleteDoc(doc(db, "projects", id))
+        deleteDoc(doc(db, "sensor_networks", id))
             .then(() => {
-                // console.log(`id: ${id} deleted`)
                 setProjects(projects.filter(p => p.id !== id));
             })
             .catch((error) => {
-                if (error) {
-                    console.log(error);
-                } else {
-                    console.log('will this ever run?');
-                }
+                console.log('Error deleting project', error);
             })
             .finally(() => {
-                setCurrentProject(null); // in case we were editing; let's set current to none after delete
+              setStep('projects');
+              setCurrentProject(null); // in case we were editing; let's set current to none after delete
             })
 
     }
+
+    const saveProject = (projectFragment) => {
+        if (!currentProject) {
+            return;
+        }
+
+        if (!currentProject.id) {
+            addProject(projectFragment);
+            return;
+        }
+
+        const docRef = doc(db, "sensor_networks", currentProject.id);
+        updateDoc(docRef, projectFragment)
+            .then(response => {
+                console.log(response);
+                const projectsCopy = [...projects];
+                const index = projectsCopy.findIndex(p => p.id === currentProject.id);
+                projectsCopy[index] = {...currentProject, ...projectFragment};
+                setProjects(projectsCopy);
+            })
+            .catch(error => {
+                console.log('project update error ', error.message);
+            });
+    }
+
 
     const editProject = (project, e) => {
         e.preventDefault();
@@ -87,41 +93,31 @@ const Dashboard = ({db}) => {
             return;
         }
         setCurrentProject(project);
+        setStep('project');
     }
 
 
-    const saveProject = (projectFragment) => {
-        if (!currentProject) {
-            return;
-        }
+    const handleAddProject = (e) => {
+        e.preventDefault();
 
-        const docRef = doc(db, "projects", currentProject.id);
-        updateDoc(docRef, projectFragment)
-            .then(response => {
-                console.log(response)
-                const projectsCopy = [...projects];
-                const index = projectsCopy.findIndex(p => p.id === currentProject.id);
-                projectsCopy[index] = {...currentProject, ...projectFragment};
-                setProjects(projectsCopy);
-            })
-            .catch(error => {
-                console.log('project update error '+error.message);
-            });
+        setCurrentProject({});
+        setStep('project');
     }
 
     return <div>
-        <h1>Dashboard</h1>
+        <h2>Projects</h2>
+        {step === 'projects' && <div>
+            {isProjectsLoading && <div className='spinning-loader'></div>}
+            {projects.map(project =>
+                <div key={project.id} className={currentProject && project.id === currentProject.id ? 'current':''}>
+                    <a href='#edit' onClick={editProject.bind(null, project)}>{project.name}</a> &nbsp;
+                    <a href='#delete' onClick={deleteProject.bind(null, project.id)}>delete</a>
+                </div>
+            )}
+            <div><a href='#add' onClick={handleAddProject}>+ Add Project</a></div>
+        </div>}
 
-        <h3>Projects</h3>
-        {projects.map(project =>
-            <div key={project.id} className={currentProject && project.id === currentProject.id ? 'current':''}>
-                <a href='#edit' onClick={editProject.bind(null, project)}>{project.name}</a> &nbsp;
-                <a href='#delete' onClick={deleteProject.bind(null, project.id)}>delete</a>
-            </div>)}
-
-        <button type='button' onClick={addProject}>Add Project</button>
-
-        {!!currentProject && <DashboardProject project={currentProject} saveProject={saveProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject}/>}
+        {step === 'project' && <Project db={db} project={currentProject} addProject={addProject} saveProject={saveProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject} setStep={setStep}/>}
     </div>;
 };
 
