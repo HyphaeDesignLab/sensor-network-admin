@@ -81,7 +81,7 @@ export default function InputString({value, path, onSave, type='text',
     }, [newValue]);
 
     const WrappingTag = wrapEl ? wrapEl : 'div';
-    return (
+    return (<React.Fragment>
         <WrappingTag>
             {hasLabel && !!path && <strong>{humanReadableTitle(path)}: </strong>}
             {isEditable ?
@@ -96,8 +96,7 @@ export default function InputString({value, path, onSave, type='text',
             }
             {isEditable && <span>&nbsp;<a href='#' onClick={handleCancelClick}>cancel</a></span>}
             {isChanged && <span>&nbsp;<a href='#' onClick={handleSaveClick}>save</a></span>}
-
-            <WrappingTag className='measure-text-length-offpage' ref={measureTextLengthElRef} style={{...inputStyle}}>{newValue}</WrappingTag>
         </WrappingTag>
-    );
+        <WrappingTag className='measure-text-length-offpage' ref={measureTextLengthElRef} style={{...inputStyle}}>{newValue}</WrappingTag>
+    </React.Fragment>);
 };
