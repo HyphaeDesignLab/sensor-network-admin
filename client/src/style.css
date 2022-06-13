@@ -33,6 +33,32 @@ h2 > input, h3 > input, h4 > input {
     font-size: inherit;
 }
 
+button.link, .button-link {
+    display: inline-block;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    font-family: inherit;
+    font-size: inherit;
+    height: 25px;
+}
+button.link[disabled] {
+    cursor: not-allowed;
+    text-decoration: none;
+}
+
+button.link:hover, button.link[disabled], .button-link:hover {
+    position: relative;
+    background-color: lightgrey;
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+}
+button.link:focus, .button-link:focus {
+    top: 1px;
+    border: 1px solid grey;
+}
+
 .projects {
 
 }
@@ -46,7 +72,7 @@ h2 > input, h3 > input, h4 > input {
     font-weight: bold;
 }
 
-.measure-text-length-offpage {
+.measure-text-length-offpage, .offpage {
     position: fixed;
     top: -1000vh;
     left: -1000vw;
