@@ -2,7 +2,6 @@ import React, { useState, useEffect, useDebugValue } from 'react';
 import { collection, getDocs, addDoc, doc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 
 import Project from './Project';
-import AddProject from './AddProject';
 
 const Dashboard = ({db}) => {
     const [step, setStep] = useState('projects');
