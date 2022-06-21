@@ -9,7 +9,7 @@ const sensorIdProps = {
     appkey: {title: 'App Key'}
 };
 
-const SensorIdsComponent = ({ids, onSave}) => {
+const SensorIds = ({ids, onSave}) => {
     const [ids_, setIds] = useState(null);
 
     const onEditSaved = (ids__) => {
@@ -61,4 +61,4 @@ const SensorIdsComponent = ({ids, onSave}) => {
     </div>;
 };
 
-export default SensorIdsComponent;
+export default SensorIds;
