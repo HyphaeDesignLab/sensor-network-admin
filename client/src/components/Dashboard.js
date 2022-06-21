@@ -3,7 +3,7 @@ import { collection, getDocs, addDoc, doc, getDoc, deleteDoc, updateDoc } from '
 
 import Project from './Project';
 
-const Dashboard = ({db}) => {
+const Dashboard = ({firebaseApp}) => {
     const [step, setStep] = useState('projects');
     const [projects, setProjects] = useState([]);
     const [isProjectsLoading, setProjectsLoading] = useState(false);
@@ -11,7 +11,7 @@ const Dashboard = ({db}) => {
 
     useEffect(() => {
         setProjectsLoading(true);
-        getDocs(collection(db, "sensor_networks"))
+        getDocs(collection(firebaseApp.db, "sensor_networks"))
         .then(querySnapshot => {
             let p = [];
             querySnapshot.forEach((doc) => {
@@ -28,7 +28,7 @@ const Dashboard = ({db}) => {
     }, []);
 
     const addProject = (project) => {
-        addDoc(collection(db, "sensor_networks"), project).then(docRef => {
+        addDoc(collection(firebaseApp.db, "sensor_networks"), project).then(docRef => {
             project.id = docRef.id;
             setProjects([...projects, project]);
             setCurrentProject(project);
@@ -46,7 +46,7 @@ const Dashboard = ({db}) => {
             return;
         }
 
-        deleteDoc(doc(db, "sensor_networks", id))
+        deleteDoc(doc(firebaseApp.db, "sensor_networks", id))
             .then(() => {
                 setProjects(projects.filter(p => p.id !== id));
             })
@@ -70,7 +70,7 @@ const Dashboard = ({db}) => {
             return;
         }
 
-        const docRef = doc(db, "sensor_networks", currentProject.id);
+        const docRef = doc(firebaseApp.db, "sensor_networks", currentProject.id);
         updateDoc(docRef, projectFragment)
             .then(response => {
                 console.log(response);
@@ -116,7 +116,7 @@ const Dashboard = ({db}) => {
             <div><a href='#add' onClick={handleAddProject}>+ Add Project</a></div>
         </div>}
 
-        {step === 'project' && <Project db={db} project={currentProject} addProject={addProject} saveProject={saveProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject} setStep={setStep}/>}
+        {step === 'project' && <Project firebaseApp={firebaseApp} project={currentProject} addProject={addProject} saveProject={saveProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject} setStep={setStep}/>}
     </div>;
 };
 

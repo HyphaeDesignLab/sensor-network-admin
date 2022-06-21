@@ -37,7 +37,7 @@ const App = () => {
             <h1>Sensor Networks Dashboard</h1>
             <main>
                 <AuthUI auth={auth}/>
-                {!!authUser && <Dashboard db={db} /> }
+                {!!authUser && <Dashboard firebaseApp={{db}}/> }
             </main>
 
         </div>

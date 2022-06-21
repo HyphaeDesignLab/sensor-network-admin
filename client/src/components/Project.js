@@ -6,7 +6,7 @@ import InputBoolean from "./InputBoolean";
 import EditSensor from './EditSensor';
 import {addDoc, updateDoc, deleteDoc, doc, collection, query, where, getDocs} from "firebase/firestore";
 
-const Project = ({db, project, saveProject, deleteProject, setCurrentProject, setStep}) => {
+const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentProject, setStep}) => {
     const [sensorToEdit, setSensorToEdit] = useState(false);
 
     const [sensors, setSensors] = useState([]);
@@ -15,7 +15,7 @@ const Project = ({db, project, saveProject, deleteProject, setCurrentProject, se
         if (!project.id) {
             return; // no need for fetching sensors of new project
         }
-        const sensorsRef = collection(db, "sensors");
+        const sensorsRef = collection(firebaseApp.db, "sensors");
         // Create a query against the collection.
         const q = query(sensorsRef, where("network", "==", project.id));
         setSensorsLoading(true);
@@ -42,18 +42,20 @@ const Project = ({db, project, saveProject, deleteProject, setCurrentProject, se
     const saveSensor = (sensor) => {
         sensor.network = project.id;
         if (!sensor.id) {
-            return addDoc(collection(db, "sensors"), sensor).then(docRef => {
+            return addDoc(collection(firebaseApp.db, "sensors"), sensor).then(docRef => {
                 console.log("Sensor written with ID: ", docRef.id);
                 sensor.id = docRef.id;
                 setSensors([...sensors, sensor]);
+                setSensorToEdit(sensor);
             }).catch(e => {
                 console.error("Error adding sensor: ", e);
             });
         } else {
-            const sensorDoc = doc(db, "sensors", sensor.id);
+            const sensorDoc = doc(firebaseApp.db, "sensors", sensor.id);
             return updateDoc(sensorDoc, sensor).then(response => {
                 const sensorsCopy = sensors.map(s => s.id === sensor.id ? {...sensor}:s);
                 setSensors(sensorsCopy);
+                setSensorToEdit(sensor);
             }).catch(e => {
                 console.error("Error editing sensor: ", e.message);
             });
