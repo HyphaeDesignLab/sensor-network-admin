@@ -78,7 +78,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                     {isSensorsLoading && <div className='spinning-loader'></div>}
                     {sensors && !sensors.length && <div>(no sensors)</div>}
                     {sensors && sensors.map(sensor =>
-                        <div>{sensor.label}<a href='#edit' onClick={setSensorToEdit.bind(null, sensor)}>edit</a></div>
+                        <div key={sensor.id}>{sensor.name} <a href='#edit' onClick={setSensorToEdit.bind(null, sensor)}>edit</a></div>
                     )}
                     <div>
                         <a href='#add-sensor' onClick={addNewSensor}>Add New Sensor</a>
