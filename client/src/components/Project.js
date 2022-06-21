@@ -22,7 +22,9 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
         getDocs(q).then(qSnapshot => {
             const sensors_ = [];
             qSnapshot.forEach(doc => {
-                sensors_.push(doc.data());
+                const sensor = doc.data();
+                sensor.id = doc.id;
+                sensors_.push(sensor);
             });
             setSensors(sensors_);
             setSensorsLoading(false);
