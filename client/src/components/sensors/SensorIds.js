@@ -38,25 +38,29 @@ const SensorIds = ({ids, onSave}) => {
     }
 
     const [isEditing, setEditing] = useState(false);
-    const onEditClick = () => {
+    const handleEditClick = () => {
         setEditing(true);
+    };
+
+    const cancelEdit = () => {
+        setEditing(false);
     };
 
 
     return <div>
         {!isEditing ?
             <React.Fragment>
-                {!!ids_ && Object.keys(sensorIdProps).map(sensorId =>
+                {!!ids_ && Object.keys(ids_).map(sensorId =>
                 <div key={sensorId}>
                     <span>{sensorIdProps[sensorId].title}</span>:
                     <InputString path={sensorId} value={ids_[sensorId]} type={'text'} onSave={onEditSaved} hasLabel={false}
                                  inputStyle={{padding: '5px', fontFamily: 'monospace, sans-serif', letterSpacing: '3px'}}
                     />
                 </div>)}
-                <button type='button' onClick={onEditClick}>{!!ids_ ? 'Update Ids' : 'Add Ids'}</button>
+                <button type='button' onClick={handleEditClick}>{!!ids_ ? 'Update Ids' : 'Add Ids'}</button>
             </React.Fragment>
             :
-            <SensorOcrParser onConfirmed={onOcrConfirmed} />
+            <SensorOcrParser onConfirm={onOcrConfirmed} onCancel={cancelEdit}/>
         }
     </div>;
 };

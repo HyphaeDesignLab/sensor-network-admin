@@ -24,10 +24,10 @@ const ocrOptions = {
 
 const addOcrAmbigiousCharsMarkup = text => text.replace(/[4s0]/ig, m => `<span style="color: red; font-weight: bold; ">${m[0]}</span>`);
 
-const SensorOcrParser = ({onConfirmed}) => {
+const SensorOcrParser = ({onConfirm, onCancel}) => {
     const [imageData, setImageData] = useState('');
     const [isImageDataLoading, setImageDataLoading] = useState('');
-    const onImageChange = event => {
+    const handleImageChange = event => {
         if (event.target.files) {
             setImageDataLoading(true);
             let imgFile = event.target.files[0];
@@ -62,7 +62,7 @@ const SensorOcrParser = ({onConfirmed}) => {
     const [isOcrTextLoading, setOcrTextLoading] = useState(false);
     const [ocrTextError, setOcrTextError] = useState('');
     const [ocrText, setOcrText] = useState('');
-    const onOcrParseClick = event => {
+    const handleOcrParseClick = event => {
         const formData = new FormData();
         formData.append('apikey', 'K83508668988957')
         formData.append('base64Image', imageData)
@@ -120,7 +120,7 @@ const SensorOcrParser = ({onConfirmed}) => {
     }, [ocrText]);
 
     const [editableId, setEditableId] = useState('');
-    const onSaveOrEdit = sensorId => {
+    const handleSaveOrEdit = sensorId => {
         const el = sensorIdProps[sensorId].ref.current;
         if (editableId === sensorId) {
             setSensorIds({...sensorIds, [sensorId]: el.innerText});
@@ -137,19 +137,23 @@ const SensorOcrParser = ({onConfirmed}) => {
         }
     };
 
-    const onConfirmClick = () => {
-      onConfirmed(sensorIds);
+    const handleConfirmClick = () => {
+      onConfirm(sensorIds);
+    };
+
+    const handleCancelClick = () => {
+        onCancel();
     };
 
     return <div>
         <h2>Upload/Take a Photo of Sensor Registration Keys</h2>
         <form>
-            <input type="file" onChange={onImageChange} />
+            <input type="file" onChange={handleImageChange} />
             {isImageDataLoading && <div>Loading image...</div>}
         </form>
         {!!imageData && <div>
             <div style={{maxHeight: '400px', overflowY: 'scroll'}}><img src={imageData} style={{width: '90%', maxWidth: '920px'}} /></div>
-            {!ocrText && <button type='button' onClick={onOcrParseClick} disabled={isOcrTextLoading}>Parse Text from Image</button>}
+            {!ocrText && <button type='button' onClick={handleOcrParseClick} disabled={isOcrTextLoading}>Parse Text from Image</button>}
             {isOcrTextLoading && <div>Parsing text via OCR...</div>}
             {!!ocrTextError && <div>{ocrTextError}</div>}
         </div>}
@@ -168,11 +172,12 @@ const SensorOcrParser = ({onConfirmed}) => {
                           letterSpacing: '3px'
                         }}
                 ></span>
-                <button type='button' onClick={onSaveOrEdit.bind(null, sensorId)}>{editableId === sensorId ? 'save' : 'edit'}</button>
+                <button type='button' onClick={handleSaveOrEdit.bind(null, sensorId)}>{editableId === sensorId ? 'save' : 'edit'}</button>
             </div>)}
         </div>}
 
-        <button type='button' onClick={onConfirmClick}>Confirm</button>
+        <button type='button' onClick={handleConfirmClick}>Confirm</button> &nbsp;
+        <a href='#cancel' type='button' onClick={handleCancelClick}>cancel</a>
     </div>;
 };
 
