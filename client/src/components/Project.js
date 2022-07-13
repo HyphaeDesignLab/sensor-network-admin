@@ -3,7 +3,7 @@ import InputString from "./InputString";
 import Maps from "./Maps";
 import InputNumber from "./InputNumber";
 import InputBoolean from "./InputBoolean";
-import EditSensor from './EditSensor';
+import Sensor from './EditSensor';
 import {addDoc, updateDoc, deleteDoc, doc, collection, query, where, getDocs} from "firebase/firestore";
 
 const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentProject, setStep}) => {
@@ -94,7 +94,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
             :
             <div>
                 <h2>{project.name}: Sensors</h2>
-                <EditSensor sensor={sensorToEdit} onSave={saveSensor} onCancel={cancelSaveSensor} />
+                <Sensor sensor={sensorToEdit} onSave={saveSensor} onCancel={cancelSaveSensor} />
             </div>}
     </div>;
 };

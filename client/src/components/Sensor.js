@@ -5,7 +5,7 @@ import SensorPhotos from "./sensors/SensorPhotos";
 import InputString from "./InputString";
 import SensorIds from "./sensors/SensorIds";
 
-const EditSensor = ({sensor, onSave, onCancel}) => {
+const Sensor = ({sensor, onSave, onCancel}) => {
 
   const [location, setLocation] = useState(sensor.location);
   const [isEditLocation, setEditLocation] = useState(false);
@@ -52,4 +52,4 @@ const EditSensor = ({sensor, onSave, onCancel}) => {
   </div>
 }
 
-export default EditSensor;
+export default Sensor;
