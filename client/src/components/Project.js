@@ -3,7 +3,7 @@ import InputString from "./InputString";
 import Maps from "./Maps";
 import InputNumber from "./InputNumber";
 import InputBoolean from "./InputBoolean";
-import Sensor from './EditSensor';
+import Sensor from './Sensor';
 import {addDoc, updateDoc, deleteDoc, doc, collection, query, where, getDocs} from "firebase/firestore";
 
 const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentProject, setStep}) => {
