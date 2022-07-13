@@ -69,7 +69,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
     };
 
     return <div>
-        <div><a href='#' onClick={closeProject}>&lt;&lt; Back to all Projects</a></div>
+        <div><a href='#' onClick={closeProject}>&lt;&lt; all Projects</a></div>
         {!sensorToEdit ?
             <div>
                 <InputString onSave={saveProject} value={project.id ? project.name : 'New Project'} path='name' type='string' isOnlyEditMode={!project.id} hasLabel={false} wrapEl='h2'/>
@@ -93,7 +93,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
             </div>
             :
             <div>
-                <h2>{project.name}: Sensors</h2>
+                <h2>{project.name} Sensors</h2>
                 <Sensor sensor={sensorToEdit} onSave={saveSensor} onCancel={cancelSaveSensor} />
             </div>}
     </div>;
