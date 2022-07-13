@@ -33,15 +33,15 @@ const Sensor = ({sensor, onSave, onCancel}) => {
   };
 
   return <div>
-    <div><a href='#' onClick={onCancel}>&lt;&lt; Back to Project</a></div>
+    <div><a href='#' onClick={onCancel}>&lt;&lt; All Sensors</a></div>
 
-    <h2>Sensor</h2>
-    <InputString onSave={handleNameEdit} value={sensor.name ? sensor.name : 'New Sensor'} path='name' type='string' isOnlyEditMode={!sensor.id} hasLabel={false} wrapEl='h3'/>
-
+    <InputString onSave={handleNameEdit} value={sensor.name ? sensor.name : 'New Sensor'} path='name' type='string' isOnlyEditMode={!sensor.id} hasLabel={false} wrapEl='h2'/>
 
     {/* send device id and show either a success of error to the user*/}
-    <div>AWS Registration</div>
-    <SensorIds ids={sensor.ids} onSave={handleIdsEdit} />
+    <h3>AWS IOT Registration</h3>
+    <h4>IOT Ids</h4>
+    <SensorIds ids={sensor.ids} onSave={handleIdsEdit} headingLevel={5}/>
+    <h4>Register Ids</h4>
 
     <h3>Location</h3>
     <div>{!!location && <span>Longitude: {location.lng}, Latitude: {location.lat}</span>} <a href='#' onClick={handleLocationEdit}>{!!location ? 'Edit':'Add Location'}</a></div>

@@ -9,7 +9,8 @@ const sensorIdProps = {
     appkey: {title: 'App Key'}
 };
 
-const SensorIds = ({ids, onSave}) => {
+const SensorIds = ({ids, onSave, headingLevel=3}) => {
+    const Hx = 'h'+headingLevel;
     const [ids_, setIds] = useState(null);
 
     const onEditSaved = (ids__) => {

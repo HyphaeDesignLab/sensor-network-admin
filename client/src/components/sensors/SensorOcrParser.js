@@ -24,7 +24,8 @@ const ocrOptions = {
 
 const addOcrAmbigiousCharsMarkup = text => text.replace(/[4s0]/ig, m => `<span style="color: red; font-weight: bold; ">${m[0]}</span>`);
 
-const SensorOcrParser = ({onConfirm, onCancel}) => {
+const SensorOcrParser = ({onConfirm, onCancel, headingLevel=3}) => {
+    const Hx = 'h'+headingLevel;
     const [imageData, setImageData] = useState('');
     const [isImageDataLoading, setImageDataLoading] = useState('');
     const handleImageChange = event => {
@@ -146,7 +147,7 @@ const SensorOcrParser = ({onConfirm, onCancel}) => {
     };
 
     return <div>
-        <h2>Upload/Take a Photo of Sensor Registration Keys</h2>
+        <Hx>Upload/Take a Photo of Sensor Registration Keys</Hx>
         <form>
             <input type="file" onChange={handleImageChange} />
             {isImageDataLoading && <div>Loading image...</div>}
