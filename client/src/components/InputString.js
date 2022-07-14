@@ -94,7 +94,9 @@ export default function InputString({value, path, onSave, type='text',
                 :
                 <span onClick={handleEditClick} style={inputStyle}>{oldValue} <EditIcon /></span>
             }
-            {isEditable && <span>&nbsp;<a href='#' onClick={handleCancelClick}>cancel</a></span>}
+            {(isOnlyEditMode && isChanged) || (!isOnlyEditMode && isEditable) &&
+                <span>&nbsp;<a href='#' onClick={handleCancelClick}>cancel</a></span>
+            }
             {isChanged && <span>&nbsp;<a href='#' onClick={handleSaveClick}>save</a></span>}
         </WrappingTag>
         <WrappingTag className='measure-text-length-offpage' ref={measureTextLengthElRef} style={{...inputStyle}}>{newValue}</WrappingTag>
