@@ -13,16 +13,16 @@ const SensorIds = ({ids, onSave, headingLevel=3}) => {
     const Hx = 'h'+headingLevel;
     const [ids_, setIds] = useState(null);
 
-    const onEditSaved = (ids__) => {
-        setIds({ids_, ...ids__});
-        saveToAws(ids__);
-        setEditing(false);
-    }
+    const onEditSaved = (idsFragment) => {
+        const newIds = {...ids_, ...idsFragment};
+        setIds(newIds);
+        saveToAws(newIds);
+    };
 
     const onOcrConfirmed = (ids__) => {
+        setIsManualEntry(true);
         setIds(ids__);
         saveToAws(ids__);
-        setEditing(false);
     };
 
     useEffect(() => {
@@ -38,31 +38,41 @@ const SensorIds = ({ids, onSave, headingLevel=3}) => {
             });
     }
 
-    const [isEditing, setEditing] = useState(false);
-    const handleEditClick = () => {
-        setEditing(true);
+    const onOcrEditCancel = () => {
+        setIsManualEntry(null);
     };
 
-    const cancelEdit = () => {
-        setEditing(false);
-    };
+    const [isManualEntry, setIsManualEntry] = useState(null);
 
+    const inputStringStyle = {
+        padding: '5px',
+        fontFamily: 'monospace, sans-serif',
+        letterSpacing: '3px'
+    };
 
     return <div>
-        {!isEditing ?
-            <React.Fragment>
-                {!!ids_ && Object.keys(ids_).map(sensorId =>
-                <div key={sensorId}>
-                    <span>{sensorIdProps[sensorId].title}</span>:
-                    <InputString path={sensorId} value={ids_[sensorId]} type={'text'} onSave={onEditSaved} hasLabel={false}
-                                 inputStyle={{padding: '5px', fontFamily: 'monospace, sans-serif', letterSpacing: '3px'}}
-                    />
-                </div>)}
-                <button type='button' onClick={handleEditClick}>{!!ids_ ? 'Update Ids' : 'Add Ids'}</button>
-            </React.Fragment>
-            :
-            <SensorOcrParser onConfirm={onOcrConfirmed} onCancel={cancelEdit}/>
+        <div>
+            <button type='button' onClick={() => setIsManualEntry(false)} disabled={isManualEntry === false}>Scan from Photo</button> &nbsp;
+            {!ids_ && <button type='button' onClick={() => setIsManualEntry(true)} disabled={isManualEntry === true}>Type-in Ids</button>}
+        </div>
+        {isManualEntry === false &&
+            <SensorOcrParser onConfirm={onOcrConfirmed} onCancel={onOcrEditCancel} headingLevel={headingLevel}/>
         }
+
+        {isManualEntry !== false &&
+            <React.Fragment>
+                {Object.keys(sensorIdProps).map(sensorId =>
+                    <div key={sensorId}>
+                        <span>{sensorIdProps[sensorId].title}</span>:
+                        {isManualEntry === false ?
+                            <span style={inputStringStyle}>{ids_[sensorId]}</span> :
+                            <InputString path={sensorId} value={ids_ ? ids_[sensorId] : ''}
+                                     type={'text'} onSave={onEditSaved} hasLabel={false}
+                                     isOnlyEditMode={!ids_ || !ids_[sensorId]} inputStyle={inputStringStyle} wrapEl='span'
+                            />
+                        }
+                    </div>)}
+            </React.Fragment>}
     </div>;
 };
 

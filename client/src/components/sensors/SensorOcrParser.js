@@ -120,20 +120,16 @@ const SensorOcrParser = ({onConfirm, onCancel, headingLevel=3}) => {
         setSensorIds(ids);
     }, [ocrText]);
 
-    const [editableId, setEditableId] = useState('');
-    const handleSaveOrEdit = sensorId => {
+    const [editableIds, setEditableIds] = useState({});
+    const handleSaveOrEdit = (sensorId, isSave) => {
         const el = sensorIdProps[sensorId].ref.current;
-        if (editableId === sensorId) {
+
+        if (isSave) {
             setSensorIds({...sensorIds, [sensorId]: el.innerText});
-            setEditableId('');
+            setEditableIds({...editableIds, [sensorId]: false});
         } else {
-            if (!!editableId) {
-                // if switch sensor id editing, but previous sensor ID was not explicitly saved
-                // reset last one to pre-saved
-                el.innerHTML = addOcrAmbigiousCharsMarkup(sensorIds[sensorId]);
-            }
-            el.contentEditable = true;
-            setEditableId(sensorId);
+            el.innerHTML = addOcrAmbigiousCharsMarkup(sensorIds[sensorId]);
+            setEditableIds({...editableIds, [sensorId]: true});
             el.focus();
         }
     };
@@ -153,31 +149,40 @@ const SensorOcrParser = ({onConfirm, onCancel, headingLevel=3}) => {
             {isImageDataLoading && <div>Loading image...</div>}
         </form>
         {!!imageData && <div>
-            <div style={{maxHeight: '400px', overflowY: 'scroll'}}><img src={imageData} style={{width: '90%', maxWidth: '920px'}} /></div>
-            {!ocrText && <button type='button' onClick={handleOcrParseClick} disabled={isOcrTextLoading}>Parse Text from Image</button>}
-            {isOcrTextLoading && <div>Parsing text via OCR...</div>}
-            {!!ocrTextError && <div>{ocrTextError}</div>}
+            <div style={{maxHeight: '150px', maxWidth: '920px', overflowY: 'scroll'}}>
+                <img src={imageData} style={{width: '100%'}} />
+            </div>
+            <div>(scroll up and down to see entire image content)</div>
+            {!ocrText &&
+                <button type='button' onClick={handleOcrParseClick} disabled={isOcrTextLoading}>Parse Text from Image</button>
+            }
+            {isOcrTextLoading &&
+                <div>Parsing text via OCR...</div>
+            }
+            {!!ocrTextError &&
+                <div>{ocrTextError}</div>
+            }
         </div>}
         {!!ocrText && <div>
-            <h3>Parsed Sensor IDs (Please review/edit)</h3>
+            <strong>Parsed Sensor IDs (Please review/edit)</strong>
             {Object.keys(sensorIdProps).map(sensorId =>
             <div key={sensorId}>
                 <span>{sensorIdProps[sensorId].title}</span>:
                 <span ref={sensorIdProps[sensorId].ref}
-                      contentEditable={editableId === sensorId ? 'true' : 'false'}
+                      contentEditable={editableIds[sensorId] ? 'true' : 'false'}
                       style={{
-                          border: editableId === sensorId ? '1px solid black' : 'none',
+                          border: editableIds[sensorId] ? '1px solid black' : 'none',
                           padding: '5px',
                           fontSize: '140%',
                           fontFamily: 'monospace, sans-serif',
                           letterSpacing: '3px'
                         }}
                 ></span>
-                <button type='button' onClick={handleSaveOrEdit.bind(null, sensorId)}>{editableId === sensorId ? 'save' : 'edit'}</button>
+                <button type='button' onClick={handleSaveOrEdit.bind(null, sensorId, !!editableIds[sensorId])}>{editableIds[sensorId] ? 'save' : 'edit'}</button>
             </div>)}
         </div>}
 
-        <button type='button' onClick={handleConfirmClick}>Confirm</button> &nbsp;
+        {!!ocrText && <React.Fragment><button type='button' onClick={handleConfirmClick}>Confirm</button> &nbsp;</React.Fragment>}
         <a href='#cancel' type='button' onClick={handleCancelClick}>cancel</a>
     </div>;
 };
