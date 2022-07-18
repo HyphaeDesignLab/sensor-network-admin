@@ -9,7 +9,12 @@ const http = require("http");
 
 const express = require('express');
 // https://expressjs.com/en/resources/middleware/cors.html
-const cors = require('cors')({origin: ['http://nbah.lan:8002', 'http://localhost:5002']});
+const cors = require('cors')({origin: [
+    'http://nbah.lan:8002',
+    'http://localhost:5002',
+    'https://geo-dashboard-347901.web.app',
+    'https://geo-dashboard-347901.firebaseapp.com']
+});
 
 // Setting the `keepAlive` option to `true` keeps
 // connections open between function invocations
