@@ -1,4 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
+import ImageInput from "./ImageInput";
 
 const getImgDimensionsFitInBox = (img, MAX_WIDTH, MAX_HEIGHT) => {
     var width = img.width;
@@ -27,37 +28,8 @@ const addOcrAmbigiousCharsMarkup = text => text.replace(/[4s0]/ig, m => `<span s
 const SensorOcrParser = ({onConfirm, onCancel, headingLevel=3}) => {
     const Hx = 'h'+headingLevel;
     const [imageData, setImageData] = useState('');
-    const [isImageDataLoading, setImageDataLoading] = useState('');
-    const handleImageChange = event => {
-        if (event.target.files) {
-            setImageDataLoading(true);
-            let imgFile = event.target.files[0];
-
-            var imgOriginal = document.createElement('img');
-            imgOriginal.onload = function (event) {
-                // RESIZE TO FIT IN BOX
-                const [width, height] = getImgDimensionsFitInBox(imgOriginal, 3600, 3600);
-
-                // Dynamically create a canvas element
-                var canvas = document.createElement("canvas");
-                canvas.width = width;
-                canvas.height = height;
-
-                var canvasContext = canvas.getContext("2d");
-                canvasContext.drawImage(imgOriginal, 0, 0, width, height);
-
-                const dataUrl = canvas.toDataURL(imgFile.type); // get base64
-                setImageData(dataUrl);
-                setOcrText('');
-                setImageDataLoading(false);
-            }
-
-            var reader = new FileReader();
-            reader.onload = readerEvent => {
-                imgOriginal.src = readerEvent.target.result;
-            }
-            reader.readAsDataURL(imgFile);
-        }
+    const handleImageChange = photo => {
+        setImageData(photo);
     }
 
     const [isOcrTextLoading, setOcrTextLoading] = useState(false);
@@ -144,10 +116,7 @@ const SensorOcrParser = ({onConfirm, onCancel, headingLevel=3}) => {
 
     return <div>
         <Hx>Upload/Take a Photo of Sensor Registration Keys</Hx>
-        <form>
-            <input type="file" onChange={handleImageChange} />
-            {isImageDataLoading && <div>Loading image...</div>}
-        </form>
+        <ImageInput onLoaded={handleImageChange} label='Upload/Take Photo' fitToBox={{width: 3200, height: 3200}} />&nbsp;
         {!!imageData && <div>
             <div style={{maxHeight: '150px', maxWidth: '920px', overflowY: 'scroll'}}>
                 <img src={imageData} style={{width: '100%'}} />
