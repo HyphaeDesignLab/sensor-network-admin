@@ -1,0 +1,14 @@
+{
+  "name": "hyphae-sensors-awsiot-api",
+  "version": "1.0.0",
+  "description": "the API that gives the hyphae sensor network ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
