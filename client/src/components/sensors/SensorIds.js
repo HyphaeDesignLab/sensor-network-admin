@@ -16,11 +16,13 @@ const SensorIds = ({ids, onSave, headingLevel=3}) => {
     const onEditSaved = (idsFragment) => {
         const newIds = {...ids_, ...idsFragment};
         setIds(newIds);
+        onSave(newIds);
     };
 
     const onOcrConfirmed = (ids__) => {
         setIsManualEntry(true);
         setIds(ids__);
+        onSave(ids__);
     };
 
     useEffect(() => {
