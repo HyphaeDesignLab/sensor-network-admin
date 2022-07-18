@@ -16,13 +16,11 @@ const SensorIds = ({ids, onSave, headingLevel=3}) => {
     const onEditSaved = (idsFragment) => {
         const newIds = {...ids_, ...idsFragment};
         setIds(newIds);
-        saveToAws(newIds);
     };
 
     const onOcrConfirmed = (ids__) => {
         setIsManualEntry(true);
         setIds(ids__);
-        saveToAws(ids__);
     };
 
     useEffect(() => {
@@ -30,13 +28,6 @@ const SensorIds = ({ids, onSave, headingLevel=3}) => {
             setIds(ids);
         }
     }, [ids]);
-
-    const saveToAws = (ids__) => {
-        Promise.resolve()
-            .then(() => {
-                onSave(ids__);
-            });
-    }
 
     const onOcrEditCancel = () => {
         setIsManualEntry(null);

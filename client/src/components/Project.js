@@ -64,6 +64,42 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
         }
     }
 
+    const addSensorToAwsIot = (sensor) => {
+        return firebaseApp.auth.currentUser.getIdToken().then(authToken => {
+            if (!authToken) {
+                console.log('no authed to test')
+            }
+
+            const body = {
+                token: authToken,
+                deveui: sensor.ids.deveui,
+                appeui: sensor.ids.appeui,
+                appkey: sensor.ids.appkey,
+                appkeu: sensor.ids.appkey,
+                project: project.aws_iot_id,
+                type: sensor.type,
+                name: sensor.name
+            };
+
+            return fetch('http://localhost:5001/geo-dashboard-347901/us-central1/sensors/register', {
+                method: 'post',
+                header: {
+                    'content-type': 'application/x-www-form-urlencoded'
+                },
+                mode: 'cors', // no-cors, *cors, same-origin
+                body: Object.entries(body).map(e => `${e[0]}=${encodeURIComponent(e[1])}`).join('&')
+            }).then(resp => resp.json()).then(json => {
+                if (!!json.error) {
+                    throw new Error(json.error);
+                }
+                if (!json.id) {
+                    throw new Error('no AWS ID returned');
+                }
+                return json.id;
+            });
+        });
+    }
+
     const cancelSaveSensor = () => {
         setSensorToEdit(false);
     };
@@ -74,6 +110,10 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
             <div>
                 <InputString onSave={saveProject} value={project.id ? project.name : 'New Project'} path='name' type='string' isOnlyEditMode={!project.id} hasLabel={false} wrapEl='h2'/>
                 <InputString onSave={saveProject} value={project.description} path='description' type='string' />
+                <div>
+                    <InputString onSave={saveProject} value={project.aws_iot_id} path='aws_iot_id' type='string' />
+                    [note: aws iot id is used to calculate the wireless destination topic: &lt;projectAwsIotId&gt;__&lt;sensorType&gt;]
+                </div>
 
                 {!!project.id && <div>
                     <h3>Sensors:</h3>
@@ -83,7 +123,11 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                         <div key={sensor.id}>{sensor.name} <a href='#edit' onClick={setSensorToEdit.bind(null, sensor)}>edit</a></div>
                     )}
                     <div>
-                        <a href='#add-sensor' onClick={addNewSensor}>Add New Sensor</a>
+                        {!project.aws_iot_id ?
+                            <span>Please set the Project AWS IOT ID in order to add sensors<br/><a href='#add-sensor-disabled' onClick={()=>{}}>Add New Sensor</a></span>
+                            :
+                            <a href='#add-sensor' onClick={addNewSensor}>Add New Sensor</a>
+                        }
                     </div>
                 </div>}
 
@@ -94,7 +138,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
             :
             <div>
                 <h2>{project.name} Sensors</h2>
-                <Sensor sensor={sensorToEdit} onSave={saveSensor} onCancel={cancelSaveSensor} />
+                <Sensor sensor={sensorToEdit} onSave={saveSensor} onSaveToAws={addSensorToAwsIot} onCancel={cancelSaveSensor} />
             </div>}
     </div>;
 };
