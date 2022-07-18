@@ -1,19 +1,17 @@
 const functions = require("firebase-functions");
-const admin = require('firebase-admin');
+const admin = require("firebase-admin");
 admin.initializeApp();
-
-// const config = functions.config();
 
 // https://firebase.google.com/docs/functions/networking
 const http = require("http");
 
-const express = require('express');
+const express = require("express");
 // https://expressjs.com/en/resources/middleware/cors.html
-const cors = require('cors')({origin: [
-    'http://nbah.lan:8002',
-    'http://localhost:5002',
-    'https://geo-dashboard-347901.web.app',
-    'https://geo-dashboard-347901.firebaseapp.com']
+const cors = require("cors")({origin: [
+    "http://nbah.lan:8002",
+    "http://localhost:5002",
+    "https://geo-dashboard-347901.web.app",
+    "https://geo-dashboard-347901.firebaseapp.com"]
 });
 
 // Setting the `keepAlive` option to `true` keeps
@@ -25,20 +23,22 @@ const agent = new http.Agent({keepAlive: true});
 // The Firebase ID token needs to be passed as a Bearer token in the Authorization HTTP header like this:
 // `Authorization: Bearer <Firebase ID Token>`.
 // when decoded successfully, the ID Token content will be added as `req.user`.
-const checkAuth = async (req, res, next) => {
-    const body = Object.fromEntries(req.body.split('&').map(param => param.split('=').map(p => decodeURIComponent(p))));
+const checkAuth =  (req, res, next) => {
+    if (!req.body || ((req.body instanceof Object) && Object.keys(req.body instanceof Object).length === 0)) {
+        res.status(403).send({error: "need some parameters"});
+    }
+    const body = Object.fromEntries(req.body.split("&").map(param => param.split("=").map(p => decodeURIComponent(p))));
     if ((!body || !body.token)) {
-        res.status(403).send({error: 'not authorized'});
+        res.status(403).send({error: "not authorized"});
         return;
     }
 
-    try {
-        const decodedToken = await admin.auth().verifyIdToken(body.token);
+    admin.auth().verifyIdToken(body.token).then(decodedToken => {
         req.user = decodedToken;
         next();
-    } catch (error) {
-        res.status(403).send({error: 'error verifying Firebase ID token '+error.message});
-    }
+    }).catch (error => {
+        res.status(403).send({error: "error verifying Firebase ID token "+error.message});
+    });
 };
 
 const sensorsApp = express();
@@ -46,7 +46,11 @@ const sensorsApp = express();
 sensorsApp.use(cors);
 sensorsApp.use(checkAuth);
 
-sensorsApp.post('/register', (request, response) => {
+sensorsApp.post("/register", (request, response) => {
+    if (!request.body || request.body.indexOf("deveui=") < 0) {
+        response.status(500).send("must provide some params to sensor/register");
+        return;
+    }
     let req = http.request({
         host: "localhost",
         port: 3001,
