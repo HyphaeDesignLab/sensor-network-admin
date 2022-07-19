@@ -1,5 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import ImageInput from "./ImageInput";
+// if image is too large for OCR to work we might have to
+//  crop it via a library: https://www.npmjs.com/package/react-image-crop
 
 const getImgDimensionsFitInBox = (img, MAX_WIDTH, MAX_HEIGHT) => {
     var width = img.width;
@@ -116,7 +118,7 @@ const SensorOcrParser = ({onConfirm, onCancel, headingLevel=3}) => {
 
     return <div>
         <Hx>Upload/Take a Photo of Sensor Registration Keys</Hx>
-        <ImageInput onLoaded={handleImageChange} label='Upload/Take Photo' fitToBox={{width: 3200, height: 3200}} />&nbsp;
+        <ImageInput onLoaded={handleImageChange} label='Upload/Take Photo' fitToBox={{width: 1600, height: 1600}} />&nbsp;
         {!!imageData && <div>
             <div style={{maxHeight: '150px', maxWidth: '920px', overflowY: 'scroll'}}>
                 <img src={imageData} style={{width: '100%'}} />
