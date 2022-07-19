@@ -20,14 +20,12 @@
       {
         "source": "**",
         "destination": "/index.html"
+      },
+      {
+        "source": "/sensors",
+        "function": "sensors"
       }
     ]
-  },
-  "storage": {
-    "rules": "storage.rules"
-  },
-  "remoteconfig": {
-    "template": "remoteconfig.template.json"
   },
   "emulators": {
     "firestore": {
