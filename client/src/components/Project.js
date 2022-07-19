@@ -6,6 +6,10 @@ import InputBoolean from "./InputBoolean";
 import Sensor from './Sensor';
 import {addDoc, updateDoc, deleteDoc, doc, collection, query, where, getDocs} from "firebase/firestore";
 
+import env from './../keys/env';
+import serverConfigAllEnv from './../keys/server';
+const serverConfig = serverConfigAllEnv[env];
+
 const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentProject, setStep}) => {
     const [sensorToEdit, setSensorToEdit] = useState(false);
 
@@ -71,7 +75,6 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
             }
 
             const body = {
-                token: authToken,
                 deveui: sensor.ids.deveui,
                 appeui: sensor.ids.appeui,
                 appkey: sensor.ids.appkey,
@@ -80,14 +83,11 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                 type: sensor.type,
                 name: sensor.name
             };
-
-            return fetch('http://localhost:5001/geo-dashboard-347901/us-central1/sensors/register', {
-                method: 'post',
-                header: {
-                    'content-type': 'application/x-www-form-urlencoded'
-                },
+            const host = `${serverConfig.URLS_AWS_CLI_API__PROTOCOL}://${serverConfig.URLS_AWS_CLI_API__HOST}:${serverConfig.URLS_AWS_CLI_API__PORT}`;
+            const query = Object.entries(body).map(e => `${e[0]}=${encodeURIComponent(e[1])}`).join('&');
+            return fetch(`${host}/sensor/add?${query}`, {
+                method: 'get',
                 mode: 'cors', // no-cors, *cors, same-origin
-                body: Object.entries(body).map(e => `${e[0]}=${encodeURIComponent(e[1])}`).join('&')
             }).then(resp => resp.json()).then(json => {
                 if (!!json.error) {
                     throw new Error(json.error);
