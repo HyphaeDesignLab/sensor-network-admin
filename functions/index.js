@@ -52,9 +52,9 @@ sensorsApp.post("/register", (request, response) => {
         return;
     }
     let req = http.request({
-        host: "localhost",
-        port: 3001,
-        path: `/device/get?${request.body}`,
+        host: process.env.URLS_AWS_CLI_API__HOST,
+        port: process.env.URLS_AWS_CLI_API__PORT,
+        path: `/device/add?${request.body}`,
         method: "GET",
         agent: agent // Holds the connection open after the first invocation
     }, res => {
