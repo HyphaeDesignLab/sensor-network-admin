@@ -59,6 +59,8 @@ const Sensor = ({sensor, onSave, onSaveToAws, onCancel}) => {
     <div>Type (for AWS IOT, etc.) <select onChange={handleTypeEdit} value={sensor.type}>
       <option>--select type--</option>
       <option value='temphum_dragino_sm31'>temp+hum (dragino sm31)</option>
+      <option value='mrt_dragino_d22'>MRT+temp (dragino d22)</option>
+      <option value='wind_barani_meteowind_iot_pro'>Wind (Barani MeteoWind IOT Pro)</option>
       <option value='temphum_dragino_lht65'>temp+hum indoor (dragino lht65)</option>
     </select></div>
 
