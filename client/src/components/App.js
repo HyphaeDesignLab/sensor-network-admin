@@ -12,8 +12,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-//import {connectFirestoreEmulator } from 'firebase/firestore';
-//connectFirestoreEmulator(db, 'localhost', 8080);
+//import firebaseSetup from './dev/firebaseSetup';
+//firebaseSetup(db, auth);
 
 const App = () => {
     const [authUser, setAuthUser] = useState(null);
