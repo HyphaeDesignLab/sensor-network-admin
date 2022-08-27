@@ -17,9 +17,29 @@ if (!!env.cors_urls) {
     app.use(cors);
 }
 
+const { pgClient } = require('pg');
+
 const { execSync } = require('child_process');
 const removeSpaces = s => s.replace(/[^\w]/, '_').replace(/__+/, '_').replace(/^_+|_+$/, '');
 
+app.get('/sensor/test-db', function (req, res) {
+    const client = new pgClient({
+        host: env.pg_host,
+        port: env.pg_port,
+        user: env.pg_user,
+        password: env.pg_pass,
+        database: env.pg_db,
+        ssl: true,
+    });
+    return new Promise((resolve, reject) => {
+        client.connect().then(() => {
+            client.query('SELECT $1::text as connected', ['Connection to postgres successful!']).then(res => {
+                console.log(res.rows[0].connected);
+                client.end().then(() => resolve()).catch(() => reject());
+            }).catch(() => reject());
+        }).catch(() => reject());
+    });
+});
 app.get('/sensor/add', function (req, res) {
     try {
 
