@@ -10,15 +10,12 @@ if (process.argv[2]) {
 }
 
 var express = require('express');
-const cors = require("cors")({origin: [
-        "http://nbah.lan:8002",
-        "http://localhost:5002",
-        "https://geo-dashboard-347901.web.app",
-        "https://geo-dashboard-347901.firebaseapp.com"]
-});
-
 const app = express();
-app.use(cors);
+
+if (!!env.cors_urls) {
+    const cors = require("cors")({origin: env.cors_urls.split('|')});
+    app.use(cors);
+}
 
 const { execSync } = require('child_process');
 const removeSpaces = s => s.replace(/[^\w]/, '_').replace(/__+/, '_').replace(/^_+|_+$/, '');
