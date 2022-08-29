@@ -17,13 +17,13 @@ if (!!env.cors_urls) {
     app.use(cors);
 }
 
-const { pgClient } = require('pg');
+const { Client } = require('pg');
 
 const { execSync } = require('child_process');
 const removeSpaces = s => s.replace(/[^\w]/, '_').replace(/__+/, '_').replace(/^_+|_+$/, '');
 
 app.get('/sensor/test-db', function (req, res) {
-    const client = new pgClient({
+    const client = new Client({
         host: env.pg_host,
         port: env.pg_port,
         user: env.pg_user,
@@ -36,9 +36,9 @@ app.get('/sensor/test-db', function (req, res) {
             client.query('SELECT $1::text as zzz', ['Connection to postgres successful!']).then(res => {
                 client.end().then(() => {
                     resolve(res.rows[0].zzz);
-                }).catch(() => reject('cannot end query'));
-            }).catch(() => reject('cannot query'));
-        }).catch(() => reject('cannot connect'));
+                }).catch((e) => reject('cannot end query' + e));
+            }).catch((e) => reject('cannot query' + e));
+        }).catch((e) => reject('cannot connect: ' + e));
     }).then(r => res.send(JSON.stringify(r))).catch(e => res.send(JSON.stringify(e)))
 });
 app.get('/sensor/add', function (req, res) {
@@ -90,14 +90,11 @@ app.get('/', function (req, res) {
 
 if (env.env === 'prod') {
 
-    let server;
-    if (env.env === 'prod') {
-        const key = fs.readFileSync(env.ssl_key);
-        const cert = fs.readFileSync(env.ssl_cert);
-        const ca = fs.readFileSync(env.ssl_chain);
-        const https = require('https');
-        server = https.createServer({key: key, cert: cert, ca }, app);
-    }
+    const key = fs.readFileSync(env.ssl_key);
+    const cert = fs.readFileSync(env.ssl_cert);
+    const ca = fs.readFileSync(env.ssl_chain);
+    const https = require('https');
+    let server = https.createServer({key: key, cert: cert, ca }, app);
     server.listen(3001);
 } else {
     app.listen(3001);
