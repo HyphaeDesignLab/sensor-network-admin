@@ -33,12 +33,13 @@ app.get('/sensor/test-db', function (req, res) {
     });
     return new Promise((resolve, reject) => {
         client.connect().then(() => {
-            client.query('SELECT $1::text as connected', ['Connection to postgres successful!']).then(res => {
-                console.log(res.rows[0].connected);
-                client.end().then(() => resolve()).catch(() => reject());
-            }).catch(() => reject());
-        }).catch(() => reject());
-    });
+            client.query('SELECT $1::text as zzz', ['Connection to postgres successful!']).then(res => {
+                client.end().then(() => {
+                    resolve(res.rows[0].zzz);
+                }).catch(() => reject('cannot end query'));
+            }).catch(() => reject('cannot query'));
+        }).catch(() => reject('cannot connect'));
+    }).then(r => res.send(JSON.stringify(r))).catch(e => res.send(JSON.stringify(e)))
 });
 app.get('/sensor/add', function (req, res) {
     try {
