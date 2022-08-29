@@ -4,8 +4,10 @@ if [ ! "$home_dir" ]; then
   exit;
 fi;
 
-if [ "$(ps aux | grep 'node index.js' | grep -v 'grep' | head -1)" ]; then
+running_check="$(ps aux | grep 'node index.js' | grep -v 'grep')"
+if [ "$running_check" ]; then
         echo 'running';
+        echo $running_check;
 else
         cd $home_dir;
         echo 'not running';
