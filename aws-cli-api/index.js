@@ -28,9 +28,9 @@ app.get('/sensor/test-db', function (req, res) {
     const client = new Client({connectionString, ssl: { rejectUnauthorized: false }});
     return new Promise((resolve, reject) => {
         client.connect().then(() => {
-            client.query('SELECT $1::text as zzz', ['Connection to postgres successful!']).then(res => {
+            client.query('select name, device_eui from greenspine.sensors where type =\'wind_barani_meteowind_iot_pro\' order by name', ['Connection to postgres successful!']).then(res => {
                 client.end().then(() => {
-                    resolve(res.rows[0].zzz);
+                    resolve(res.rows.map(row => row.name+'/'+row.device_eui).join(', '));
                 }).catch((e) => reject('cannot end query' + e));
             }).catch((e) => reject('cannot query' + e));
         }).catch((e) => reject('cannot connect: ' + e));
