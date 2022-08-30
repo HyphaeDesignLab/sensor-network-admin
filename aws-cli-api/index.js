@@ -22,15 +22,10 @@ const { Client } = require('pg');
 const { execSync } = require('child_process');
 const removeSpaces = s => s.replace(/[^\w]/, '_').replace(/__+/, '_').replace(/^_+|_+$/, '');
 
+const connectionString = `postgres://${env.pg_user}:${env.pg_pass}@${env.pg_host}:${env.pg_port}/${env.pg_db}`;
+
 app.get('/sensor/test-db', function (req, res) {
-    const client = new Client({
-        host: env.pg_host,
-        port: env.pg_port,
-        user: env.pg_user,
-        password: env.pg_pass,
-        database: env.pg_db,
-        ssl: true,
-    });
+    const client = new Client({connectionString, ssl: { rejectUnauthorized: false }});
     return new Promise((resolve, reject) => {
         client.connect().then(() => {
             client.query('SELECT $1::text as zzz', ['Connection to postgres successful!']).then(res => {
