@@ -22,9 +22,11 @@ if [ "$running_check" ]; then
                 done;
                 echo "restarting process ";
                 if [ "$3" = 'background' ]; then
-                        sudo node index.js .env &
+                  echo 'starting in background';
+                  sudo node index.js .env &
                 else
-                        sudo node index.js .env
+                  echo 'starting in FORE-ground';
+                  sudo node index.js .env
                 fi;
         fi;
 else
@@ -32,8 +34,10 @@ else
         echo 'not running';
         if [ "$2" = 'restart' ]; then
                 if [ "$3" = 'background' ]; then
+                        echo 'starting in background';
                         sudo node index.js .env &
                 else
+                        echo 'starting in FORE-ground';
                         sudo node index.js .env
                 fi;
         fi
