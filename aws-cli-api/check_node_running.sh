@@ -20,6 +20,7 @@ if [ "$running_check" ]; then
                   echo "stopping process " $pid;
                   kill -KILL $pid;
                 done;
+                echo "restarting process ";
                 if [ "$3" = 'background' ]; then
                         sudo node index.js .env &
                 else
