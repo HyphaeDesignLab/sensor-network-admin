@@ -39,6 +39,11 @@ app.get('/:project/sensors/get', function (req, res) {
         }).catch((e) => reject('cannot connect: ' + e));
     }).then(r => res.send(JSON.stringify(r))).catch(e => res.send(JSON.stringify(e)))
 });
+
+app.post('/sensors/sync', function (req, res) {
+    res.send(JSON.stringify(req.body.zzz));
+});
+
 app.get('/sensor/add', function (req, res) {
     try {
 
