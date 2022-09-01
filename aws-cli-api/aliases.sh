@@ -1,5 +1,7 @@
 function aws-cli-api-ssh-github-init {
-	eval "$(ssh-agent -s)"
+	if [ ! "$(ps aux | grep 'ssh-agent' | grep -v grep)" ]; then
+	  eval "$(ssh-agent -s)"
+  fi;
 	ssh-add ~/.ssh/sensor_install_dashboard_github_id_ed25519
 }
 
