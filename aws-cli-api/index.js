@@ -31,7 +31,7 @@ app.get('/:project/sensors/get', function (req, res) {
     const project = req.params.project.replace(/\W/g, '');
     return new Promise((resolve, reject) => {
         pgClient.connect().then(() => {
-            pgClient.query('select name, device_eui from ${project}.sensors order by name').then(res => {
+            pgClient.query(`select name, device_eui from ${project}.sensors order by name`).then(res => {
                 pgClient.end().then(() => {
                     resolve(res.rows.map(row => row.name+'/'+row.device_eui).join(', '));
                 }).catch((e) => reject('cannot end query' + e));
