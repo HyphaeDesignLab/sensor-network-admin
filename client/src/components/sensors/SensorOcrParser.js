@@ -25,7 +25,7 @@ const ocrOptions = {
     OCREngine: 2
 }
 
-const addOcrAmbigiousCharsMarkup = text => text.replace(/[4s0z]/ig, m => `<span style="color: red; font-weight: bold; ">${m[0]}</span>`);
+const addOcrAmbigiousCharsMarkup = text => text.replace(/[4sef0z]/ig, m => `<span style="color: red; font-weight: bold; ">${m[0]}</span>`);
 
 const SensorOcrParser = ({onConfirm, onCancel, headingLevel=3}) => {
     const Hx = 'h'+headingLevel;
