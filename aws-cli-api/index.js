@@ -11,6 +11,8 @@ if (process.argv[2]) {
 
 var express = require('express');
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 if (!!env.cors_urls) {
     const cors = require("cors")({origin: env.cors_urls.split('|')});
