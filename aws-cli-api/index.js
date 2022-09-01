@@ -37,11 +37,13 @@ app.get('/:project/sensors/get', function (req, res) {
                 }).catch((e) => reject('cannot end query' + e));
             }).catch((e) => reject('cannot query' + e));
         }).catch((e) => reject('cannot connect: ' + e));
-    })
-        .then(r => res.send(JSON.stringify(r))).catch(e => res.send(JSON.stringify(e)))
-        .finally(() => {
-            pgClient.end();
-        });
+    }).then(r => {
+        pgClient.end();
+        res.send(JSON.stringify(r));
+    }).catch(e => {
+        pgClient.end();
+        res.send(JSON.stringify(e));
+    });
 });
 
 app.post('/sensors/sync', function (req, res) {
