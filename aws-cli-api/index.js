@@ -25,9 +25,10 @@ const { execSync } = require('child_process');
 const removeSpaces = s => s.replace(/[^\w]/, '_').replace(/__+/, '_').replace(/^_+|_+$/, '');
 
 const connectionString = `postgres://${env.pg_user}:${env.pg_pass}@${env.pg_host}:${env.pg_port}/${env.pg_db}`;
+const pgClient = new Client({connectionString, ssl: { rejectUnauthorized: false }});
 
 app.get('/sensor/test-db', function (req, res) {
-    const client = new Client({connectionString, ssl: { rejectUnauthorized: false }});
+
     return new Promise((resolve, reject) => {
         client.connect().then(() => {
             client.query('select name, device_eui from greenspine.sensors where type =\'mrt_dragino_d22\' order by name').then(res => {
