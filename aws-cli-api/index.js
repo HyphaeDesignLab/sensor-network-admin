@@ -27,12 +27,12 @@ const removeSpaces = s => s.replace(/[^\w]/, '_').replace(/__+/, '_').replace(/^
 const connectionString = `postgres://${env.pg_user}:${env.pg_pass}@${env.pg_host}:${env.pg_port}/${env.pg_db}`;
 const pgClient = new Client({connectionString, ssl: { rejectUnauthorized: false }});
 
-app.get('/sensor/test-db', function (req, res) {
-
+app.get('/:project/sensors/get', function (req, res) {
+    const project = req.params.project.replace(/\W/g, '');
     return new Promise((resolve, reject) => {
-        client.connect().then(() => {
-            client.query('select name, device_eui from greenspine.sensors where type =\'mrt_dragino_d22\' order by name').then(res => {
-                client.end().then(() => {
+        pgClient.connect().then(() => {
+            pgClient.query('select name, device_eui from ${project}.sensors order by name').then(res => {
+                pgClient.end().then(() => {
                     resolve(res.rows.map(row => row.name+'/'+row.device_eui).join(', '));
                 }).catch((e) => reject('cannot end query' + e));
             }).catch((e) => reject('cannot query' + e));
