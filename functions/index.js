@@ -1,6 +1,7 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp();
+const db = admin.firestore();
 
 // https://firebase.google.com/docs/functions/networking
 const http = require("http");
@@ -72,17 +73,79 @@ sensorsApp.post("/register", (request, response) => {
 });
 exports.sensors = functions.https.onRequest(sensorsApp);
 
-// exports.exportProject = functions.https.onRequest((request, response) => {
-//     // exmamples: https://firebase.google.com/docs/functions/get-started
-//     // save sampleData as JSON to a file so that it can included in HTML
-//     const docId = request.query.projectId;
-//
-//     // pull data form firestore(projects/docID)
-//     const sampleData = {
-//         blah: 1,
-//         blah2: 2
-//     }
-//     functions.logger.info(["sample project", sampleData], {structuredData: true});
-//
-//     response.send({status: "success", docId, sampleData});
-// });
+// Export-import app
+const exportApp = express();
+
+exportApp.get("/projects/list", (request, response) => {
+    if (!parseInt(process.env.IMPORT_EXPORT_ALLOWED)) {
+        response.status(500).send("action not enabled");
+    }
+    var queryRef = db.collection("sensor_networks").get();
+    return queryRef.then(querySnap => {
+        let html = "";
+        querySnap.forEach(doc => {
+            const data = doc.data();
+            html += `<a href="${process.env.FUNCTIONS_URL}/exportApp/sensors/export/${doc.id}">${data.name} (${data.description})</a><br/>`;
+        });
+        response.status(200).header("content-type", "text/html").send(html);
+    }).catch(e => {
+        response.status(500).send(e.message);
+    });
+});
+
+exportApp.get("/sensors/export/:projectId", (request, response) => {
+    if (!parseInt(process.env.IMPORT_EXPORT_ALLOWED)) {
+        response.status(500).send("action not enabled");
+    }
+    const projectId = request.params.projectId.replace(/\W/g, "");
+    var queryRef = db.collection("sensors").where("network", "==", projectId).get();
+    //        functions.logger.info(["sample project", sampleData], {structuredData: true});
+    return queryRef.then(querySnap => {
+        const data = [];
+        querySnap.forEach(doc => {
+            data.push(doc.data());
+        });
+        response.status(200).header("content-type", "text/plain").send(JSON.stringify(data));
+    }).catch(e => {
+        response.status(500).send(e.message);
+    });
+});
+
+exportApp.get("/sensors/import", (request, response) => {
+    if (!parseInt(process.env.IMPORT_EXPORT_ALLOWED)) {
+        response.status(500).send("action not enabled");
+    }
+    response.status(200).header("content-type", "text/html").send(`
+<form method="post" enctype="application/x-www-form-urlencoded">
+<input name="projectName" placeholder="project name" /><br/>
+<input name="projectDescription" placeholder="description"/><br/>
+<textarea name="sensorsJson" style="max-width: 600px; width: 100%; height: 400px;" placeholder="">JSON of sensors data</textarea><br/>
+<button>create project and import sensors</button>    
+</form>
+    `);
+});
+
+exportApp.post("/sensors/import", (request, response) => {
+    if (!parseInt(process.env.IMPORT_EXPORT_ALLOWED) || process.env.ENV !== "dev") {
+        response.status(500).send("action not enabled");
+    }
+    return db.collection("sensor_networks").add({
+        name: request.body.projectName,
+        description: request.body.projectDescription
+    }).then(docRef => {
+        const sensors = JSON.parse(request.body.sensorsJson);
+        const batch = db.batch();
+        sensors.forEach(sensor => {
+            var sensorsRef = db.collection("sensors").doc();
+            sensor.network = docRef.id
+            batch.set(sensorsRef, sensor);
+        })
+
+        return batch.commit().then(zz => {
+            response.status(200).header("content-type", "text/html").send(JSON.stringify("imported: "+JSON.stringify(zz)));
+        })
+    }).catch(e => {
+        response.status(500).send(e.message);
+    });
+});
+exports.exportApp = functions.https.onRequest(exportApp);
