@@ -5,3 +5,4 @@ else
   clientEnv='dev';
 fi;
 echo "export default '$clientEnv';" > ./src/keys/env.js
+cp "./src/components/dev/firebaseSetup_$clientEnv.js" ./src/components/dev/firebaseSetup.js
