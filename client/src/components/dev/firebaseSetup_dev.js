@@ -5,8 +5,8 @@ import serverConfigAllEnv from "../../keys/server";
 const serverConfig = serverConfigAllEnv[env];
 
 export default (auth, db) => {
-    if (env.env === 'dev' && serverConfig.USE_EMULATORS === 'yes') {
-        connectAuthEmulator(auth, "http://localhost:"+serverConfig.EMULATOR_FUNCTIONS_PORT);
+    if (env === 'dev' && serverConfig.USE_EMULATORS === 'yes') {
+        connectAuthEmulator(auth, "http://localhost:"+serverConfig.EMULATORS_AUTH_PORT);
         connectFirestoreEmulator(db, 'localhost', serverConfig.EMULATORS_FIRESTORE_PORT);
     }
 };

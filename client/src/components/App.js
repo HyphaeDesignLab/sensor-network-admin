@@ -13,7 +13,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 import firebaseSetup from './dev/firebaseSetup';
-firebaseSetup(db, auth);
+firebaseSetup(auth, db);
 
 const App = () => {
     const [authUser, setAuthUser] = useState(null);
