@@ -6,9 +6,7 @@ import InputBoolean from "./InputBoolean";
 import Sensor from './Sensor';
 import {addDoc, updateDoc, deleteDoc, doc, collection, query, where, getDocs} from "firebase/firestore";
 
-import env from './../keys/env';
-import serverConfigAllEnv from './../keys/server';
-const serverConfig = serverConfigAllEnv[env];
+import clientEnv from '../keys/client';
 
 const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentProject, setStep}) => {
     const [sensorToEdit, setSensorToEdit] = useState(false);
@@ -83,7 +81,8 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                 type: sensor.type,
                 name: sensor.name
             };
-            const host = `${serverConfig.URLS_AWS_CLI_API__PROTOCOL}://${serverConfig.URLS_AWS_CLI_API__HOST}:${serverConfig.URLS_AWS_CLI_API__PORT}`;
+            const cmd = isDelete ? 'delete' : 'add';
+            const host = `${clientEnv.URLS_AWS_CLI_API__PROTOCOL}://${clientEnv.URLS_AWS_CLI_API__HOST}:${clientEnv.URLS_AWS_CLI_API__PORT}`;
             const query = Object.entries(body).map(e => `${e[0]}=${encodeURIComponent(e[1])}`).join('&');
             return fetch(`${host}/sensor/add?${query}`, {
                 method: 'get',
