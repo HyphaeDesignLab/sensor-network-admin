@@ -6,10 +6,10 @@
   "scripts": {
     "build": "webpack --mode=production --node-env=production",
     "start": "nodemon server/index.js",
-    "build:dev": "npm run client-env dev && webpack --mode=development",
-    "build:devprod": "npm run client-env prod && webpack --mode=development",
+    "build:dev_w_emulators": "npm run client-env dev && webpack --mode=development",
+    "build:dev": "npm run client-env prod && webpack --mode=development",
     "build:prod": "npm run client-env prod && webpack --mode=production --node-env=production",
-    "proxy-api": "lcp --proxyUrl https://smai.us --proxyPartial smai-prod",
+    "proxy-api": "lcp --proxyUrl https://sensors.admin --proxyPartial sensors-admin",
     "watch": "webpack --watch",
     "serve": "webpack serve",
     "client-env": "./setenv.sh $1"

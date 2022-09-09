@@ -4,5 +4,5 @@ if [ "$1" = 'prod' ]; then
 else
   clientEnv='dev';
 fi;
-echo "export default '$clientEnv';" > ./src/keys/env.js
-cp "./src/components/dev/firebaseSetup_$clientEnv.js" ./src/components/dev/firebaseSetup.js
+cp "./src/keys/client.$clientEnv.js" "./src/keys/client.js"
+firebase apps:sdkconfig 2>/dev/null | sed -e 's/});/};/' -e 's/firebase.initializeApp({/export default {/' > ./src/keys/firebase-config.js
