@@ -6,12 +6,14 @@ import Project from './Project';
 const Dashboard = ({firebaseApp}) => {
     const [step, setStep] = useState('projects');
     const [projects, setProjects] = useState([]);
+    const [projectsError, setProjectsError] = useState(false);
     const [isProjectsLoading, setProjectsLoading] = useState(false);
     const [currentProject, setCurrentProject] = useState(null);
 
     useEffect(() => {
         setProjectsLoading(true);
-        getDocs(collection(firebaseApp.db, "sensor_networks"))
+        const projectsRef = collection(firebaseApp.db, "sensor_networks");
+        getDocs(projectsRef)
         .then(querySnapshot => {
             let p = [];
             querySnapshot.forEach((doc) => {
@@ -20,10 +22,16 @@ const Dashboard = ({firebaseApp}) => {
                 p.push(project);
             })
             setProjects(p);
-            setProjectsLoading(false);
         })
         .catch((error) => {
-            console.log('Error getting project', error);
+            if (error.code === 'permission-denied') {
+                setProjectsError('You must have privilidges to access projects list');
+            } else {
+                setProjectsError(error.message);
+            }
+        })
+        .finally(() => {
+            setProjectsLoading(false);
         });
     }, []);
 
@@ -107,6 +115,7 @@ const Dashboard = ({firebaseApp}) => {
         <h2>Projects</h2>
         {step === 'projects' && <div>
             {isProjectsLoading && <div className='spinning-loader'></div>}
+            {!!projectsError && <div>{projectsError}</div>}
             {projects.map(project =>
                 <div key={project.id} className={currentProject && project.id === currentProject.id ? 'current':''}>
                     <a href='#edit' onClick={editProject.bind(null, project)}>{project.name}</a> &nbsp;
