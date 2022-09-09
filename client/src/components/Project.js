@@ -66,7 +66,18 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
         }
     }
 
-    const addSensorToAwsIot = (sensor) => {
+    const deleteSensor = (sensor) => {
+        addSensorToAwsIot(sensor, 'delete');
+        const sensorDoc = doc(firebaseApp.db, "sensors", sensor.id);
+        return deleteDoc(sensorDoc, sensor).then(response => {
+            setSensors(sensors.filter(s => s.id !== sensor.id));
+            setSensorToEdit(null);
+        }).catch(e => {
+            console.error("Error deleting sensor: ", e.message);
+        });
+    };
+
+    const addSensorToAwsIot = (sensor, isDelete) => {
         return firebaseApp.auth.currentUser.getIdToken().then(authToken => {
             if (!authToken) {
                 console.log('no authed to test')
@@ -84,7 +95,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
             const cmd = isDelete ? 'delete' : 'add';
             const host = `${clientEnv.URLS_AWS_CLI_API__PROTOCOL}://${clientEnv.URLS_AWS_CLI_API__HOST}:${clientEnv.URLS_AWS_CLI_API__PORT}`;
             const query = Object.entries(body).map(e => `${e[0]}=${encodeURIComponent(e[1])}`).join('&');
-            return fetch(`${host}/sensor/add?${query}`, {
+            return fetch(`${host}/sensor/${cmd}?${query}`, {
                 method: 'get',
                 mode: 'cors', // no-cors, *cors, same-origin
             }).then(resp => resp.json()).then(json => {
@@ -119,7 +130,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                     {isSensorsLoading && <div className='spinning-loader'></div>}
                     {sensors && !sensors.length && <div>(no sensors)</div>}
                     {sensors && sensors.map(sensor =>
-                        <div key={sensor.id}>{sensor.name} <a href='#edit' onClick={setSensorToEdit.bind(null, sensor)}>edit</a></div>
+                        <div key={sensor.id}>{sensor.name} ({sensor.id.substr(0,5)})<a href='#edit' onClick={setSensorToEdit.bind(null, sensor)}>edit</a></div>
                     )}
                     <div>
                         {!project.aws_iot_id ?
@@ -137,7 +148,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
             :
             <div>
                 <h2>{project.name} Sensors</h2>
-                <Sensor sensor={sensorToEdit} onSave={saveSensor} onSaveToAws={addSensorToAwsIot} onCancel={cancelSaveSensor} />
+                <Sensor sensor={sensorToEdit} onSave={saveSensor} onDelete={deleteSensor} onSaveToAws={addSensorToAwsIot} onCancel={cancelSaveSensor} />
             </div>}
     </div>;
 };

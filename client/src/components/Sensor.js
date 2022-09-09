@@ -5,7 +5,7 @@ import SensorPhotos from "./sensors/SensorPhotos";
 import InputString from "./InputString";
 import SensorIds from "./sensors/SensorIds";
 
-const Sensor = ({sensor, onSave, onSaveToAws, onCancel}) => {
+const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onCancel}) => {
 
   const [location, setLocation] = useState(sensor.location);
   const [isEditLocation, setEditLocation] = useState(false);
@@ -35,6 +35,9 @@ const Sensor = ({sensor, onSave, onSaveToAws, onCancel}) => {
   const handleTypeEdit = (e) => {
     const type = e.target.value;
     return onSave({...sensor, type}); // spread the IDs into original object
+  };
+  const handleDelete = () => {
+    return onDelete(sensor);
   };
 
   const [awsError, setAwsError] = useState(false);
@@ -91,6 +94,9 @@ const Sensor = ({sensor, onSave, onSaveToAws, onCancel}) => {
 
     <h3>Photos of Sensor as Installed</h3>
     <SensorPhotos photos={sensor.photos} onUpdated={handlePhotoUpdate} />
+
+    <h3>Delete Sensor</h3>
+    <button clasName='link' type='button' onClick={handleDelete}>Delete</button>
   </div>
 }
 
