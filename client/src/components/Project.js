@@ -129,16 +129,16 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                     <h3>Sensors:</h3>
                     {isSensorsLoading && <div className='spinning-loader'></div>}
                     {sensors && !sensors.length && <div>(no sensors)</div>}
-                    {sensors && sensors.map(sensor =>
-                        <div key={sensor.id}>{sensor.name} ({sensor.id.substr(0,5)})<a href='#edit' onClick={setSensorToEdit.bind(null, sensor)}>edit</a></div>
-                    )}
                     <div>
                         {!project.aws_iot_id ?
-                            <span>Please set the Project AWS IOT ID in order to add sensors<br/><a href='#add-sensor-disabled' onClick={()=>{}}>Add New Sensor</a></span>
+                            <span className='error'>Please set the Project AWS IOT ID in order to add sensors<br/><a href='#add-sensor-disabled' onClick={()=>{}}>Add New Sensor</a></span>
                             :
                             <a href='#add-sensor' onClick={addNewSensor}>Add New Sensor</a>
                         }
                     </div>
+                    {sensors && sensors.map(sensor =>
+                        <div key={sensor.id}>{sensor.name} ({sensor.id.substr(0,5)})<a href='#edit' onClick={setSensorToEdit.bind(null, sensor)}>edit</a></div>
+                    )}
                 </div>}
 
                 <div>

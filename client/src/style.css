@@ -97,3 +97,7 @@ button.link:focus, .button-link:focus {
         transform: rotateZ(360deg);
     }
 }
+
+.error {
+    color: #c40f0f;
+}
