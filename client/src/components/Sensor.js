@@ -96,7 +96,7 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onCancel}) => {
     <SensorPhotos photos={sensor.photos} onUpdated={handlePhotoUpdate} />
 
     <h3>Delete Sensor</h3>
-    <button clasName='link' type='button' onClick={handleDelete}>Delete</button>
+    <button className='link' type='button' onClick={handleDelete}>Delete</button>
   </div>
 }
 
