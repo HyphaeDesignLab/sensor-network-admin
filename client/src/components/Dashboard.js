@@ -81,11 +81,11 @@ const Dashboard = ({firebaseApp}) => {
         const docRef = doc(firebaseApp.db, "sensor_networks", currentProject.id);
         updateDoc(docRef, projectFragment)
             .then(response => {
-                console.log(response);
                 const projectsCopy = [...projects];
                 const index = projectsCopy.findIndex(p => p.id === currentProject.id);
                 projectsCopy[index] = {...currentProject, ...projectFragment};
                 setProjects(projectsCopy);
+                setCurrentProject(projectsCopy[index]);
             })
             .catch(error => {
                 console.log('project update error ', error.message);

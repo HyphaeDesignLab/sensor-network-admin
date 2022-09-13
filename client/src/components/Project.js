@@ -8,6 +8,7 @@ import {addDoc, updateDoc, deleteDoc, doc, collection, query, where, getDocs} fr
 
 import clientEnv from '../keys/client';
 
+const noAwsProjectIdErrorMessage = 'Please set the Project AWS IOT ID in order to add sensors';
 const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentProject, setStep}) => {
     const [sensorToEdit, setSensorToEdit] = useState(false);
 
@@ -34,6 +35,10 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
     }, [project]);
 
     const addNewSensor = () => {
+        if (!project.aws_iot_id) {
+            alert(noAwsProjectIdErrorMessage);
+            return;
+        }
         setSensorToEdit({});
     }
 
@@ -129,12 +134,11 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                     <h3>Sensors:</h3>
                     {isSensorsLoading && <div className='spinning-loader'></div>}
                     {sensors && !sensors.length && <div>(no sensors)</div>}
-                    <div>
-                        {!project.aws_iot_id ?
-                            <span className='error'>Please set the Project AWS IOT ID in order to add sensors<br/><a href='#add-sensor-disabled' onClick={()=>{}}>Add New Sensor</a></span>
-                            :
-                            <a href='#add-sensor' onClick={addNewSensor}>Add New Sensor</a>
+                    <div style={{marginBottom: '10px'}}>
+                        {!project.aws_iot_id &&
+                            <div className='error'>{noAwsProjectIdErrorMessage}</div>
                         }
+                        <button type='button' onClick={addNewSensor} className='link'>Add New Sensor</button>
                     </div>
                     {sensors && sensors.map(sensor =>
                         <div key={sensor.id}>{sensor.name} ({sensor.id.substr(0,5)})<a href='#edit' onClick={setSensorToEdit.bind(null, sensor)}>edit</a></div>
