@@ -6,7 +6,7 @@ mapboxgl.accessToken = mapboxToken;
 
 import './mapbox.css';
 
-const GeoLocator = ({onDone, initialValue=null}) => {
+const GeoLocator = ({onDone, onCancel, initialValue=null}) => {
   const [coordinates, setCoordinates] = useState(initialValue);
   const [error, setError] = useState('');
   const [isGetInProgress, setGetInProgress] = useState(false);
@@ -121,6 +121,7 @@ const GeoLocator = ({onDone, initialValue=null}) => {
         <button onClick={handleConfirm}>Confirm Location is Correct</button>
       </div>
     }
+    <div><button type='button' className='link' onClick={onCancel}>cancel location edit</button></div>
     {error ? <div>{error}</div> : null}
   </div>
 }
