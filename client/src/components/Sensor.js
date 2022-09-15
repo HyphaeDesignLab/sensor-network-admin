@@ -13,7 +13,7 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onCancel}) => {
   const handleLocationSet = (lngLat) => {
     setEditLocation(false);
     setLocation(lngLat);
-    return onSave({...sensor, ...lngLat}); // spread the lng/lat into original object
+    return onSave({...sensor, location: lngLat}); // spread the lng/lat into original object
   };
 
   const handleLocationEdit = () => {
