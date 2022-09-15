@@ -117,8 +117,8 @@ const GeoLocator = ({onDone, initialValue=null}) => {
           </div>
         </div>
         <div>Location: longitude={coordinates.lng}, latitude={coordinates.lat} (accuracy: {coordinates.accuracy})</div>
-        <button onClick={handleEdit}>{isEdit ? 'Done Editing' : 'Adjust Location'}</button>
-        <button onClick={handleConfirm}>Confirm Location is Correct</button>
+        <button onClick={handleEdit}>{isEdit ? 'Done Adjusting':'Adjust'} Location</button>
+        {!isEdit && <button onClick={handleConfirm}>Confirm Location</button>}
       </div>
     }
     {error ? <div>{error}</div> : null}
