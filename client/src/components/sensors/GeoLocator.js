@@ -5,6 +5,7 @@ import mapboxgl from 'mapbox-gl';
 mapboxgl.accessToken = mapboxToken;
 
 import './mapbox.css';
+import InputString from "../InputString";
 
 const GeoLocator = ({onDone, initialValue=null}) => {
   const [coordinates, setCoordinates] = useState(initialValue);
@@ -122,7 +123,13 @@ const GeoLocator = ({onDone, initialValue=null}) => {
           <div ref={mapContainer} className="map-container" style={{width: '100%', height: '100%'}}>
           </div>
         </div>
-        <div>Location: longitude={coordinates.lng}, latitude={coordinates.lat} (accuracy: {coordinates.accuracy})</div>
+        <div>
+          Longitude:
+          <InputString onSave={handleManualEdit} value={coordinates.lng} path='lng' type='string' hasLabel={false} />
+          Latitude:
+          <InputString onSave={handleManualEdit} value={coordinates.lat} path='lng' type='string' hasLabel={false} />
+          (accuracy: {coordinates.accuracy})
+        </div>
         <button onClick={handleEdit}>{isEdit ? 'Done Adjusting':'Adjust'} Location</button>
         {!isEdit && <button onClick={handleConfirm}>Confirm Location</button>}
       </div>
