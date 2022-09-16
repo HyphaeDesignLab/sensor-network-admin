@@ -5,3 +5,12 @@
 .mapboxgl-compact {
     display: none;
 }
+
+.map-container-outer {
+    margin: 10px;
+}
+
+.map-container-outer div {
+    margin: 0;
+    padding: 0;
+}

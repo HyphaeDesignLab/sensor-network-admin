@@ -77,6 +77,12 @@ const GeoLocator = ({onDone, initialValue=null}) => {
     }
   }, []);
 
+  const handleManualEdit = (coordinate) => {
+    const newCoorinates = {...coordinates, ...coordinate};
+    if (newCoorinates.lng && newCoorinates.lat) {
+      setCoordinates(newCoorinates);
+    }
+  };
   const handleEdit = () => {
     // going from ON to OFF
     if (isEdit) {
@@ -108,8 +114,8 @@ const GeoLocator = ({onDone, initialValue=null}) => {
         <button onClick={handleGet} disabled={isGetInProgress}>{isGetInProgress ? 'Getting location...' : 'Get Current Location'}</button>
       </div> :
       <div>
-        <div style={{width: '300px', height: '300px', position: 'relative'}}>
-          <svg style={{width: '40px', position: 'absolute', bottom: 'calc(50% - 5px)', left: '50%', fill: '#ff28c4', display: isEdit ? '':'none'}} viewBox="0 0 100 100">
+        <div style={{width: '300px', height: '300px', position: 'relative'}} className='map-container-outer'>
+          <svg style={{width: '40px', position: 'absolute', bottom: 'calc(50% - 5px)', left: 'calc(50% - 20px)', fill: '#ff28c4', display: isEdit ? '':'none'}} viewBox="0 0 100 100">
             <path d="M50,89.5c0.32,0,0.62-0.17,0.78-0.43c1.03-1.59,24.88-39.15,24.88-52.91C75.66,22.02,64.15,10.5,50,10.5  c-14.15,0-25.66,11.51-25.66,25.66c0,13.75,23.85,51.32,24.88,52.91C49.38,89.33,49.68,89.5,50,89.5z M33.46,36.16  c0-9.13,7.41-16.55,16.54-16.55c9.13,0,16.54,7.43,16.54,16.55c0,9.11-7.41,16.54-16.54,16.54C40.87,52.7,33.46,45.27,33.46,36.16z">
             </path>
           </svg>
