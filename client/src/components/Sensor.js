@@ -89,14 +89,12 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onCancel}) => {
     </React.Fragment>}
 
     <h3>Location</h3>
-    <div>
+    {!isEditLocation ? <div>
       {!!location && <span>Longitude: {location.lng}, Latitude: {location.lat}</span>}
-      {!isEditLocation && <button type='button' className='link' onClick={handleLocationEdit}>{!!location ? 'Edit' : 'Add'} Location</button>}
-    </div>
-    {isEditLocation && <GeoLocator onDone={handleLocationSet} initialValue={location}/>}
-    {isEditLocation && <div>
-      <button type='button' className='link' onClick={handleLocationEdit}>Cancel {!!location ? 'Edit' : 'Add'} Location</button>
-    </div>}
+    </div> :
+      <GeoLocator onDone={handleLocationSet} initialValue={location}/>
+    }
+    <button type='button' className='link' onClick={handleLocationEdit}>{isEditLocation && 'Cancel '}{!!location ? 'Edit' : 'Add'} Location</button>
 
     <h3>Photos of Sensor as Installed</h3>
     <SensorPhotos photos={sensor.photos} onUpdated={handlePhotoUpdate} />
