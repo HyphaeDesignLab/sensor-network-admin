@@ -8,6 +8,15 @@ import './mapbox.css';
 import InputString from "../InputString";
 
 const GeoLocator = ({onDone, initialValue=null}) => {
+  // current component mounted state (maybe there is a better way to do it?)
+  // to be used / checked with in async callback's outside of react
+  const isMounted = useRef(true); // initial true
+  useEffect(() => {
+    return () => {
+      isMounted.current = false; // when dismounting set to false
+    }
+  }, []);
+
   const [coordinates, setCoordinates] = useState(initialValue);
   const [manualCoordinates, setManualCoordinates] = useState({});
   const [isCoordinatesChanged, setCoordinatesChanged] = useState(false);
@@ -16,9 +25,15 @@ const GeoLocator = ({onDone, initialValue=null}) => {
   const handleGetCurrentLocation = () => {
     setGetCurrentLocationInProgress(true);
     navigator.geolocation.getCurrentPosition(res => {
+      if (!isMounted.current) {
+        return;
+      }
       setCoordinates({lng: res.coords.longitude, lat: res.coords.latitude, accuracy: res.coords.accuracy});
       setGetCurrentLocationInProgress(false);
     }, err => {
+      if (!isMounted.current) {
+        return;
+      }
       let error = ({1: 'permission deined', 2: 'position unavailable', 3: 'timeout'})[err.code]  + ' ' + err.message;
       setError(error);
     }, {
@@ -91,19 +106,6 @@ const GeoLocator = ({onDone, initialValue=null}) => {
     }
     setCoordinatesChanged(true);
   }, [coordinates]);
-
-  // let's make sure the timeout used in "handleEditOrDoneEdit" can be cancelled, if component is deconstructed
-  //   as timeout is waiting, to avoid errors
-  const setEditOffWithDelayTimeoutId = useRef(null);
-  useEffect(() => {
-    // make sure to
-    return () => {
-      if (setEditOffWithDelayTimeoutId.current) {
-        clearTimeout(setEditOffWithDelayTimeoutId.current);
-        setEditOffWithDelayTimeoutId.current = null;
-      }
-    }
-  }, []);
 
   const handleManualEdit = (coordinatesFragment) => {
     setManualCoordinates({ ...manualCoordinates, ...coordinatesFragment });
