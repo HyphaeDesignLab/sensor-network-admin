@@ -18,7 +18,7 @@ const GeoLocator = ({onDone, initialValue=null}) => {
   }, []);
 
   const [coordinates, setCoordinates] = useState(initialValue);
-  const [manualCoordinates, setManualCoordinates] = useState({});
+  const [manualCoordinates, setManualCoordinates] = useState({...initialValue});
   const [isCoordinatesChanged, setCoordinatesChanged] = useState(false);
   const [error, setError] = useState('');
   const [isGetCurrentLocationInProgress, setGetCurrentLocationInProgress] = useState(false);
@@ -108,7 +108,7 @@ const GeoLocator = ({onDone, initialValue=null}) => {
   }, [coordinates]);
 
   const handleManualEdit = (coordinatesFragment) => {
-    setManualCoordinates({ ...manualCoordinates, ...coordinatesFragment });
+    setManualCoordinates({ ...coordinates, ...coordinatesFragment });
   };
 
   // whenever manual coordinates change, check if
@@ -116,6 +116,10 @@ const GeoLocator = ({onDone, initialValue=null}) => {
     if (manualCoordinates.lng && manualCoordinates.lat) {
       if (JSON.stringify(manualCoordinates) !== JSON.stringify(coordinates)) {
         map.current.setCenter([manualCoordinates.lng, manualCoordinates.lat]);
+        map.current.getSource('currentLocation').setData({
+          type: 'Point',
+          coordinates: [manualCoordinates.lng, manualCoordinates.lat]
+        });
       }
       setCoordinates(manualCoordinates);
     }
