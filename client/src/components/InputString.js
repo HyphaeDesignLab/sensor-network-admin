@@ -62,7 +62,7 @@ export default function InputString({value, path, onSave, type='text',
     }
 
     const handleChange = e => {
-        setNewValue(e.target.value);
+        setNewValue(type === 'number' ? parseFloat(e.target.value) : e.target.value);
     };
 
     const handleSaveClick = () => {

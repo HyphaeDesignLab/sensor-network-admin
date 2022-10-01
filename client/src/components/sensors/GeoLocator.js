@@ -134,9 +134,9 @@ const GeoLocator = ({onDone, initialValue=null}) => {
         <div>
           <strong>Edit Manually</strong><br/>
           Longitude:
-          <InputString onSave={handleManualEdit} value={!!coordinates ? coordinates.lng:''} path='lng' type='string' hasLabel={false} wrapEl='span' />
+          <InputString onSave={handleManualEdit} value={!!coordinates ? coordinates.lng:''} path='lng' type='number' hasLabel={false} wrapEl='span' />
           Latitude:
-          <InputString onSave={handleManualEdit} value={!!coordinates ? coordinates.lat:''} path='lng' type='string' hasLabel={false} wrapEl='span' />
+          <InputString onSave={handleManualEdit} value={!!coordinates ? coordinates.lat:''} path='lng' type='number' hasLabel={false} wrapEl='span' />
           {!!coordinates && !!coordinates.accuracy && <span>accuracy: {coordinates.accuracy}</span>}
         </div>
 
