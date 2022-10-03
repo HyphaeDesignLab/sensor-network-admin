@@ -9,7 +9,7 @@ const EditIcon = () => {
 };
 const minInputWidth = 30;
 
-export default function InputString({value, path, onSave, type='text',
+export default function InputString({value=null, path, onSave, type='text',
                                         hasLabel=true, isOnlyEditMode=false, onCancel=null,
                                         inputStyle= {}, wrapEl=null}) {
     const [newValue, setNewValue] = useState(value);
@@ -62,6 +62,9 @@ export default function InputString({value, path, onSave, type='text',
     }
 
     const handleChange = e => {
+        if (e.target.value === null) {
+            return;
+        }
         setNewValue(type === 'number' ? parseFloat(e.target.value) : e.target.value);
     };
 
@@ -94,10 +97,10 @@ export default function InputString({value, path, onSave, type='text',
                 :
                 <span onClick={handleEditClick} style={inputStyle}>{oldValue} <EditIcon /></span>
             }
+            {isChanged && <span>&nbsp;<button onClick={handleSaveClick}>save</button></span>}
             {(isOnlyEditMode && isChanged) || (!isOnlyEditMode && isEditable) &&
-                <span>&nbsp;<a href='#' onClick={handleCancelClick}>cancel</a></span>
+                <span>&nbsp;<button className='link' onClick={handleCancelClick}>cancel</button></span>
             }
-            {isChanged && <span>&nbsp;<a href='#' onClick={handleSaveClick}>save</a></span>}
         </WrappingTag>
         <WrappingTag className='measure-text-length-offpage' ref={measureTextLengthElRef} style={{...inputStyle}}>{newValue}</WrappingTag>
     </React.Fragment>);
