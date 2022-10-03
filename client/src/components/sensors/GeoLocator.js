@@ -157,7 +157,6 @@ const GeoLocator = ({onDone, initialValue=null}) => {
           </div>
         </div>}
       </div>
-    }
     {error ? <div>{error}</div> : null}
   </div>
 }
