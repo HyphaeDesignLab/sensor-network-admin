@@ -100,6 +100,12 @@ const GeoLocator = ({onDone, initialValue=null}) => {
       map.current.on('touchstart',  () => {setEditingOnMap(true);});
       map.current.on('touchcancel',  () => {setEditingOnMap(false);});
       map.current.on('touchmove', setNewCoordinates);
+    } else {
+      map.current.setCenter([coordinates.lng, coordinates.lat]);
+      map.current.getSource(layerId).setData({
+        type: 'Point',
+        coordinates: [coordinates.lng, coordinates.lat]
+      });
     }
   }, [coordinates]);
 
@@ -108,6 +114,7 @@ const GeoLocator = ({onDone, initialValue=null}) => {
       if (isCoordinatesChanged) {
         setCoordinatesChanged(false);
       }
+      return;
     }
     setCoordinatesChanged(true);
   }, [coordinates]);
@@ -118,14 +125,8 @@ const GeoLocator = ({onDone, initialValue=null}) => {
 
   // whenever manual coordinates change, check if
   useEffect(() => {
-    if (manualCoordinates.lng && manualCoordinates.lat) {
-      if (JSON.stringify(manualCoordinates) !== JSON.stringify(coordinates)) {
-        map.current.setCenter([manualCoordinates.lng, manualCoordinates.lat]);
-        map.current.getSource('currentLocation').setData({
-          type: 'Point',
-          coordinates: [manualCoordinates.lng, manualCoordinates.lat]
-        });
-      }
+    if (JSON.stringify(manualCoordinates) !== JSON.stringify(coordinates)
+        && manualCoordinates.lng && manualCoordinates.lat) {
       setCoordinates(manualCoordinates);
     }
   }, [manualCoordinates]);
