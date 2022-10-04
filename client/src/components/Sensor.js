@@ -55,7 +55,8 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
   const [awsIdUnregistered, setAwsIdUnregistered] = useState(false);
   const handleAwsIdsSave = () => {
     setAwsError(false);
-    setAwsRegInProgress(true)
+    setAwsRegInProgress(true);
+    setAwsIdUnregistered(false);
     onSaveToAws(sensor).then(awsId => {
       return onSave({...sensor, aws_iot_id: awsId});
     }).catch(e => {
