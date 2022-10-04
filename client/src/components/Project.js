@@ -85,7 +85,8 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
     const addSensorToAwsIot = (sensor, isDelete) => {
         return firebaseApp.auth.currentUser.getIdToken().then(authToken => {
             if (!authToken) {
-                console.log('no authed to test')
+                console.log('visitor not logged in');
+                return Promise.reject('visitor not logged in')
             }
 
             const body = {
@@ -116,7 +117,8 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
     const deleteSensorFromAwsIot = (sensorAswId) => {
         return firebaseApp.auth.currentUser.getIdToken().then(authToken => {
             if (!authToken) {
-                console.log('no authed to test')
+                console.log('visitor not logged in');
+                return Promise.reject('visitor not logged in')
             }
 
             const host = `${clientEnv.URLS_AWS_CLI_API__PROTOCOL}://${clientEnv.URLS_AWS_CLI_API__HOST}:${clientEnv.URLS_AWS_CLI_API__PORT}`;
