@@ -142,7 +142,7 @@ const GeoLocator = ({onDone, initialValue=null}) => {
       <div>
         {isCoordinatesChanged && <button onClick={handleConfirm}>Save Location Edits</button>}
         <div>
-          <strong>Edit Manually</strong><br/>
+          <strong>Enter Longitude/Latitude</strong><br/>
           Longitude:
           <InputString onSave={handleManualEdit} value={!!coordinates ? coordinates.lng:''} path='lng' type='number' hasLabel={false} wrapEl='span' />
           Latitude:
@@ -150,7 +150,8 @@ const GeoLocator = ({onDone, initialValue=null}) => {
           {!!coordinates && !!coordinates.accuracy && <span>accuracy: {coordinates.accuracy}</span>}
         </div>
 
-        <strong>Edit on Map</strong><br/>
+        <strong>Change on Map</strong><br/>
+        <p>Drag map to re-adjust location</p>
         <div>
           <button className='link' onClick={handleGetCurrentLocation} disabled={isGetCurrentLocationInProgress}>{isGetCurrentLocationInProgress ? 'Getting location...' : 'Get Current Location'}</button>
         </div>
