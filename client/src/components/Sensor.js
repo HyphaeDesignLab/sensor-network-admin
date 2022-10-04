@@ -4,6 +4,7 @@ import GeoLocator from "./sensors/GeoLocator";
 import SensorPhotos from "./sensors/SensorPhotos";
 import InputString from "./InputString";
 import SensorIds from "./sensors/SensorIds";
+import ConfirmDialog from "./ConfirmDialog";
 
 const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCancel}) => {
 
@@ -46,8 +47,26 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
     const type = e.target.value;
     return onSave({...sensor, type}); // spread the IDs into original object
   };
+
+  const [isConfirmDeleteShown, setIsConfirmDeleteShown] = useState(false);
+  const [isDeleteSensorInProgress, setIsDeleteSensorInProgress] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
+  const confirmDelete = () => {
+    setDeleteError(false);
+    setIsDeleteSensorInProgress(true);
+    setIsConfirmDeleteShown(false);
+    onDelete(sensor).catch(e => {
+      setDeleteError(e.message);
+    })
+    .finally(() => {
+      setIsDeleteSensorInProgress(false);
+    });
+  };
+  const cancelDelete = () => {
+    setIsConfirmDeleteShown(false);
+  };
   const handleDelete = () => {
-    return onDelete(sensor);
+    setIsConfirmDeleteShown(true);
   };
 
   const [awsError, setAwsError] = useState(false);
@@ -93,6 +112,7 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
     setAwsError(`Removing AWS IOT ID from DB...`);
     const awsIotId = sensor.aws_iot_id;
     onSave({...sensor, aws_iot_id: null}).then(() => {
+      setAwsError(`Removed AWS IOT ID from DB.`);
       setAwsIdUnregistered(awsIotId);
     }).catch(e => {
       setAwsError('Error removing AWS IOT ID from DB');
@@ -157,7 +177,16 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
     <SensorPhotos photos={sensor.photos} onUpdated={handlePhotoUpdate} />
 
     <h3>Delete Sensor</h3>
-    <button className='link' type='button' onClick={handleDelete}>Delete</button>
+    {isDeleteSensorInProgress && <div>Deleting sensor...</div>}
+    {!!deleteError && <div className='error'>{deleteError}</div>}
+    <button className='link' type='button' onClick={handleDelete} disabled={isDeleteSensorInProgress}>Delete</button>
+
+    {isConfirmDeleteShown && <ConfirmDialog
+        onCancel={cancelDelete} onConfirm={confirmDelete}
+        title='Delete Sensor?'
+        text='Do you really want to delete this sensor. It will also un-register the associated AWS IOT device. This can NOT be UNDONE.'
+        confirmText='Delete'
+    ></ConfirmDialog>}
   </div>
 }
 

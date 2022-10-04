@@ -1,6 +1,7 @@
 * {
     margin: 0;
     box-sizing: border-box;
+    font-size: 16px;
 }
 
 div, p {
@@ -33,6 +34,10 @@ h2 > input, h3 > input, h4 > input {
     font-size: inherit;
 }
 
+button {
+    height: 25px;
+    display: inline-block;
+}
 button.link, .button-link {
     display: inline-block;
     background: none;
@@ -100,4 +105,62 @@ button.link:focus, .button-link:focus {
 
 .error {
     color: #c40f0f;
+}
+
+
+.overlay-wrap {
+    position: fixed;
+    z-index: 8888;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: rgba(255, 255, 255, .5);
+    transition: background-color 500ms ease-in;
+}
+
+
+.overlay-wrap .overlay-text {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    text-align: center;
+    flex-direction: column;
+    width: 40%;
+    max-width: 300px;
+    min-width: 200px;
+    min-height: 200px;
+    padding: 0;
+    border-radius: 20px;
+    background-color: rgba(213, 213, 234, 0.8)
+}
+
+.overlay-text h3 {
+    font-size: 20px;
+}
+.overlay-text p {
+    font-size: 14px;
+}
+.overlay-text .overlay-close  {
+    position: absolute;
+    top: 2px;
+    right: 5px;
+    font-size: 15px;
+    cursor: pointer;
+    border-radius: 6px;
+    height: 20px;
+    width: 20px;
+    background: #1c2e5c;
+    color: white;
+}
+.overlay-text .overlay-close:hover {
+    background: #000000;
+    color: #5bcad9;
 }
