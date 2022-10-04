@@ -110,13 +110,19 @@ const GeoLocator = ({onDone, onCancel, initalCoordinates=null}) => {
   }, [coordinates]);
 
   useEffect(() => {
-    if (!!initialValue && JSON.stringify(initialValue) === JSON.stringify(coordinates)) {
-      if (isCoordinatesChanged) {
-        setCoordinatesChanged(false);
+    if (!!initalCoordinates) {
+      if (JSON.stringify(initalCoordinates) !== JSON.stringify(coordinates)) {
+        setCoordinatesChanged(true);
+      } else {
+        if (isCoordinatesChanged) {
+          setCoordinatesChanged(false);
+        }
       }
-      return;
+    } else {
+      if (coordinates.lng && coordinates.lat) {
+        setCoordinatesChanged(true);
+      }
     }
-    setCoordinatesChanged(true);
   }, [coordinates]);
 
   const handleManualEdit = (coordinatesFragment) => {
