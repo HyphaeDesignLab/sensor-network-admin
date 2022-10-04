@@ -72,7 +72,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
     }
 
     const deleteSensor = (sensor) => {
-        addSensorToAwsIot(sensor, 'delete');
+        deleteSensorFromAwsIot(sensor.aws_iot_id);
         const sensorDoc = doc(firebaseApp.db, "sensors", sensor.id);
         return deleteDoc(sensorDoc, sensor).then(response => {
             setSensors(sensors.filter(s => s.id !== sensor.id));
@@ -97,10 +97,9 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                 type: sensor.type,
                 name: sensor.name
             };
-            const cmd = isDelete ? 'delete' : 'add';
             const host = `${clientEnv.URLS_AWS_CLI_API__PROTOCOL}://${clientEnv.URLS_AWS_CLI_API__HOST}:${clientEnv.URLS_AWS_CLI_API__PORT}`;
             const query = Object.entries(body).map(e => `${e[0]}=${encodeURIComponent(e[1])}`).join('&');
-            return fetch(`${host}/sensor/${cmd}?${query}`, {
+            return fetch(`${host}/sensor/add?${query}`, {
                 method: 'get',
                 mode: 'cors', // no-cors, *cors, same-origin
             }).then(resp => resp.json()).then(json => {
@@ -111,6 +110,27 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                     throw new Error('no AWS ID returned');
                 }
                 return json.id;
+            });
+        });
+    }
+    const deleteSensorFromAwsIot = (sensorAswId) => {
+        return firebaseApp.auth.currentUser.getIdToken().then(authToken => {
+            if (!authToken) {
+                console.log('no authed to test')
+            }
+
+            const host = `${clientEnv.URLS_AWS_CLI_API__PROTOCOL}://${clientEnv.URLS_AWS_CLI_API__HOST}:${clientEnv.URLS_AWS_CLI_API__PORT}`;
+            return fetch(`${host}/sensor/delete?id=${sensorAswId}`, {
+                method: 'get',
+                mode: 'cors', // no-cors, *cors, same-origin
+            }).then(resp => resp.json()).then(json => {
+                if (!!json.error) {
+                    throw new Error(json.error);
+                }
+                if (!json.id) {
+                    throw new Error('no AWS ID returned');
+                }
+                return true;
             });
         });
     }
