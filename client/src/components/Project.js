@@ -71,14 +71,28 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
         }
     }
 
+    // Add a deleted sensor note/error message + timeout to disappear (and clear timeout on UNmount)
+    const [deletedSensorNote, setDeletedSensorNote] = useState(false);
+    const deletedSensorNoteTimeout = useRef(0);
+    useEffect(() => {
+        if (deletedSensorNoteTimeout.current) {
+            clearTimeout(deletedSensorNoteTimeout.current);
+        }
+    }, []);
+
     const deleteSensor = (sensor) => {
+        setDeletedSensorNote(false);
         deleteSensorFromAwsIot(sensor);
         const sensorDoc = doc(firebaseApp.db, "sensors", sensor.id);
         return deleteDoc(sensorDoc, sensor).then(response => {
             setSensors(sensors.filter(s => s.id !== sensor.id));
             setSensorToEdit(null);
+            setDeletedSensorNote(`Deleted sensor ${sensor.name} (id: ${sensor.id.substr(0,7)})`);
+            deletedSensorNoteTimeout.current = setTimeout(() => {
+                setDeletedSensorNote(false);
+            }, 15000);
         }).catch(e => {
-            console.error("Error deleting sensor: ", e.message);
+            setDeletedSensorNote("Error deleting sensor: " + e.message);
         });
     };
 
@@ -157,10 +171,13 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                         {!project.aws_iot_id &&
                             <div className='error'>{noAwsProjectIdErrorMessage}</div>
                         }
+                        {!!deletedSensorNote &&
+                            <div className='error'>{deletedSensorNote}</div>
+                        }
                         <button type='button' onClick={addNewSensor} className='link'>Add New Sensor</button>
                     </div>
                     {sensors && sensors.map(sensor =>
-                        <div key={sensor.id}>{sensor.name} ({sensor.id.substr(0,5)})<a href='#edit' onClick={setSensorToEdit.bind(null, sensor)}>edit</a></div>
+                        <div key={sensor.id}>{sensor.name} (id: {sensor.id.substr(0,7)})<a href='#edit' onClick={setSensorToEdit.bind(null, sensor)}>edit</a></div>
                     )}
                 </div>}
 
