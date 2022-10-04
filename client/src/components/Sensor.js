@@ -148,9 +148,9 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
                 <button type={'button'} onClick={handleAwsIdsSave} disabled={isAwsRegInProgress}>Register</button>
                 {isAwsRegInProgress && <div className='spinning-loader'></div>}
                 {awsIdUnregistered && <div>
-                  Please check manually that &nbsp;
+                  <span>Please check manually that the device </span>
                   <a href={'https://us-west-2.console.aws.amazon.com/iot/home?region=us-west-2#/wireless/devices/details/'+awsIdUnregistered} target='_blank'>{awsIdUnregistered}</a>
-                  has been removed from AWS IOT itself.
+                  <span> has been removed from AWS IOT itself.</span>
                 </div>}
               </React.Fragment> :
               <React.Fragment>
