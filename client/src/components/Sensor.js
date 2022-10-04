@@ -9,11 +9,18 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onCancel}) => {
 
   const [location, setLocation] = useState(sensor.location);
   const [isEditLocation, setEditLocation] = useState(false);
+  const [hasLocationChanged, setLocationChanged] = useState(false);
 
   const handleLocationSet = (lngLat) => {
     setEditLocation(false);
     setLocation(lngLat);
-    return onSave({...sensor, location: lngLat}); // spread the lng/lat into original object
+    setLocationChanged(true);
+    // spread the lng/lat into original object
+    return onSave({...sensor, location: lngLat}).finally(() => {
+      setTimeout(() => {
+        setLocationChanged(false);
+      }, 1000);
+    });
   };
 
   const handleLocationEditStart = () => {
@@ -93,7 +100,7 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onCancel}) => {
 
     <h3>Location</h3>
     <button type='button' className='link' onClick={handleLocationEditStart}>{!!location ? 'Edit' : 'Add'} Location</button>
-    {!isEditLocation ? <div>
+    {!isEditLocation ? <div style={{transition: 'background-color 500ms ease-in', backgroundColor: hasLocationChanged ? '#98d28f':'white'}}>
       {!!location && <span>Longitude: {location.lng}, Latitude: {location.lat}</span>}
     </div> :
       <GeoLocator onDone={handleLocationSet} initalCoordinates={location} onCancel={handleLocationEditCancel}/>
