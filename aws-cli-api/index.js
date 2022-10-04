@@ -79,8 +79,8 @@ app.get('/sensor/add', function (req, res) {
 });
 app.get('/sensor/delete', function (req, res) {
     try {
-        const id = removeSpaces(req.query.id); // sensor type
-        const cmd = `aws iotwireless create-wireless-device --id ${id}`;
+        const id = req.query.id.replace(/[^\w-]/g, '');
+        const cmd = `aws iotwireless delete-wireless-device --id ${id}`;
 
         const outputBuffer = execSync(cmd);
         const outputObject = JSON.parse(outputBuffer.toString());
