@@ -129,6 +129,10 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
         });
     }
     const deleteSensorFromAwsIot = (sensor) => {
+        if (!sensor.aws_iot_id) {
+            return Promise.resolve('Sensor has not AWS IOT ID to un-register');
+        }
+
         return firebaseApp.auth.currentUser.getIdToken().then(authToken => {
             if (!authToken) {
                 console.log('visitor not logged in');
