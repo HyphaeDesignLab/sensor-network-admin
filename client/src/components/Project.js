@@ -164,7 +164,8 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                 <InputString onSave={saveProject} value={project.description} path='description' type='string' />
                 <div>
                     <InputString onSave={saveProject} value={project.aws_iot_id} path='aws_iot_id' type='string' />
-                    [note: aws iot id is used to calculate the wireless destination topic: &lt;projectAwsIotId&gt;__&lt;sensorType&gt;]
+                    (AWS IOT ID is used to calculate the wireless destination topic: &lt;projectAwsIotId&gt;__&lt;sensorType&gt;)
+                    {!project.aws_iot_id && <div className='error'>{noAwsProjectIdErrorMessage}</div>}
                 </div>
 
                 {!!project.id && <div>
@@ -172,9 +173,6 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                     {isSensorsLoading && <div className='spinning-loader'></div>}
                     {sensors && !sensors.length && <div>(no sensors)</div>}
                     <div style={{marginBottom: '10px'}}>
-                        {!project.aws_iot_id &&
-                            <div className='error'>{noAwsProjectIdErrorMessage}</div>
-                        }
                         {!!deletedSensorNote &&
                             <div className='error'>{deletedSensorNote}</div>
                         }
