@@ -16,8 +16,11 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onCancel}) => {
     return onSave({...sensor, location: lngLat}); // spread the lng/lat into original object
   };
 
-  const handleLocationEdit = () => {
-    setEditLocation(s => !s);
+  const handleLocationEditStart = () => {
+    setEditLocation(true);
+  };
+  const handleLocationEditCancel = () => {
+    setEditLocation(false);
   };
 
   const handlePhotoUpdate = (photos) => {
@@ -89,12 +92,12 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onCancel}) => {
     </React.Fragment>}
 
     <h3>Location</h3>
+    <button type='button' className='link' onClick={handleLocationEditStart}>{!!location ? 'Edit' : 'Add'} Location</button>
     {!isEditLocation ? <div>
       {!!location && <span>Longitude: {location.lng}, Latitude: {location.lat}</span>}
     </div> :
-      <GeoLocator onDone={handleLocationSet} initialValue={location}/>
+      <GeoLocator onDone={handleLocationSet} initalCoordinates={location} onCancel={handleLocationEditCancel}/>
     }
-    <button type='button' className='link' onClick={handleLocationEdit}>{isEditLocation && 'Cancel '}{!!location ? 'Edit' : 'Add'} Location</button>
 
     <h3>Photos of Sensor as Installed</h3>
     <SensorPhotos photos={sensor.photos} onUpdated={handlePhotoUpdate} />

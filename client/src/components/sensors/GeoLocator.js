@@ -7,7 +7,7 @@ mapboxgl.accessToken = mapboxToken;
 import './mapbox.css';
 import InputString from "../InputString";
 
-const GeoLocator = ({onDone, initialValue=null}) => {
+const GeoLocator = ({onDone, onCancel, initalCoordinates=null}) => {
   // current component mounted state (maybe there is a better way to do it?)
   // to be used / checked with in async callback's outside of react
   const isMounted = useRef(true); // initial true
@@ -17,8 +17,8 @@ const GeoLocator = ({onDone, initialValue=null}) => {
     }
   }, []);
 
-  const [coordinates, setCoordinates] = useState({...initialValue});
-  const [manualCoordinates, setManualCoordinates] = useState({...initialValue});
+  const [coordinates, setCoordinates] = useState({...initalCoordinates});
+  const [manualCoordinates, setManualCoordinates] = useState({...initalCoordinates});
   const [isCoordinatesChanged, setCoordinatesChanged] = useState(false);
   const [error, setError] = useState('');
   const [isGetCurrentLocationInProgress, setGetCurrentLocationInProgress] = useState(false);
@@ -140,7 +140,8 @@ const GeoLocator = ({onDone, initialValue=null}) => {
 
   return <div>
       <div>
-        {isCoordinatesChanged && <button onClick={handleConfirm}>Save Location Edits</button>}
+        {isCoordinatesChanged && <button onClick={handleConfirm}>Save {!!initalCoordinates && 'Edits'}</button>}
+        <button type='button' className='link' onClick={onCancel}>Cancel {!!initalCoordinates && isCoordinatesChanged && 'Edits'}</button>
         <div>
           <strong>Enter Longitude/Latitude</strong><br/>
           Longitude:
