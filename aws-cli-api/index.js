@@ -73,7 +73,7 @@ app.get('/sensor/add', function (req, res) {
 
         res.send(JSON.stringify(outputObjectLowercaseKeys));
     } catch(error) {
-        const output = JSON.stringify({id: 1, error: error.stderr.toString()})
+        const output = JSON.stringify({id: 0, error: error.stderr.toString()})
         res.status(500).send(output);
     }
 });
@@ -83,13 +83,9 @@ app.get('/sensor/delete', function (req, res) {
         const cmd = `aws iotwireless delete-wireless-device --id ${id}`;
 
         const outputBuffer = execSync(cmd);
-        const outputObject = JSON.parse(outputBuffer.toString());
-        // convert hash keys to lowercase
-        const outputObjectLowercaseKeys = Object.fromEntries(Object.entries(outputObject).map(e => [e[0].toLowerCase(), e[1]]));
-
-        res.send(JSON.stringify(outputObjectLowercaseKeys));
+        res.send({message: !outputBuffer || !outputBuffer.toString() ? `AWS IOT device ${id} was deleted` : outputBuffer.toString()});
     } catch(error) {
-        const output = JSON.stringify({id: 1, error: error.stderr.toString()})
+        const output = JSON.stringify({id: 0, error: error.message})
         res.status(500).send(output);
     }
 });

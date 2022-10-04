@@ -5,7 +5,7 @@ import SensorPhotos from "./sensors/SensorPhotos";
 import InputString from "./InputString";
 import SensorIds from "./sensors/SensorIds";
 
-const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onCancel}) => {
+const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCancel}) => {
 
   const [location, setLocation] = useState(sensor.location);
   const [isEditLocation, setEditLocation] = useState(false);
@@ -52,16 +52,52 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onCancel}) => {
 
   const [awsError, setAwsError] = useState(false);
   const [isAwsRegInProgress, setAwsRegInProgress] = useState(false);
+  const [awsIdUnregistered, setAwsIdUnregistered] = useState(false);
   const handleAwsIdsSave = () => {
     setAwsError(false);
     setAwsRegInProgress(true)
     onSaveToAws(sensor).then(awsId => {
-      onSave({...sensor, aws_iot_id: awsId});
+      return onSave({...sensor, aws_iot_id: awsId});
+    }).catch(e => {
+      setAwsError(e.message);
+    }).finally(() => {
+      setAwsRegInProgress(false);
+    });
+  };
+
+  const handleAwsIdsDelete = () => {
+    setAwsError(false);
+    setAwsRegInProgress(true)
+    const awsIotId = sensor.aws_iot_id;
+    let awsDeleteMessage = '';
+    onDeleteFromAws(sensor).then(resp => {
+      if (resp && resp.message) {
+        awsDeleteMessage = resp.message;
+      }
+      return onSave({...sensor, aws_iot_id: null});
+    }).then(() => {
+      if (awsDeleteMessage) {
+        setAwsIdUnregistered(awsIotId);
+        setAwsError(awsDeleteMessage); // display the delete message as "ERROR" to add significance to its looks
+      }
     }).catch(e => {
       setAwsError(e.message);
     }).finally(() => {
       setAwsRegInProgress(false);
     })
+  };
+
+  const handleAwsIdsClear = () => {
+    setAwsRegInProgress(true);
+    setAwsError(`Removing AWS IOT ID from DB...`);
+    const awsIotId = sensor.aws_iot_id;
+    onSave({...sensor, aws_iot_id: null}).then(() => {
+      setAwsIdUnregistered(awsIotId);
+    }).catch(e => {
+      setAwsError('Error removing AWS IOT ID from DB');
+    }).finally(() => {
+      setAwsRegInProgress(false);
+    });
   };
 
   return <div>
@@ -82,7 +118,7 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onCancel}) => {
     <h4>Enter/Scan Ids</h4>
     <SensorIds ids={sensor.ids} onSave={handleIdsEdit} headingLevel={5}/>
     {!!sensor && sensor.ids && <React.Fragment>
-      <h4>Register Ids</h4>
+      <h4>Register Ids in AWS IOT</h4>
       <div>
         {!sensor.type ?
             'Please set the sensor type (above) first':
@@ -90,8 +126,18 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onCancel}) => {
               <React.Fragment>
                 <button type={'button'} onClick={handleAwsIdsSave} disabled={isAwsRegInProgress}>Register</button>
                 {isAwsRegInProgress && <div className='spinning-loader'></div>}
+                {awsIdUnregistered && <div>
+                  Please check manually that &nbsp;
+                  <a href={'https://us-west-2.console.aws.amazon.com/iot/home?region=us-west-2#/wireless/devices/details/'+awsIdUnregistered} target='_blank'>{awsIdUnregistered}</a>
+                  has been removed from AWS IOT itself.
+                </div>}
               </React.Fragment> :
-              <span>Wireless device registered with ID <a href={'https://us-west-2.console.aws.amazon.com/iot/home?region=us-west-2#/wireless/devices/details/'+sensor.aws_iot_id} target='_blank'>{sensor.aws_iot_id}</a></span>
+              <React.Fragment>
+                <span>Wireless device registered with ID <a href={'https://us-west-2.console.aws.amazon.com/iot/home?region=us-west-2#/wireless/devices/details/'+sensor.aws_iot_id} target='_blank'>{sensor.aws_iot_id}</a></span><br/>
+                <button type={'button'} className='link' onClick={handleAwsIdsDelete} disabled={isAwsRegInProgress}>Un-Register from AWS IOT</button>
+                <button type={'button'} className='link' onClick={handleAwsIdsClear} disabled={isAwsRegInProgress}>Only Clear AWS IOT ID</button>
+                {isAwsRegInProgress && <div className='spinning-loader'></div>}
+              </React.Fragment>
             )
         }
       </div>

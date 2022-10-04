@@ -72,7 +72,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
     }
 
     const deleteSensor = (sensor) => {
-        deleteSensorFromAwsIot(sensor.aws_iot_id);
+        deleteSensorFromAwsIot(sensor);
         const sensorDoc = doc(firebaseApp.db, "sensors", sensor.id);
         return deleteDoc(sensorDoc, sensor).then(response => {
             setSensors(sensors.filter(s => s.id !== sensor.id));
@@ -82,7 +82,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
         });
     };
 
-    const addSensorToAwsIot = (sensor, isDelete) => {
+    const addSensorToAwsIot = (sensor) => {
         return firebaseApp.auth.currentUser.getIdToken().then(authToken => {
             if (!authToken) {
                 console.log('visitor not logged in');
@@ -114,7 +114,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
             });
         });
     }
-    const deleteSensorFromAwsIot = (sensorAswId) => {
+    const deleteSensorFromAwsIot = (sensor) => {
         return firebaseApp.auth.currentUser.getIdToken().then(authToken => {
             if (!authToken) {
                 console.log('visitor not logged in');
@@ -122,20 +122,17 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
             }
 
             const host = `${clientEnv.URLS_AWS_CLI_API__PROTOCOL}://${clientEnv.URLS_AWS_CLI_API__HOST}:${clientEnv.URLS_AWS_CLI_API__PORT}`;
-            return fetch(`${host}/sensor/delete?id=${sensorAswId}`, {
+            return fetch(`${host}/sensor/delete?id=${sensor.aws_iot_id}`, {
                 method: 'get',
                 mode: 'cors', // no-cors, *cors, same-origin
             }).then(resp => resp.json()).then(json => {
                 if (!!json.error) {
                     throw new Error(json.error);
                 }
-                if (!json.id) {
-                    throw new Error('no AWS ID returned');
-                }
-                return true;
+                return json;
             });
         });
-    }
+    };
 
     const cancelSaveSensor = () => {
         setSensorToEdit(false);
@@ -174,7 +171,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
             :
             <div>
                 <h2>{project.name} Sensors</h2>
-                <Sensor sensor={sensorToEdit} onSave={saveSensor} onDelete={deleteSensor} onSaveToAws={addSensorToAwsIot} onCancel={cancelSaveSensor} />
+                <Sensor sensor={sensorToEdit} onSave={saveSensor} onDelete={deleteSensor} onSaveToAws={addSensorToAwsIot} onDeleteFromAws={deleteSensorFromAwsIot} onCancel={cancelSaveSensor} />
             </div>}
     </div>;
 };
