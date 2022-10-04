@@ -63,9 +63,19 @@ export default function InputString({value=null, path, onSave, type='text',
 
     const handleChange = e => {
         if (e.target.value === null) {
+            setNewValue('');
             return;
         }
-        setNewValue(type === 'number' ? parseFloat(e.target.value) : e.target.value);
+        if (type === 'number') {
+            const value = parseFloat(e.target.value);
+            if (isNaN(value)) {
+                setNewValue('');
+                return;
+            }
+            setNewValue(value);
+        } else {
+            setNewValue(String(e.target.value));
+        }
     };
 
     const handleSaveClick = () => {
