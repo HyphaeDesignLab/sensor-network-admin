@@ -1,13 +1,11 @@
 function aws-cli-api-ssh-github-init {
-	if [ ! "$(ps aux | grep 'ssh-agent' | grep -v grep)" ]; then
-	  eval "$(ssh-agent -s)"
-  fi;
-	ssh-add ~/.ssh/sensor_install_dashboard_github_id_ed25519
+  echo 'Copy and paste these commands to init GITHUB'
+  echo 'eval "$(ssh-agent -s)"'
+	echo 'ssh-add ~/.ssh/sensor_install_dashboard_github_id_ed25519'
 }
 
 function aws-cli-api-gitpull-and-update {
 	cd ~/hyphae-geodashboard/
-	ssh-github-init
 	git pull
 	cd ~/aws_cli_api/
 	cp ~/hyphae-geodashboard/aws-cli-api/*.* .
