@@ -3,22 +3,6 @@ import ImageInput from "./ImageInput";
 // if image is too large for OCR to work we might have to
 //  crop it via a library: https://www.npmjs.com/package/react-image-crop
 
-const getImgDimensionsFitInBox = (img, MAX_WIDTH, MAX_HEIGHT) => {
-    var width = img.width;
-    var height = img.height;
-    if (width > height) {
-        if (width > MAX_WIDTH) {
-            height = height * (MAX_WIDTH / width);
-            width = MAX_WIDTH;
-        }
-    } else {
-        if (height > MAX_HEIGHT) {
-            width = width * (MAX_HEIGHT / height);
-            height = MAX_HEIGHT;
-        }
-    }
-    return [width, height];
-}
 const ocrOptions = {
     detectOrientation: false,
     scale: true,
