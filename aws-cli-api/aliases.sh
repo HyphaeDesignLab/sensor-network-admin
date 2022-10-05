@@ -5,6 +5,9 @@ function aws-cli-api-ssh-github-init {
 }
 
 function aws-cli-api-gitpull-and-update {
+  echo 'Run this if GITHUB permissions not right'
+  echo 'aws-cli-api-ssh-github-init';
+  echo
 	cd ~/hyphae-geodashboard/
 	git pull
 	cd ~/aws_cli_api/
