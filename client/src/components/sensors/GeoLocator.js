@@ -144,12 +144,12 @@ const GeoLocator = ({onDone, onCancel, initalCoordinates=null}) => {
         });
   };
 
-  return <div>
+  return <section>
       <div>
         {isCoordinatesChanged && <button onClick={handleConfirm}>Save {!!initalCoordinates && 'Edits'}</button>}
         <button type='button' className='link' onClick={onCancel}>Cancel {!!initalCoordinates && isCoordinatesChanged && 'Edits'}</button>
+        <h5>Enter Longitude/Latitude</h5>
         <div>
-          <strong>Enter Longitude/Latitude</strong><br/>
           Longitude:
           <InputString onSave={handleManualEdit} value={coordinates.lng || ''} path='lng' type='number' hasLabel={false} wrapEl='span' />
           Latitude:
@@ -157,7 +157,7 @@ const GeoLocator = ({onDone, onCancel, initalCoordinates=null}) => {
           {!!coordinates && !!coordinates.accuracy && <span>accuracy: {coordinates.accuracy}</span>}
         </div>
 
-        <strong>Change on Map</strong><br/>
+        <h5>Change on Map</h5>
         <p>Drag map to re-adjust location</p>
         <div>
           <button className='link' onClick={handleGetCurrentLocation} disabled={isGetCurrentLocationInProgress}>{isGetCurrentLocationInProgress ? 'Getting location...' : 'Get Current Location'}</button>
@@ -172,7 +172,7 @@ const GeoLocator = ({onDone, onCancel, initalCoordinates=null}) => {
         </div>}
       </div>
     {error ? <div>{error}</div> : null}
-  </div>
+  </section>
 }
 
 export default GeoLocator;

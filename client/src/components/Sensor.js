@@ -121,25 +121,34 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
     });
   };
 
-  return <div>
+  return <section>
     <div><a href='#' onClick={onCancel}>&lt;&lt; All Sensors</a></div>
+    <h3>Sensor {!!sensor.id ? `"${sensor.name}" (id: ${sensor.id})` : '"New" (unsaved)'}</h3>
 
-    <InputString onSave={handleNameEdit} value={sensor.name ? sensor.name : 'New Sensor'} path='name' type='string' isOnlyEditMode={!sensor.id} hasLabel={false} wrapEl='h2'/>
+    <section>
+    <h4>Edit Name / Type</h4>
+    <h5>Name:</h5>
+    <InputString onSave={handleNameEdit} value={sensor.name ? sensor.name : ''} path='name' type='string' isOnlyEditMode={!sensor.id} hasLabel={false}/>
 
-    <div>Type (for AWS IOT, etc.) <select onChange={handleTypeEdit} value={sensor.type}>
+    {/*<div>Generate name from Type abbreviation</div>*/}
+
+    <h5>Type</h5>
+    <div>
+      <select onChange={handleTypeEdit} value={sensor.type}>
       <option>--select type--</option>
       <option value='temphum_dragino_sm31'>temp+hum (dragino sm31)</option>
       <option value='mrt_dragino_d22'>MRT+temp (dragino d22)</option>
       <option value='wind_barani_meteowind_iot_pro'>Wind (Barani MeteoWind IOT Pro)</option>
       <option value='temphum_dragino_lht65'>temp+hum indoor (dragino lht65)</option>
     </select></div>
+    </section>
 
-    {/* send device id and show either a success of error to the user*/}
-    <h3>AWS IOT Registration</h3>
-    <h4>Enter/Scan Ids</h4>
+    <section>
+    <h4>AWS IOT Registration</h4>
+    <h5>Enter/Scan Device IDs</h5>
     <SensorIds ids={sensor.ids} onSave={handleIdsEdit} headingLevel={5}/>
     {!!sensor && sensor.ids && <React.Fragment>
-      <h4>Register Ids in AWS IOT</h4>
+      <h5>Register Device IDs in AWS IOT</h5>
       <div>
         {!sensor.type ?
             'Please set the sensor type (above) first':
@@ -164,19 +173,26 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
       </div>
       {!!awsError && <div style={{color: 'red'}}>{awsError}</div>}
     </React.Fragment>}
+    </section>
 
-    <h3>Location</h3>
+    <section>
+    <h4>Location</h4>
     <button type='button' className='link' onClick={handleLocationEditStart}>{!!location ? 'Edit' : 'Add'} Location</button>
     {!isEditLocation ? <div style={{transition: 'background-color 500ms ease-in', backgroundColor: hasLocationChanged ? '#98d28f':'white'}}>
       {!!location && <span>Longitude: {location.lng}, Latitude: {location.lat}</span>}
     </div> :
       <GeoLocator onDone={handleLocationSet} initalCoordinates={location} onCancel={handleLocationEditCancel}/>
     }
+    </section>
 
-    <h3>Photos of Sensor as Installed</h3>
+    <section>
+    <h4>Photos</h4>
+    <p>of sensor as-installed, or of the device itself or anything relevant.</p>
     <SensorPhotos photos={sensor.photos} onUpdated={handlePhotoUpdate} />
+    </section>
 
-    <h3>Delete Sensor</h3>
+    <section>
+    <h4>Delete Sensor</h4>
     {isDeleteSensorInProgress && <div>Deleting sensor...</div>}
     {!!deleteError && <div className='error'>{deleteError}</div>}
     <button className='link' type='button' onClick={handleDelete} disabled={isDeleteSensorInProgress}>Delete</button>
@@ -187,7 +203,8 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
         text='Do you really want to delete this sensor. It will also un-register the associated AWS IOT device. This can NOT be UNDONE.'
         confirmText='Delete'
     ></ConfirmDialog>}
-  </div>
+    </section>
+  </section>
 }
 
 export default Sensor;

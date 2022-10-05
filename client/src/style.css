@@ -1,23 +1,31 @@
 * {
     margin: 0;
     box-sizing: border-box;
+}
+
+div, span, p, a, input, button, section {
     font-size: 16px;
 }
 
 div, p {
     margin: 2px 0;
-    padding: 1px;
+    padding: 1px 0;
 }
 span, div, p {
     font-family: Verdana, sans-serif;
 }
-div div {
-    margin-left: 5px;
+section, div div.section, section div.section {
+    margin-left: 10px;
+    margin-top: 22px;
 }
 
-h1, h2, h3, h4, h5 {
+h1, h2, h3, h4, h5, h6 {
     margin: 5px 0;
-    padding: 1px;
+    padding: 1px 0;
+}
+
+h1 span, h2 span, h3 span, h4 span, h5 span, h6 span {
+    font-size: inherit;
 }
 
 .text-length-measurable {

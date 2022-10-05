@@ -156,19 +156,23 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
         setSensorToEdit(false);
     };
 
-    return <div>
+    return <section>
         <div><a href='#' onClick={closeProject}>&lt;&lt; all Projects</a></div>
+        <h2>Project "{!project.id ? 'Untitled' : project.name}"</h2>
         {!sensorToEdit ?
-            <div>
-                <InputString onSave={saveProject} value={project.id ? project.name : 'New Project'} path='name' type='string' isOnlyEditMode={!project.id} hasLabel={false} wrapEl='h2'/>
-                <InputString onSave={saveProject} value={project.description} path='description' type='string' />
-                <div>
+            <React.Fragment>
+                <section>
+                    <h3>General</h3>
+                    <InputString onSave={saveProject} value={project.id ? project.name : 'New Project'} path='name' type='string' isOnlyEditMode={!project.id} />
+                    <InputString onSave={saveProject} value={project.description} path='description' type='string' />
                     <InputString onSave={saveProject} value={project.aws_iot_id} path='aws_iot_id' type='string' />
-                    (AWS IOT ID is used to calculate the wireless destination topic: &lt;projectAwsIotId&gt;__&lt;sensorType&gt;)
-                    {!project.aws_iot_id && <div className='error'>{noAwsProjectIdErrorMessage}</div>}
-                </div>
+                    <div>
+                        (AWS IOT ID is used to calculate the wireless destination topic: &lt;projectAwsIotId&gt;__&lt;sensorType&gt;)
+                        {!project.aws_iot_id && <div className='error'>{noAwsProjectIdErrorMessage}</div>}
+                    </div>
+                </section>
 
-                {!!project.id && <div>
+                {!!project.id && <section>
                     <h3>Sensors:</h3>
                     {isSensorsLoading && <div className='spinning-loader'></div>}
                     {sensors && !sensors.length && <div>(no sensors)</div>}
@@ -181,18 +185,19 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                     {sensors && sensors.map(sensor =>
                         <div key={sensor.id}>{sensor.name} (id: {sensor.id.substr(0,7)})<a href='#edit' onClick={setSensorToEdit.bind(null, sensor)}>edit</a></div>
                     )}
-                </div>}
+                </section>}
 
-                <div>
-                    <a href='#delete' style={{color: 'red'}} onClick={deleteProject.bind(null, project.id)}>(x) delete project</a>
-                </div>
-            </div>
+                <section>
+                    <h3>Manage</h3>
+                    <div>
+                        <a href='#delete' style={{color: 'red'}} onClick={deleteProject.bind(null, project.id)}>(x) delete project</a>
+                    </div>
+                </section>
+            </React.Fragment>
             :
-            <div>
-                <h2>{project.name} Sensors</h2>
-                <Sensor sensor={sensorToEdit} onSave={saveSensor} onDelete={deleteSensor} onSaveToAws={addSensorToAwsIot} onDeleteFromAws={deleteSensorFromAwsIot} onCancel={cancelSaveSensor} />
-            </div>}
-    </div>;
+            <Sensor sensor={sensorToEdit} onSave={saveSensor} onDelete={deleteSensor} onSaveToAws={addSensorToAwsIot} onDeleteFromAws={deleteSensorFromAwsIot} onCancel={cancelSaveSensor} />
+            }
+    </section>;
 };
 
 export default Project;

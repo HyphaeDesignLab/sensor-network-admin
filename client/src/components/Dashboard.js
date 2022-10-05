@@ -111,9 +111,9 @@ const Dashboard = ({firebaseApp}) => {
         setStep('project');
     }
 
-    return <div>
-        <h2>Projects</h2>
+    return <section>
         {step === 'projects' && <div>
+            <h2>Projects</h2>
             {isProjectsLoading && <div className='spinning-loader'></div>}
             {!!projectsError && <div>{projectsError}</div>}
             {projects.map(project =>
@@ -126,7 +126,7 @@ const Dashboard = ({firebaseApp}) => {
         </div>}
 
         {step === 'project' && <Project firebaseApp={firebaseApp} project={currentProject} addProject={addProject} saveProject={saveProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject} setStep={setStep}/>}
-    </div>;
+    </section>;
 };
 
 export default Dashboard;

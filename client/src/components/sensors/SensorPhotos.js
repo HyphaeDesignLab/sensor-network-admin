@@ -44,7 +44,7 @@ const SensorPhotos = ({photos, onUpdated}) => {
         onUpdated(updatedPhotos);
     };
 
-    return <div>
+    return <section>
         {!!error && <div style={{color: 'red'}}>Error: {error}</div>}
         {!!photos && photos.map((photo, i) => <div key={photo.slice(3000,3100)}>
             <img src={photo} /> <button onClick={handleDeleteClick.bind(null, i)}>x</button>
@@ -62,7 +62,7 @@ const SensorPhotos = ({photos, onUpdated}) => {
                     <span>saving...</span>}
             </div>
         }
-    </div>;
+    </section>;
 };
 
 export default SensorPhotos;
