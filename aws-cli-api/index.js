@@ -79,7 +79,10 @@ app.get('/sensor/add', function (req, res) {
 });
 app.get('/sensor/delete', function (req, res) {
     try {
-        const id = req.query.id.replace(/[^\w-]/g, '');
+        const id = req.query.id.replace(/[^\w\-]/g, '');
+        if (!id) {
+           throw new Error('no device id provided to delete');
+        }
         const cmd = `aws iotwireless delete-wireless-device --id ${id}`;
 
         const outputBuffer = execSync(cmd);
