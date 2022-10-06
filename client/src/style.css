@@ -172,3 +172,9 @@ button.link:focus, .button-link:focus {
     background: #000000;
     color: #5bcad9;
 }
+
+button.number-control {
+    margin: 0 2px;
+    padding: 5px;
+    font-size: 20px;
+}

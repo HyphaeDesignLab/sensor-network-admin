@@ -1,25 +1,30 @@
-import React, {useState, useEffect} from 'react';
-import ReactCrop from 'react-image-crop'
+import React, {useState, useRef} from 'react'
 import ImageInput from "../../components/sensors/ImageInput";
+import ImageCrop from "../../components/sensors/ImageCrop";
 
-function App() {
-    const [imgSrc, setImgSrc] = useState();
-    const [crop, setCrop] = useState({
-        unit: '%', // Can be 'px' or '%'
-        x: 25,
-        y: 25,
-        width: 50,
-        height: 50
-    });
+export default function App() {
+    const [src, setSrc] = useState();
+    const [isCrop, setIsCrop] = useState(false);
+    const [cropped, setCropped] = useState(false);
+
+    const handleCropped = cropped => {
+        setCropped(cropped);
+        setIsCrop(false);
+    }
 
     return (
         <div>
-            <ImageInput onLoaded={dataUrl => setImgSrc(dataUrl)}></ImageInput>
-            <ReactCrop crop={crop} onChange={c => setCrop(c)}>
-                <img src={imgSrc} />
-            </ReactCrop>
-        </div>
-    );
-}
+            <ImageInput onLoaded={dataUrl => setSrc(dataUrl)} label='Image' />
+            {!!src && <div>
+                {!isCrop && <img src={src} style={{maxHeight: '90vh', maxWidth: '90%'}} />}<br/>
+                <button onClick={() => setIsCrop(v => !v)}>Crop</button>
+                {isCrop ? <div>
+                        <ImageCrop imgSrc={src} onCrop={handleCropped} />
+                    </div> :
+                    (!!cropped ? <div>Cropped: <img src={cropped} style={{maxHeight: '90vh', maxWidth: '90%'}} /></div> : null)
+                }
+            </div>}
 
-export default App;
+        </div>
+    )
+}
