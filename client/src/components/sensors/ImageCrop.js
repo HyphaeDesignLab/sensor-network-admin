@@ -132,26 +132,27 @@ export default function ImageCrop({imgSrc, onCrop}) {
 
     return (
         <section>
-            <div>
-                Scale:
+            <span>
+                Scale:{' '}
                 <button className='number-control' type='button'
                         onClick={() => setScale(s => Math.max(.1, deltaValue(s, -0.1, 1)))}>-</button>
-                {scale}
+                {scale * 100}%
                 <button className='number-control' type='button'
                         onClick={() => setScale(s => Math.min(3, deltaValue(s, 0.1, 1)))}>+</button>
-            </div>
-            <div>
-                Rotate:
+            </span>{' '}
+            <span>
+                Rotate:{' '}
                 <button className='number-control' type='button'
                         onClick={() => setRotate(r => Math.max(-180, deltaValue(r, -1)))}>-</button>
-                {rotate}
+                {rotate}&deg;
                 <button className='number-control' type='button'
                         onClick={() => setRotate(r => Math.min(180, deltaValue(r, 1)))}>+</button>
 
-            </div>
-            <div>
-                <label><input type='checkbox' onChange={e => setShowCropPreview(Boolean(e.currentTarget.checked))}/> Show crop preview </label>
-            </div>
+            </span>{' '}
+            <span>
+                <label><input type='checkbox' onChange={e => setShowCropPreview(Boolean(e.currentTarget.checked))}/> show preview </label>
+            </span>
+            <br/>
             {Boolean(imgSrc) && (
                 <ReactCrop
                     crop={crop}
