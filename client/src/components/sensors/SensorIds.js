@@ -39,7 +39,7 @@ const SensorIds = ({ids, onSave, headingLevel=3}) => {
         setIsManualEntry(null);
     };
 
-    const [isManualEntry, setIsManualEntry] = useState(null);
+    const [isManualEntry, setIsManualEntry] = useState(true);
 
     const inputStringStyle = {
         padding: '5px',
@@ -49,8 +49,8 @@ const SensorIds = ({ids, onSave, headingLevel=3}) => {
 
     return <div>
         <div>
-            <button type='button' onClick={() => setIsManualEntry(false)} disabled={isManualEntry === false}>Scan from Photo</button> &nbsp;
-            {!ids_ && <button type='button' onClick={() => setIsManualEntry(true)} disabled={isManualEntry === true}>Type-in Ids</button>}
+            <button type='button' className='link' onClick={() => setIsManualEntry(false)} disabled={isManualEntry === false}>Scan from Photo</button>&nbsp;
+            {!isManualEntry && <button type='button' className='link' onClick={() => setIsManualEntry(true)} >cancel</button>}
         </div>
         {isManualEntry === false &&
             <SensorOcrParser onConfirm={onOcrConfirmed} onCancel={onOcrEditCancel} headingLevel={headingLevel}/>
