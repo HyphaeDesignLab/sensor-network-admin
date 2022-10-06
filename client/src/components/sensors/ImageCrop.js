@@ -171,8 +171,8 @@ export default function ImageCrop({imgSrc, onCrop}) {
                     />
                 </ReactCrop>
             )}
-            {isShowCropPreview && Boolean(completedCrop) &&
-                <div>
+            {Boolean(completedCrop) &&
+                <div style={{display: isShowCropPreview ? '': 'none'}}>
                     <canvas
                         ref={previewCanvasRef}
                         style={{
