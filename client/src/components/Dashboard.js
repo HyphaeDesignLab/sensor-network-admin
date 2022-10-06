@@ -47,9 +47,7 @@ const Dashboard = ({firebaseApp}) => {
         });
     }
 
-    const deleteProject = (id, e) => {
-        e.preventDefault();
-
+    const deleteProject = (id) => {
         if (!window.confirm(`Are you certain you want to delete project: ${projects.find(project => project.id === id).name} ?`)) {
             return;
         }
@@ -118,8 +116,7 @@ const Dashboard = ({firebaseApp}) => {
             {!!projectsError && <div>{projectsError}</div>}
             {projects.map(project =>
                 <div key={project.id} className={currentProject && project.id === currentProject.id ? 'current':''}>
-                    <a href='#edit' onClick={editProject.bind(null, project)}>{project.name}</a> &nbsp;
-                    <a href='#delete' onClick={deleteProject.bind(null, project.id)}>delete</a>
+                    <a href='#edit' onClick={editProject.bind(null, project)}>{project.name}</a>
                 </div>
             )}
             <div><a href='#add' onClick={handleAddProject}>+ Add Project</a></div>

@@ -7,6 +7,7 @@ import Sensor from './Sensor';
 import {addDoc, updateDoc, deleteDoc, doc, collection, query, where, getDocs} from "firebase/firestore";
 
 import clientEnv from '../keys/client';
+import ConfirmDialog from "./ConfirmDialog";
 
 const noAwsProjectIdErrorMessage = 'Please set the Project AWS IOT ID in order to add sensors';
 const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentProject, setStep}) => {
@@ -156,6 +157,11 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
         setSensorToEdit(false);
     };
 
+    const [isConfirmProjectDeleteShown, setConfirmProjectDeleteShown] = useState(false);
+    const confirmProjectDelete = () => {
+        deleteProject(project.id);
+    };
+
     return <section>
         <div><a href='#' onClick={closeProject}>&lt;&lt; all Projects</a></div>
         <h2>Project "{!project.id ? 'Untitled' : project.name}"</h2>
@@ -190,7 +196,14 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                 <section>
                     <h3>Manage</h3>
                     <div>
-                        <a href='#delete' style={{color: 'red'}} onClick={deleteProject.bind(null, project.id)}>(x) delete project</a>
+                        {isConfirmProjectDeleteShown && <ConfirmDialog
+                            onCancel={() => setConfirmProjectDeleteShown(false)}
+                            onConfirm={confirmProjectDelete}
+                            title='Delete Project?'
+                            text='Do you really want to delete this project. This will NOT delete sensors or un-register them from AWS IOT. This can NOT be UNDONE.'
+                            confirmText='Delete'
+                        ></ConfirmDialog>}
+                        <button className={'link'} style={{color: 'red'}} onClick={() => setConfirmProjectDeleteShown(true)}>(x) delete project</button>
                     </div>
                 </section>
             </React.Fragment>
