@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import ImageInput from "./ImageInput";
+import ImageCrop from "./ImageCrop";
 // if image is too large for OCR to work we might have to
 //  crop it via a library: https://www.npmjs.com/package/react-image-crop
 
@@ -14,9 +15,27 @@ const addOcrAmbigiousCharsMarkup = text => text.replace(/[4sef0z]/ig, m => `<spa
 const SensorOcrParser = ({onConfirm, onCancel, headingLevel=3}) => {
     const Hx = 'h'+headingLevel;
     const [imageData, setImageData] = useState('');
+    const [preCroppedImageData, setPreCroppedImageData] = useState(null);
+    const [croppedImageData, setCroppedImageData] = useState(null);
     const handleImageChange = photo => {
         setImageData(photo);
     }
+
+    const handleUndoCropped = () => {
+        setImageData(preCroppedImageData);
+        setPreCroppedImageData(null);
+    };
+    const handleCancelCropped = () => {
+        setIsCropping(false);
+        setCroppedImageData(null);
+    };
+    const handleSaveCropped = () => {
+        setIsCropping(false);
+        setPreCroppedImageData(imageData);
+        setImageData(croppedImageData);
+        setCroppedImageData(null);
+    };
+    const [isCropping, setIsCropping] = useState();
 
     const [isOcrTextLoading, setOcrTextLoading] = useState(false);
     const [ocrTextError, setOcrTextError] = useState('');
@@ -104,11 +123,26 @@ const SensorOcrParser = ({onConfirm, onCancel, headingLevel=3}) => {
         <Hx>Upload/Take a Photo of Sensor Registration Keys</Hx>
         <ImageInput onLoaded={handleImageChange} label='Upload/Take Photo' fitToBox={{width: 1600, height: 1600}} />&nbsp;
         {!!imageData && <div>
-            <div style={{maxHeight: '150px', maxWidth: '920px', overflowY: 'scroll'}}>
-                <img src={imageData} style={{width: '100%'}} />
+            {!isCropping ?
+                <div>
+                    <button onClick={() => setIsCropping(true)}>Crop Image</button>
+                    {Boolean(preCroppedImageData) && <button onClick={handleUndoCropped}>Undo Crop</button>}
+                </div>
+                :
+                <div>
+                    <button onClick={handleSaveCropped}>Save Cropped Image</button>
+                    <button className='link' onClick={handleCancelCropped}>cancel cropping</button>
+                    <ImageCrop imgSrc={imageData} onCrop={data => setCroppedImageData(data)} />
+                </div>
+            }
+            {!isCropping && <div>
+                <div>Note: scroll up and down to see entire image content</div>
+                <div style={{maxHeight: '150px', maxWidth: '920px', overflowY: 'scroll'}}>
+                    <img src={imageData} style={{width: '100%'}} />
+                </div>
             </div>
-            <div>(scroll up and down to see entire image content)</div>
-            {!ocrText &&
+            }
+            {!isCropping && !ocrText &&
                 <button type='button' onClick={handleOcrParseClick} disabled={isOcrTextLoading}>Parse Text from Image</button>
             }
             {isOcrTextLoading &&
