@@ -145,16 +145,18 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
 
     <section>
     <h4>AWS IOT Registration</h4>
-    <h5>Enter/Scan Device IDs</h5>
-    <SensorIds ids={sensor.ids} onSave={handleIdsEdit} headingLevel={5}/>
-    {!!sensor && sensor.ids && <React.Fragment>
-      <h5>Register Device IDs in AWS IOT</h5>
+      <section>
+        <h5>Type / Scan Device Registration Keys</h5>
+        <SensorIds ids={sensor.ids} onSave={handleIdsEdit} headingLevel={6}/>
+      </section>
+    {!!sensor && sensor.ids && sensor.has_all_ids && <section>
+      <h5>Register Keys in AWS IOT</h5>
       <div>
         {!sensor.type ?
             'Please set the sensor type (above) first':
             (!sensor.aws_iot_id ?
               <React.Fragment>
-                <button type={'button'} onClick={handleAwsIdsSave} disabled={isAwsRegInProgress}>Register</button>
+                <button type={'button'} className='link' onClick={handleAwsIdsSave} disabled={isAwsRegInProgress}>Register</button>
                 {isAwsRegInProgress && <div className='spinning-loader'></div>}
                 {awsIdUnregistered && <div>
                   <span>Please check manually that the device </span>
@@ -172,7 +174,7 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
         }
       </div>
       {!!awsError && <div style={{color: 'red'}}>{awsError}</div>}
-    </React.Fragment>}
+    </section>}
     </section>
 
     <section>
