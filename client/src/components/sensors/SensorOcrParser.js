@@ -119,22 +119,11 @@ const SensorOcrParser = ({onConfirm, onCancel, headingLevel=3}) => {
         onCancel();
     };
 
-    return <div>
+    return <section>
         <Hx>Upload/Take a Photo of Sensor Registration Keys</Hx>
         <ImageInput onLoaded={handleImageChange} label='Upload/Take Photo' fitToBox={{width: 1600, height: 1600}} />&nbsp;
+        <button className='link' type='button' onClick={handleCancelClick}>cancel</button>
         {!!imageData && <div>
-            {!isCropping ?
-                <div>
-                    <button onClick={() => setIsCropping(true)}>Crop Image</button>
-                    {Boolean(preCroppedImageData) && <button onClick={handleUndoCropped}>Undo Crop</button>}
-                </div>
-                :
-                <div>
-                    <button onClick={handleSaveCropped}>Save Cropped Image</button>
-                    <button className='link' onClick={handleCancelCropped}>cancel cropping</button>
-                    <ImageCrop imgSrc={imageData} onCrop={data => setCroppedImageData(data)} />
-                </div>
-            }
             {!isCropping && <div>
                 <div>Note: scroll up and down to see entire image content</div>
                 <div style={{maxHeight: '150px', maxWidth: '920px', overflowY: 'scroll'}}>
@@ -142,8 +131,20 @@ const SensorOcrParser = ({onConfirm, onCancel, headingLevel=3}) => {
                 </div>
             </div>
             }
+            {!isCropping ?
+                <div>
+                    <button  className='link' onClick={() => setIsCropping(true)}>Crop Image</button>
+                    {Boolean(preCroppedImageData) && <button className='link' onClick={handleUndoCropped}>Undo Crop</button>}
+                </div>
+                :
+                <div>
+                    <ImageCrop imgSrc={imageData} onCrop={data => setCroppedImageData(data)} />
+                    <button className='link' onClick={handleSaveCropped}>Use Cropped Image</button>
+                    <button className='link' onClick={handleCancelCropped}>cancel </button>
+                </div>
+            }
             {!isCropping && !ocrText &&
-                <button type='button' onClick={handleOcrParseClick} disabled={isOcrTextLoading}>Parse Text from Image</button>
+                <button className='link' type='button' onClick={handleOcrParseClick} disabled={isOcrTextLoading}>Parse Text from Image</button>
             }
             {isOcrTextLoading &&
                 <div>Parsing text via OCR...</div>
@@ -153,7 +154,7 @@ const SensorOcrParser = ({onConfirm, onCancel, headingLevel=3}) => {
             }
         </div>}
         {!!ocrText && <div>
-            <strong>Parsed Sensor IDs (Please review/edit)</strong>
+            <Hx>Parsed Sensor IDs (Please review/edit)</Hx>
             {Object.keys(sensorIdProps).map(sensorId =>
             <div key={sensorId}>
                 <span>{sensorIdProps[sensorId].title}</span>:
@@ -167,13 +168,12 @@ const SensorOcrParser = ({onConfirm, onCancel, headingLevel=3}) => {
                           letterSpacing: '3px'
                         }}
                 ></span>
-                <button type='button' onClick={handleSaveOrEdit.bind(null, sensorId, !!editableIds[sensorId])}>{editableIds[sensorId] ? 'save' : 'edit'}</button>
+                <button className='link' type='button' onClick={handleSaveOrEdit.bind(null, sensorId, !!editableIds[sensorId])}>{editableIds[sensorId] ? 'save' : 'edit'}</button>
             </div>)}
         </div>}
 
-        {!!ocrText && <React.Fragment><button type='button' onClick={handleConfirmClick}>Confirm</button> &nbsp;</React.Fragment>}
-        <a href='#cancel' type='button' onClick={handleCancelClick}>cancel</a>
-    </div>;
+        {!!ocrText && <React.Fragment><button type='button' onClick={handleConfirmClick}>Confirm &amp; Save</button> &nbsp;</React.Fragment>}
+    </section>;
 };
 
 /*
