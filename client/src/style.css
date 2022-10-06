@@ -23,6 +23,12 @@ h1, h2, h3, h4, h5, h6 {
     margin: 5px 0;
     padding: 1px 0;
 }
+h1 { font-size: 32px; }
+h2 { font-size: 28px; }
+h3 { font-size: 24px; color: #0202cb; }
+h4 { font-size: 20px; color: #0066c7; }
+h5 { font-size: 18px; color: #0076ec; }
+h6 { font-size: 16px; color: dodgerblue; }
 
 h1 span, h2 span, h3 span, h4 span, h5 span, h6 span {
     font-size: inherit;
@@ -175,6 +181,8 @@ button.link:focus, .button-link:focus {
 
 button.number-control {
     margin: 0 2px;
-    padding: 5px;
-    font-size: 20px;
+    padding: 7px;
+    font-size: 25px;
+    line-height: 10px;
+    height: 30px;
 }
