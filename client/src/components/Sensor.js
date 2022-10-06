@@ -39,8 +39,8 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
     return onSave({...sensor, ...sensorFragment}); // spread the fragment (contains name) into original object
   };
 
-  const handleIdsEdit = (ids) => {
-    return onSave({...sensor, ids}); // spread the IDs into original object
+  const handleIdsEdit = (ids, hasAllIds) => {
+    return onSave({...sensor, ids, has_all_ids: hasAllIds}); // spread the IDs into original object
   };
 
   const handleTypeEdit = (e) => {

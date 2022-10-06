@@ -8,21 +8,25 @@ const sensorIdProps = {
     appeui: {title: 'App EUI'},
     appkey: {title: 'App Key'}
 };
+const sensorIdKeys = Object.keys(sensorIdProps);
 
 const SensorIds = ({ids, onSave, headingLevel=3}) => {
     const Hx = 'h'+headingLevel;
     const [ids_, setIds] = useState(null);
 
+    const areAllIdsSet = ids => {
+      return sensorIdKeys.every(id => !!ids[id]);
+    };
     const onEditSaved = (idsFragment) => {
         const newIds = {...ids_, ...idsFragment};
         setIds(newIds);
-        onSave(newIds);
+        onSave(newIds, areAllIdsSet(newIds));
     };
 
     const onOcrConfirmed = (ids__) => {
         setIsManualEntry(true);
         setIds(ids__);
-        onSave(ids__);
+        onSave(ids__, areAllIdsSet(ids__));
     };
 
     useEffect(() => {
