@@ -10,7 +10,7 @@ import clientEnv from '../keys/client';
 import ConfirmDialog from "./ConfirmDialog";
 
 const noAwsProjectIdErrorMessage = 'Please set the Project AWS IOT ID in order to add sensors';
-const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentProject, setStep}) => {
+const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentProject, setStep, sensorTypes}) => {
     const [sensorToEdit, setSensorToEdit] = useState(false);
 
     const [sensors, setSensors] = useState([]);
@@ -208,7 +208,9 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                 </section>
             </React.Fragment>
             :
-            <Sensor sensor={sensorToEdit} onSave={saveSensor} onDelete={deleteSensor} onSaveToAws={addSensorToAwsIot} onDeleteFromAws={deleteSensorFromAwsIot} onCancel={cancelSaveSensor} />
+            <Sensor sensor={sensorToEdit} onSave={saveSensor} onDelete={deleteSensor}
+                    onSaveToAws={addSensorToAwsIot} onDeleteFromAws={deleteSensorFromAwsIot}
+                    onCancel={cancelSaveSensor} sensorTypes={sensorTypes}/>
             }
     </section>;
 };

@@ -2,8 +2,10 @@ import React, { useState, useEffect, useDebugValue } from 'react';
 import { collection, getDocs, addDoc, doc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 
 import Project from './Project';
+import SensorTypes from './SensorTypes';
 
 const Dashboard = ({firebaseApp}) => {
+    const [sensorTypes, setSensorTypes] = useState([]);
     const [step, setStep] = useState('projects');
     const [projects, setProjects] = useState([]);
     const [projectsError, setProjectsError] = useState(false);
@@ -12,28 +14,61 @@ const Dashboard = ({firebaseApp}) => {
 
     useEffect(() => {
         setProjectsLoading(true);
-        const projectsRef = collection(firebaseApp.db, "sensor_networks");
-        getDocs(projectsRef)
-        .then(querySnapshot => {
-            let p = [];
-            querySnapshot.forEach((doc) => {
-                let project = doc.data();
-                project.id = doc.id;
-                p.push(project);
+        Promise.any([initProjects(), initSensorTypes()])
+            .finally(() => {
+                setProjectsLoading(false);
             })
-            setProjects(p);
-        })
-        .catch((error) => {
-            if (error.code === 'permission-denied') {
-                setProjectsError('You must have privilidges to access projects list');
-            } else {
-                setProjectsError(error.message);
-            }
-        })
-        .finally(() => {
-            setProjectsLoading(false);
-        });
     }, []);
+
+    const initProjects = () => {
+        return new Promise((resolve, reject) => {
+            const projectsRef = collection(firebaseApp.db, "sensor_networks");
+            getDocs(projectsRef)
+            .then(querySnapshot => {
+                let p = [];
+                querySnapshot.forEach((doc) => {
+                    let project = doc.data();
+                    project.id = doc.id;
+                    p.push(project);
+                })
+                setProjects(p);
+                resolve();
+            })
+            .catch((error) => {
+                if (error.code === 'permission-denied') {
+                    setProjectsError('You must have privilidges to access projects list');
+                } else {
+                    setProjectsError(error.message);
+                }
+                reject();
+            });
+        });
+    };
+
+    const initSensorTypes = () => {
+        return new Promise((resolve, reject) => {
+            const sensorTypesRef = collection(firebaseApp.db, "sensor_types");
+            getDocs(sensorTypesRef)
+                .then(querySnapshot => {
+                    let typesArr = [];
+                    querySnapshot.forEach((doc) => {
+                        let type = doc.data();
+                        type.id = doc.id;
+                        typesArr.push(type);
+                    })
+                    setSensorTypes(typesArr);
+                    resolve();
+                })
+                .catch((error) => {
+                    if (error.code === 'permission-denied') {
+                        setProjectsError('You must have privilidges to access sensor types');
+                    } else {
+                        setProjectsError(error.message);
+                    }
+                    reject();
+                })
+        });
+    }
 
     const addProject = (project) => {
         addDoc(collection(firebaseApp.db, "sensor_networks"), project).then(docRef => {
@@ -109,6 +144,11 @@ const Dashboard = ({firebaseApp}) => {
         setStep('project');
     }
 
+    const handleManageSensorTypes = (e) => {
+        setCurrentProject({});
+        setStep('sensor_types');
+    }
+
     return <section>
         {step === 'projects' && <div>
             <h2>Projects</h2>
@@ -119,10 +159,16 @@ const Dashboard = ({firebaseApp}) => {
                     <a href='#edit' onClick={editProject.bind(null, project)}>{project.name}</a>
                 </div>
             )}
-            <div><a href='#add' onClick={handleAddProject}>+ Add Project</a></div>
-        </div>}
+            <div><button className='link' onClick={handleAddProject}>+ Add Project</button></div>
 
-        {step === 'project' && <Project firebaseApp={firebaseApp} project={currentProject} addProject={addProject} saveProject={saveProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject} setStep={setStep}/>}
+            <h2>Other Settings</h2>
+            <div><button className='link' onClick={handleManageSensorTypes}>Manage Sensor Types</button></div>
+        </div>}
+        {step === 'sensor_types' && <div>
+            <div><button className={'link'} onClick={() => setStep('projects')}>&lt;&lt; all Projects</button></div>
+            <SensorTypes title={<h2>Sensor Types</h2>} firebaseApp={firebaseApp} onUpdate={setSensorTypes} />
+        </div>}
+        {step === 'project' && <Project firebaseApp={firebaseApp} project={currentProject} addProject={addProject} saveProject={saveProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject} setStep={setStep} sensorTypes={sensorTypes}/>}
     </section>;
 };
 

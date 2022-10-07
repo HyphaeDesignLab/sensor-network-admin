@@ -6,7 +6,7 @@ import InputString from "./InputString";
 import SensorIds from "./sensors/SensorIds";
 import ConfirmDialog from "./ConfirmDialog";
 
-const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCancel}) => {
+const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCancel, sensorTypes}) => {
 
   const [location, setLocation] = useState(sensor.location);
   const [isEditLocation, setEditLocation] = useState(false);
@@ -136,10 +136,7 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
     <div>
       <select onChange={handleTypeEdit} value={sensor.type}>
       <option>--select type--</option>
-      <option value='temphum_dragino_sm31'>temp+hum (dragino sm31)</option>
-      <option value='mrt_dragino_d22'>MRT+temp (dragino d22)</option>
-      <option value='wind_barani_meteowind_iot_pro'>Wind (Barani MeteoWind IOT Pro)</option>
-      <option value='temphum_dragino_lht65'>temp+hum indoor (dragino lht65)</option>
+      {sensorTypes.map(type => <option key={type.id} value={type.id} title={type.description}>{type.name}</option>)}
     </select></div>
     </section>
 
