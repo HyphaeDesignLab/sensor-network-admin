@@ -91,14 +91,22 @@ const SensorTypes = ({title, firebaseApp, onUpdate}) => {
         {isLoading && <div className='spinning-loader'></div>}
 
         <p>
-            NOTE: the internal ID is used for the AWS IOT topics that consumer-clients subscribe to.<br/>
-            Talk to admin if you need changes or create a new sensor TYPE with the appropriate ID
+            The <strong>internal ID</strong> is used for the AWS IOT topics that consumer-clients subscribe to.<br/>
+            If you need an existing sensor type internal ID changed, please talk to an admin.
+        </p>
+        <p>
+            The <strong>short label</strong> shows up on the sensor edit screen, where the sensor type is selected.
+        </p>
+        <p>
+            The <strong>long description</strong> is used for describing in full any long details that cannot be captured
+            fully in a short lable/internal ID.
         </p>
 
         {Boolean(types.length) && types.map(type =>
             <div key={type.id} style={{margin: '20px 10px'}}>
-                <div><InputString value={type.name} path='name' hasLabel={false} wrapEl='strong' onSave={typeFragment => handleUpdateType(type.id, typeFragment)} /> (Internal ID: {type.id})</div>
-                <div><InputString value={type.description} path='description' wrapEl='span' onSave={typeFragment => handleUpdateType(type.id, typeFragment)} /></div>
+                <div><strong>{type.id}</strong> (internal ID)</div>
+                <div>Short label: <InputString value={type.name} path='name' hasLabel={false} wrapEl='span' onSave={typeFragment => handleUpdateType(type.id, typeFragment)} /> </div>
+                <div>Long description: <InputString value={type.description} path='description' hasLabel={false} wrapEl='span' onSave={typeFragment => handleUpdateType(type.id, typeFragment)} /></div>
             </div>
         )}
         {isShowAddNewType ? <div>
@@ -108,11 +116,11 @@ const SensorTypes = ({title, firebaseApp, onUpdate}) => {
                 <InputString value={tempType.id??''} path='id' hasLabel={false} onSave={handleSaveTempType} wrapEl='span' />
             </div>
             <div>
-                <strong>Name: </strong>
+                <strong>Short label: </strong>
                 <InputString value={tempType.name??''} path='name' hasLabel={false} onSave={handleSaveTempType} wrapEl='span' />
             </div>
             <div>
-                <strong>Description: </strong>
+                <strong>Long description: </strong>
                 <InputString value={tempType.description??''} path='description' hasLabel={false} onSave={handleSaveTempType} wrapEl='span' />
             </div>
             <button type='button' className='link' onClick={handleSaveNewType} disabled={(!tempType.id || !tempType.name || !tempType.description) || isSavingNewType}>Save</button>
