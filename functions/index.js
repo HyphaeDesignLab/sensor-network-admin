@@ -8,12 +8,7 @@ const http = require("http");
 
 const express = require("express");
 // https://expressjs.com/en/resources/middleware/cors.html
-const cors = require("cors")({origin: [
-    "http://nbah.lan:8002",
-    "http://localhost:5002",
-    "https://geo-dashboard-347901.web.app",
-    "https://geo-dashboard-347901.firebaseapp.com"]
-});
+const cors = require("cors")({origin: (process.env.CORS_URLS ? process.env.CORS_URLS.split("|") : "*")});
 
 // Setting the `keepAlive` option to `true` keeps
 // connections open between function invocations
@@ -28,9 +23,12 @@ const connectionString = `postgres://${process.env.PG_USER}:${process.env.PG_PAS
 // The Firebase ID token needs to be passed as a Bearer token in the Authorization HTTP header like this:
 // `Authorization: Bearer <Firebase ID Token>`.
 // when decoded successfully, the ID Token content will be added as `req.user`.
-const checkAuth =  (req, res, next) => {
-    if (!req.body || ((req.body instanceof Object) && Object.keys(req.body instanceof Object).length === 0)) {
-        res.status(403).send({error: "need some parameters"});
+// UNLESS page is in UNAUTH hash
+const unauthedRoutes = {};
+const checkAuth =  (appBasePath, req, res, next) => {
+    if (unauthedRoutes[appBasePath+req.path]) {
+        next();
+        return;
     }
     const body = Object.fromEntries(req.body.split("&").map(param => param.split("=").map(p => decodeURIComponent(p))));
     if ((!body || !body.token)) {
@@ -38,7 +36,7 @@ const checkAuth =  (req, res, next) => {
         return;
     }
 
-    admin.auth().verifyIdToken(body.token).then(decodedToken => {
+    admin.auth().verifyIdToken(req.body.token).then(decodedToken => {
         req.user = decodedToken;
         next();
     }).catch (error => {
@@ -49,7 +47,8 @@ const checkAuth =  (req, res, next) => {
 const sensorsApp = express();
 
 sensorsApp.use(cors);
-sensorsApp.use(checkAuth);
+const sensorsAppBasePath = "sensors"; // must match the property <path> in exports.<path> below
+sensorsApp.use((req, res, next) => checkAuth(sensorsAppBasePath, req, res, next));
 
 sensorsApp.post("/register", (request, response) => {
     if (!request.body || request.body.indexOf("deveui=") < 0) {
@@ -78,9 +77,12 @@ sensorsApp.post("/register", (request, response) => {
 exports.sensors = functions.https.onRequest(sensorsApp);
 
 // Export-import app
-const exportApp = express();
+const eximportApp = express();
+eximportApp.use(cors);
+const eximportAppBasePath = "eximport"; // must match the property <path> in exports.<path> below
+eximportApp.use((req, res, next) => checkAuth(eximportAppBasePath, req, res, next));
 
-exportApp.get("/projects/list", (request, response) => {
+eximportApp.get("/projects/list", (request, response) => {
     if (!parseInt(process.env.IMPORT_EXPORT_ALLOWED)) {
         response.status(500).send("action not enabled");
     }
@@ -89,7 +91,7 @@ exportApp.get("/projects/list", (request, response) => {
         let html = "";
         querySnap.forEach(doc => {
             const data = doc.data();
-            html += `<a href="${process.env.FUNCTIONS_URL}/exportApp/sensors/export/${doc.id}">${data.name} (${data.description})</a><br/>`;
+            html += `<a href="${process.env.FUNCTIONS_URL}/eximport/export/${doc.id}">${data.name} (${data.description})</a><br/>`;
         });
         response.status(200).header("content-type", "text/html").send(html);
     }).catch(e => {
@@ -97,7 +99,7 @@ exportApp.get("/projects/list", (request, response) => {
     });
 });
 
-exportApp.get("/sensors/export/:projectId", (request, response) => {
+eximportApp.get("/sensors/export/:projectId", (request, response) => {
     if (!parseInt(process.env.IMPORT_EXPORT_ALLOWED)) {
         response.status(500).send("action not enabled");
     }
@@ -115,7 +117,7 @@ exportApp.get("/sensors/export/:projectId", (request, response) => {
     });
 });
 
-exportApp.get("/sensors/import", (request, response) => {
+eximportApp.get("/sensors/import", (request, response) => {
     if (!parseInt(process.env.IMPORT_EXPORT_ALLOWED)) {
         response.status(500).send("action not enabled");
     }
@@ -129,7 +131,7 @@ exportApp.get("/sensors/import", (request, response) => {
     `);
 });
 
-exportApp.post("/sensors/import", (request, response) => {
+eximportApp.post("/sensors/import", (request, response) => {
     if (!parseInt(process.env.IMPORT_EXPORT_ALLOWED) || process.env.ENV !== "dev") {
         response.status(500).send("action not enabled");
     }
@@ -152,8 +154,6 @@ exportApp.post("/sensors/import", (request, response) => {
         response.status(500).send(e.message);
     });
 });
-exports.exportApp = functions.https.onRequest(exportApp);
-
 
 unauthedRoutes[eximportAppBasePath+"/sync"] = true;
 eximportApp.post("/sync", (request, response) => {
@@ -204,11 +204,7 @@ onWriteHandler(change, context) {
       // access a particular field as you would any JS property
       const name = newValue.name;
 
-      // Then return a promise of a set operation to update the count
-      return change.after.ref.set({
-        name_change_count: count + 1
-      }, {merge: true});
-}
+exports.eximport = functions.https.onRequest(eximportApp);
 
 where:
 context.eventType = <string>
