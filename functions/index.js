@@ -30,8 +30,12 @@ const checkAuth =  (appBasePath, req, res, next) => {
         next();
         return;
     }
-    const body = Object.fromEntries(req.body.split("&").map(param => param.split("=").map(p => decodeURIComponent(p))));
-    if ((!body || !body.token)) {
+    if (!req.body || ((req.body instanceof Object) && Object.keys(req.body).length === 0)) {
+        res.status(403).send({error: "need some parameters", body: req.body});
+        return;
+    }
+
+    if (!req.body.token) {
         res.status(403).send({error: "not authorized"});
         return;
     }
