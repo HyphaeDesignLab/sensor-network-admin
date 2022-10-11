@@ -9,6 +9,6 @@ export const setupFirebaseEmulators = (props) => {
     }
 };
 
-export const getFirebaseFunctionsUrl = (clientEnv, config) => {
-    return clientEnv.FUNCTIONS_URL.replace(/\{(locationId|projectId)\}/g, (m, p) => config[p]);
+export const getFirebaseFunctionsUrl = () => {
+    return clientEnv.FUNCTIONS_URL;
 };
