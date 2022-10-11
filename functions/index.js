@@ -20,6 +20,10 @@ const cors = require("cors")({origin: [
 const agent = new http.Agent({keepAlive: true});
 
 
+const { Client } = require("pg");
+const connectionString = `postgres://${process.env.PG_USER}:${process.env.PG_PASS}@${process.env.PG_HOST}:${process.env.PG_PORT}/${process.env.PG_DB}`;
+
+
 // Express middleware that validates Firebase ID Tokens passed in the Authorization HTTP header.
 // The Firebase ID token needs to be passed as a Bearer token in the Authorization HTTP header like this:
 // `Authorization: Bearer <Firebase ID Token>`.
@@ -151,17 +155,25 @@ exportApp.post("/sensors/import", (request, response) => {
 exports.exportApp = functions.https.onRequest(exportApp);
 
 
-/*
-firestore trigger function:
-https://firebase.google.com/docs/functions/firestore-events
-
-const functions = require('firebase-functions');
-
-SINGLE DOC
-exports.myFunction = functions.firestore
-  .document('my-collection/{docId}')
-  .onWrite((change, context) => {
-  });
+unauthedRoutes[eximportAppBasePath+"/sync"] = true;
+eximportApp.post("/sync", (request, response) => {
+    const pgClient = new Client({connectionString});
+    return new Promise((resolve, reject) => { //
+        pgClient.connect().then(() => {
+            pgClient.query(`select name, device_eui from ${process.env.PG_PROJECT_NAME}.sensors order by name`).then(res => {
+                pgClient.end().then(() => {
+                    resolve(res.rows.map(row => row.name+"/"+row.device_eui).join(", "));
+                }).catch((e) => reject("cannot end query" + e));
+            }).catch((e) => reject("cannot query" + e));
+        }).catch((e) => reject("cannot connect: " + e));
+    }).then(r => {
+        pgClient.end();
+        response.send(JSON.stringify(r));
+    }).catch(e => {
+        pgClient.end();
+        response.send(JSON.stringify(e));
+    });
+}); //
 
 WILDCARD
 // Listen for changes in all documents in the 'users' collection

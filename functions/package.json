@@ -20,7 +20,8 @@
     "firebase-admin": "^11.0.1",
     "firebase-functions": "^3.21.2",
     "http": "^0.0.1-security",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "pg": "^8.8.0"
   },
   "devDependencies": {
     "eslint": "^5.12.0",

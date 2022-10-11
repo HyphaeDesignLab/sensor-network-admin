@@ -11,6 +11,7 @@ module.exports = {
     'dashboard':  { import: `${SRC_DIR}/index.jsx`, filename: `dashboard.bundle.js` },
     // TESTS:
     //'sensor': { import: `${SRC_DIR}/tests/sensors/index.jsx`, filename: 'tests/sensor.bundle.js'},
+    // 'pg': { import: `${SRC_DIR}/tests/pg/index.jsx`, filename: 'tests/pg.bundle.js'},
     // 'image-crop': { import: `${SRC_DIR}/tests/image-crop/index.jsx`, filename: 'tests/image-crop.bundle.js'},
     // 'context':  { import: `${SRC_DIR}/tests/context/index.jsx`, filename: `tests/context.bundle.js` },
     // 'form':  { import: `${SRC_DIR}/tests/form/index.jsx`, filename: `tests/form.bundle.js` }
