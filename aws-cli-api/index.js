@@ -46,8 +46,22 @@ app.get('/:project/sensors/get', function (req, res) {
     });
 });
 
-app.post('/sensors/sync', function (req, res) {
-    res.send(JSON.stringify(req.body.zzz));
+app.get('/sensors/sync', function (req, res) {
+    return new Promise((resolve, reject) => {
+        pgClient.connect().then(() => {
+            pgClient.query(`select name, count from test`).then(res => {
+                pgClient.end().then(() => {
+                    resolve(res.rows.map(row => JSON.stringify(row)).join(', '));
+                }).catch((e) => reject('cannot end query' + e));
+            }).catch((e) => reject('cannot query' + e));
+        }).catch((e) => reject('cannot connect: ' + e));
+    }).then(r => {
+        pgClient.end();
+        res.send(JSON.stringify(r));
+    }).catch(e => {
+        pgClient.end();
+        res.send(JSON.stringify(e));
+    });
 });
 
 app.get('/sensor/add', function (req, res) {
