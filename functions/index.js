@@ -82,6 +82,26 @@ sensorsApp.post("/register", (request, response) => {
     });
     req.end();
 });
+
+unauthedRoutes[sensorsAppBasePath+"/readings/latest"] = true;
+sensorsApp.get("/readings/latest", (request, response) => {
+    const pgClient = new Client({connectionString});
+    return new Promise((resolve, reject) => { //
+        pgClient.connect().then(() => {
+            pgClient.query(`select * from ${process.env.PG_PROJECT_NAME}.sensor_readings_latest`).then(res => {
+                pgClient.end().then(() => {
+                    resolve(res.rows);
+                }).catch((e) => reject("cannot end query" + e));
+            }).catch((e) => reject("cannot query" + e));
+        }).catch((e) => reject("cannot connect: " + e));
+    }).then(r => {
+        pgClient.end();
+        response.send(JSON.stringify(r));
+    }).catch(e => {
+        pgClient.end();
+        response.send(JSON.stringify(e));
+    });
+}); //
 exports.sensors = functions.https.onRequest(sensorsApp);
 
 // Export-import app
