@@ -25,44 +25,48 @@ const { execSync } = require('child_process');
 const removeSpaces = s => s.replace(/[^\w]/, '_').replace(/__+/, '_').replace(/^_+|_+$/, '');
 
 const connectionString = `postgres://${env.pg_user}:${env.pg_pass}@${env.pg_host}:${env.pg_port}/${env.pg_db}`;
-const pgClient = new Client({connectionString, ssl: { rejectUnauthorized: false }});
 
-app.get('/:project/sensors/get', function (req, res) {
-    const project = req.params.project.replace(/\W/g, '');
+const pgQuery = (query) => {
+    const pgClientProps = {connectionString};
+    if (env.pg_ssl) {
+        pgClientProps.ssl = { rejectUnauthorized: false };
+    }
+    const pgClient = new Client(pgClientProps);
     return new Promise((resolve, reject) => {
         pgClient.connect().then(() => {
-            pgClient.query(`select name, device_eui from ${project}.sensors order by name`).then(res => {
+            pgClient.query(query).then(queryResult => {
                 pgClient.end().then(() => {
-                    resolve(res.rows.map(row => row.name+'/'+row.device_eui).join(', '));
+                    resolve(queryResult);
                 }).catch((e) => reject('cannot end query' + e));
             }).catch((e) => reject('cannot query' + e));
         }).catch((e) => reject('cannot connect: ' + e));
-    }).then(r => {
+    }).then(queryResult => {
         pgClient.end();
-        res.send(JSON.stringify(r));
+        return queryResult;
     }).catch(e => {
         pgClient.end();
+        throw e;
+    });
+}
+app.get('/sensors/readings/last', function (req, res) {
+    pgQuery(`select * from ${env.project}.sensor_readings_latest`)
+    .then(result => {
+        res.send(JSON.stringify(result.rows));
+    }).catch(e => {
         res.send(JSON.stringify(e));
     });
 });
 
 app.get('/sensors/sync', function (req, res) {
-    return new Promise((resolve, reject) => {
-        pgClient.connect().then(() => {
-            pgClient.query(`select name, count from test`).then(res => {
-                pgClient.end().then(() => {
-                    resolve(res.rows.map(row => JSON.stringify(row)).join(', '));
-                }).catch((e) => reject('cannot end query' + e));
-            }).catch((e) => reject('cannot query' + e));
-        }).catch((e) => reject('cannot connect: ' + e));
-    }).then(r => {
-        pgClient.end();
-        res.send(JSON.stringify(r));
+    pgQuery(`select now()`)
+    .then(result => {
+        res.send(JSON.stringify(result.rows));
     }).catch(e => {
-        pgClient.end();
         res.send(JSON.stringify(e));
     });
 });
+
+
 
 app.get('/sensor/add', function (req, res) {
     try {
