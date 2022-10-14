@@ -3,7 +3,7 @@ function sensors-api {
   cmd2="$2"
 
   if [ "$cmd" = "git" ]; then
-    if [ "$cmd" = "init" ]; then
+    if [ "$cmd2" = "init" ]; then
       echo 'Copy and paste these commands to init GITHUB'
       echo 'eval "$(ssh-agent -s)"'
       echo 'ssh-add ~/.ssh/sensor_install_dashboard_github_id_ed25519'
