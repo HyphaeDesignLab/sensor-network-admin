@@ -1,35 +1,54 @@
-function aws-cli-api-ssh-github-init {
-  echo 'Copy and paste these commands to init GITHUB'
-  echo 'eval "$(ssh-agent -s)"'
-	echo 'ssh-add ~/.ssh/sensor_install_dashboard_github_id_ed25519'
+function sensors-api {
+  cmd="$1";
+  cmd2="$2"
+
+  if [ "$cmd" = "git" ]; then
+    if [ "$cmd" = "init" ]; then
+      echo 'Copy and paste these commands to init GITHUB'
+      echo 'eval "$(ssh-agent -s)"'
+      echo 'ssh-add ~/.ssh/sensor_install_dashboard_github_id_ed25519'
+    elif [ "$cmd2" = "update" ]; then
+      echo 'Run this if GITHUB permissions not right'
+      echo 'aws-cli-api-ssh-github-init';
+      echo
+      cd ~/hyphae-geodashboard/
+      git pull
+      cd ~/aws_cli_api/
+      cp ~/hyphae-geodashboard/aws-cli-api/*.* .
+    else
+      sensor-api-help
+    fi
+  elif [ "$cmd" = "start" ]; then
+    if [ "$cmd2" = "bg" ]; then
+      cd ~/aws_cli_api/
+	    ./check_node_running.sh . restart bg
+    elif [ ! "$cmd2" ]; then
+      cd ~/aws_cli_api/
+	    ./check_node_running.sh . restart
+	  else
+	    sensor-api-help;
+    fi
+  elif [ "$cmd" = "stop" ]; then
+    cd ~/aws_cli_api/
+    ./check_node_running.sh . stop
+  elif [ "$cmd" = "status" ]; then
+    cd ~/aws_cli_api/
+    ./check_node_running.sh .
+  else
+    sensor-api-help;
+  fi
 }
 
-function aws-cli-api-gitpull-and-update {
-  echo 'Run this if GITHUB permissions not right'
-  echo 'aws-cli-api-ssh-github-init';
+function sensor-api-help {
   echo
-	cd ~/hyphae-geodashboard/
-	git pull
-	cd ~/aws_cli_api/
-	cp ~/hyphae-geodashboard/aws-cli-api/*.* .
-}
-
-function aws-cli-api-start-in-bg {
-	cd ~/aws_cli_api/
-	./check_node_running.sh . restart background
-}
-
-function aws-cli-api-start {
-	cd ~/aws_cli_api/
-	./check_node_running.sh . restart
-}
-
-function aws-cli-api-stop {
-	cd ~/aws_cli_api/
-	./check_node_running.sh . stop
-}
-
-function aws-cli-api-status {
-	cd ~/aws_cli_api/
-	./check_node_running.sh .
+      echo " Sample Usage"
+      echo
+      echo "    sensors-api"
+      echo "         git init"
+      echo "         git update"
+      echo "         start "
+      echo "         start bg"
+      echo "         stop"
+      echo "         status"
+      echo
 }
