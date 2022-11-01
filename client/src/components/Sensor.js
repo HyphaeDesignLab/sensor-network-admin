@@ -35,8 +35,12 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
     return onSave({...sensor, photos}); // add the photos array to original object
   };
 
-  const handleNameEdit = (sensorFragment) => {
+  const handleFieldEdit = (sensorFragment) => {
     return onSave({...sensor, ...sensorFragment}); // spread the fragment (contains name) into original object
+  };
+
+  const handleSiteEdit = (sensorSiteFragment) => {
+    return onSave({...sensor, site: {...sensor.site, ...sensorSiteFragment}}); // spread the fragment (contains name) into original object
   };
 
   const handleIdsEdit = (ids, hasAllIds) => {
@@ -128,9 +132,17 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
     <section>
     <h4>Edit Name / Type</h4>
     <h5>Name:</h5>
-    <InputString onSave={handleNameEdit} value={sensor.name ? sensor.name : ''} path='name' type='string' isOnlyEditMode={!sensor.id} hasLabel={false}/>
+    <InputString onSave={handleFieldEdit} value={sensor.name ? sensor.name : ''} path='name' type='string' isOnlyEditMode={!sensor.id} hasLabel={false}/>
 
     {/*<div>Generate name from Type abbreviation</div>*/}
+
+    <h5>Elevation</h5>
+      <InputString onSave={handleFieldEdit} value={sensor.elevation ? sensor.elevation : ''} path='elevation' type='number' isOnlyEditMode={!sensor.id} hasLabel={false}/>
+
+    <h5>Site</h5>
+      <InputString onSave={handleSiteEdit} value={(!!sensor.site && !!sensor.site.name) ? sensor.site.name : ''} path='name' type='string' isOnlyEditMode={!sensor.id} />
+      <InputString onSave={handleSiteEdit} value={(!!sensor.site && !!sensor.site.description) ? sensor.site.description : ''} path='description' type='string' isOnlyEditMode={!sensor.id} />
+      <InputString onSave={handleSiteEdit} value={(!!sensor.site && !!sensor.site.type) ? sensor.site.type : ''} path='type' type='string' isOnlyEditMode={!sensor.id} />
 
     <h5>Type</h5>
     <div>
