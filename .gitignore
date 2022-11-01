@@ -72,3 +72,5 @@ keys
 _notes/
 
 tmp
+
+firebase-emulator-export/
