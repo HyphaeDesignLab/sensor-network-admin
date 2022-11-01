@@ -110,24 +110,8 @@ eximportApp.use(cors);
 const eximportAppBasePath = "eximport"; // must match the property <path> in exports.<path> below
 eximportApp.use((req, res, next) => checkAuth(eximportAppBasePath, req, res, next));
 
-eximportApp.get("/projects/list", (request, response) => {
-    if (!parseInt(process.env.IMPORT_EXPORT_ALLOWED)) {
-        response.status(500).send("action not enabled");
-    }
-    var queryRef = db.collection("sensor_networks").get();
-    return queryRef.then(querySnap => {
-        let html = "";
-        querySnap.forEach(doc => {
-            const data = doc.data();
-            html += `<a href="${process.env.FUNCTIONS_URL}/eximport/export/${doc.id}">${data.name} (${data.description})</a><br/>`;
-        });
-        response.status(200).header("content-type", "text/html").send(html);
-    }).catch(e => {
-        response.status(500).send(e.message);
-    });
-});
 
-eximportApp.get("/sensors/export/:projectId", (request, response) => {
+eximportApp.post("/sensors/export/:projectId", (request, response) => {
     if (!parseInt(process.env.IMPORT_EXPORT_ALLOWED)) {
         response.status(500).send("action not enabled");
     }
@@ -143,20 +127,6 @@ eximportApp.get("/sensors/export/:projectId", (request, response) => {
     }).catch(e => {
         response.status(500).send(e.message);
     });
-});
-
-eximportApp.get("/sensors/import", (request, response) => {
-    if (!parseInt(process.env.IMPORT_EXPORT_ALLOWED)) {
-        response.status(500).send("action not enabled");
-    }
-    response.status(200).header("content-type", "text/html").send(`
-<form method="post" enctype="application/x-www-form-urlencoded">
-<input name="projectName" placeholder="project name" /><br/>
-<input name="projectDescription" placeholder="description"/><br/>
-<textarea name="sensorsJson" style="max-width: 600px; width: 100%; height: 400px;" placeholder="">JSON of sensors data</textarea><br/>
-<button>create project and import sensors</button>    
-</form>
-    `);
 });
 
 eximportApp.post("/sensors/import", (request, response) => {

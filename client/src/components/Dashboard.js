@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useDebugValue } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { collection, getDocs, addDoc, doc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 
 import Project from './Project';
 import SensorTypes from './SensorTypes';
+import firebaseConfig from "./../keys/firebase/config";
 
 const Dashboard = ({firebaseApp}) => {
     const [sensorTypes, setSensorTypes] = useState([]);
@@ -149,6 +150,31 @@ const Dashboard = ({firebaseApp}) => {
         setStep('sensor_types');
     }
 
+    const handleImportShow = (e) => {
+        setCurrentProject({});
+        setStep('import_export');
+    }
+
+    const importProjectNameRef = useRef();
+    const importProjectDescRef = useRef();
+    const importSensorsJsonRef = useRef();
+    const handleImport = () => {
+        firebaseApp.auth.currentUser.getIdToken().then(token => {
+            fetch(firebaseConfig.functionsUrl + '/eximport/sensors/import', {
+                method: 'post',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                    projectName: importProjectNameRef.current.value,
+                    projectDescription: importProjectDescRef.current.value,
+                    sensorsJson: importSensorsJsonRef.current.value,
+                    token
+                })
+            });
+        });
+    };
+
     return <section>
         {step === 'projects' && <div>
             <h2>Projects</h2>
@@ -156,10 +182,11 @@ const Dashboard = ({firebaseApp}) => {
             {!!projectsError && <div>{projectsError}</div>}
             {projects.map(project =>
                 <div key={project.id} className={currentProject && project.id === currentProject.id ? 'current':''}>
-                    <a href='#edit' onClick={editProject.bind(null, project)}>{project.name}</a>
+                    <a href='#edit' onClick={e => editProject(project, e)}>{project.name}</a>
                 </div>
             )}
             <div><button className='link' onClick={handleAddProject}>+ Add Project</button></div>
+            <div><button className='link' onClick={handleImportShow}>-&gt; Import Project</button></div>
 
             <h2>Other Settings</h2>
             <div><button className='link' onClick={handleManageSensorTypes}>Manage Sensor Types</button></div>
@@ -167,6 +194,15 @@ const Dashboard = ({firebaseApp}) => {
         {step === 'sensor_types' && <div>
             <div><button className={'link'} onClick={() => setStep('projects')}>&lt;&lt; all Projects</button></div>
             <SensorTypes title={<h2>Sensor Types</h2>} firebaseApp={firebaseApp} onUpdate={setSensorTypes} />
+        </div>}
+        {step === 'import_export' && <div>
+            <div><button className={'link'} onClick={() => setStep('projects')}>&lt;&lt; all Projects</button></div>
+            <h2>Import</h2>
+            <input ref={importProjectNameRef} placeholder="project name"/><br/>
+            <textarea ref={importProjectDescRef} placeholder="description"></textarea><br/>
+            <textarea ref={importSensorsJsonRef} style={{maxWidth: '600px', width: '100%', height: '400px'}} placeholder=""></textarea><br/>
+            <button onClick={handleImport}>create project and import sensors</button>
+
         </div>}
         {step === 'project' && <Project firebaseApp={firebaseApp} project={currentProject} addProject={addProject} saveProject={saveProject} deleteProject={deleteProject} setCurrentProject={setCurrentProject} setStep={setStep} sensorTypes={sensorTypes}/>}
     </section>;

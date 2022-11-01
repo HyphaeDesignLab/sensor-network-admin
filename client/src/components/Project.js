@@ -8,6 +8,7 @@ import {addDoc, updateDoc, deleteDoc, doc, collection, query, where, getDocs} fr
 
 import clientEnv from '../keys/client';
 import ConfirmDialog from "./ConfirmDialog";
+import firebaseConfig from "../keys/firebase/config";
 
 const noAwsProjectIdErrorMessage = 'Please set the Project AWS IOT ID in order to add sensors';
 const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentProject, setStep, sensorTypes}) => {
@@ -162,6 +163,24 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
         deleteProject(project.id);
     };
 
+    const [exportText, setExportText] = useState(null);
+    const handleExport = (project) => {
+        firebaseApp.auth.currentUser.getIdToken().then(token => {
+            fetch(firebaseConfig.functionsUrl + '/eximport/sensors/export/'+project.id, {
+                method: 'post',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                    token
+                })
+            })
+                .then(r => r.text())
+                .then(text => setExportText({id: project.id, name: project.name, text}))
+                .catch(e => setExportText(null));
+        });
+    };
+
     return <section>
         <div><a href='#' onClick={closeProject}>&lt;&lt; all Projects</a></div>
         <h2>Project "{!project.id ? 'Untitled' : project.name}"</h2>
@@ -195,6 +214,14 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
 
                 <section>
                     <h3>Manage</h3>
+                    <div>
+                        <button className={'link'} onClick={() => handleExport(project)}>export -&gt;</button>
+                        {!!exportText && <div style={{position: 'fixed', backgroundColor: 'white', border: '1px dashed black', padding: '10px', top: '40%', left: '40%'}}>
+                            <button className='link' style={{position: 'absolute', top: 0, right: 0}} onClick={() => setExportText(null)}>close</button>
+                            Export JSON for project {exportText.name} ({exportText.id}):<br/>
+                            <textarea readOnly={true}>{exportText.text}</textarea>
+                        </div>}
+                    </div>
                     <div>
                         {isConfirmProjectDeleteShown && <ConfirmDialog
                             onCancel={() => setConfirmProjectDeleteShown(false)}
