@@ -15,6 +15,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
     const [sensorToEdit, setSensorToEdit] = useState(false);
 
     const [sensors, setSensors] = useState([]);
+    const [sensorSites, setSensorSites] = useState(null);
     const [isSensorsLoading, setSensorsLoading] = useState(false);
     useEffect(() => {
         if (!project.id) {
@@ -26,12 +27,18 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
         setSensorsLoading(true);
         getDocs(q).then(qSnapshot => {
             const sensors_ = [];
+            const sensorSites = {};
             qSnapshot.forEach(doc => {
                 const sensor = doc.data();
                 sensor.id = doc.id;
                 sensors_.push(sensor);
+                if (sensor.site && sensor.site.name && sensor.site.type
+                    && !sensorSites[`${sensor.site.name}___${sensor.site.type}`]) {
+                    sensorSites[`${sensor.site.name}___${sensor.site.type}`] = sensor.site;
+                }
             });
             setSensors(sensors_);
+            setSensorSites(sensorSites);
             setSensorsLoading(false);
         });
     }, [project]);
@@ -52,6 +59,9 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
 
     const saveSensor = (sensor) => {
         sensor.network = project.id;
+        if (sensor.site && sensor.site.name && sensor.site.type) {
+            setSensorSites({...sensorSites, [`${sensor.site.name}___${sensor.site.type}`]: sensor.site});
+        }
         if (!sensor.id) {
             return addDoc(collection(firebaseApp.db, "sensors"), sensor).then(docRef => {
                 console.log("Sensor written with ID: ", docRef.id);
@@ -237,7 +247,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
             :
             <Sensor sensor={sensorToEdit} onSave={saveSensor} onDelete={deleteSensor}
                     onSaveToAws={addSensorToAwsIot} onDeleteFromAws={deleteSensorFromAwsIot}
-                    onCancel={cancelSaveSensor} sensorTypes={sensorTypes}/>
+                    onCancel={cancelSaveSensor} sensorTypes={sensorTypes} sensorSites={sensorSites}/>
             }
     </section>;
 };

@@ -6,7 +6,7 @@ import InputString from "./InputString";
 import SensorIds from "./sensors/SensorIds";
 import ConfirmDialog from "./ConfirmDialog";
 
-const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCancel, sensorTypes}) => {
+const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCancel, sensorTypes, sensorSites}) => {
 
   const [location, setLocation] = useState(sensor.location);
   const [isEditLocation, setEditLocation] = useState(false);
@@ -125,6 +125,21 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
     });
   };
 
+  const [showSitesList, setShowSitesList] = useState(false);
+  const [isSiteFromListSaving, setIsSiteFromListSaving] = useState(false);
+  const handleSiteSelect = site => {
+    if (isSiteFromListSaving) {
+      return;
+    }
+    setIsSiteFromListSaving(true);
+    handleSiteEdit(site)
+        .catch(e => {alert('Error saving site: '+e.message)})
+        .finally(() => {
+          setIsSiteFromListSaving(false);
+          setShowSitesList(false);
+        })
+  };
+
   return <section>
     <div><a href='#' onClick={onCancel}>&lt;&lt; All Sensors</a></div>
     <h3>Sensor {!!sensor.id ? `"${sensor.name}" (id: ${sensor.id})` : '"New" (unsaved)'}</h3>
@@ -140,6 +155,23 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
       <InputString onSave={handleFieldEdit} value={sensor.elevation ? sensor.elevation : ''} path='elevation' type='number' isOnlyEditMode={!sensor.id} hasLabel={false}/>
 
     <h5>Site</h5>
+      {!!Object.keys(sensorSites).length && <div style={{position: 'relative'}}>
+        <button type='button' className='link' onClick={() => setShowSitesList(true)}>Pick sites from other sensors</button>
+        {showSitesList && <button type='button' onClick={() => setShowSitesList(false)}>(x) close</button>}
+        {isSiteFromListSaving && <span><div className='spinning-loader' style={{display: 'inline-block'}}></div> Saving</span>}
+        {showSitesList && <div style={{position: 'absolute', maxHeight: '400px', width: '300px', overflowY: 'scroll', overflowX: 'hidden', border: '2px dashed grey', borderRadius: '5px', background: '#ccc'}}>
+
+          {Object.keys(sensorSites).map((k,i) =>
+              <div key={k}
+                   style={{borderTop: !!i ? '1px dotted black' : 'none', padding: '5px', cursor: 'pointer' }}
+                   title='Click to select site name/type/description'
+                   onClick={() => handleSiteSelect(sensorSites[k])}
+              >
+                {sensorSites[k].name} ({sensorSites[k].type}): &nbsp;
+                {sensorSites[k].description}
+          </div>)}
+        </div>}
+      </div>}
       <InputString onSave={handleSiteEdit} value={(!!sensor.site && !!sensor.site.name) ? sensor.site.name : ''} path='name' type='string' isOnlyEditMode={!sensor.id} />
       <InputString onSave={handleSiteEdit} value={(!!sensor.site && !!sensor.site.description) ? sensor.site.description : ''} path='description' type='string' isOnlyEditMode={!sensor.id} />
       <InputString onSave={handleSiteEdit} value={(!!sensor.site && !!sensor.site.type) ? sensor.site.type : ''} path='type' type='string' isOnlyEditMode={!sensor.id} />
