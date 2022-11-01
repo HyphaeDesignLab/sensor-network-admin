@@ -26,7 +26,7 @@ const connectionString = `postgres://${process.env.PG_USER}:${process.env.PG_PAS
 // UNLESS page is in UNAUTH hash
 const unauthedRoutes = {};
 const checkAuth =  (appBasePath, req, res, next) => {
-    if (req.method === "get") {
+    if (req.method === "GET") {
         next();
         return;
     }
