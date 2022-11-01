@@ -218,8 +218,8 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                         <button className={'link'} onClick={() => handleExport(project)}>export -&gt;</button>
                         {!!exportText && <div style={{position: 'fixed', backgroundColor: 'white', border: '1px dashed black', padding: '10px', top: '40%', left: '40%'}}>
                             <button className='link' style={{position: 'absolute', top: 0, right: 0}} onClick={() => setExportText(null)}>close</button>
-                            Export JSON for project {exportText.name} ({exportText.id}):<br/>
-                            <textarea readOnly={true}>{exportText.text}</textarea>
+                            Export JSON for project {exportText.name}:<br/>
+                            <textarea readOnly={true} value={exportText.text} onClick={e => e.target.select()}></textarea>
                         </div>}
                     </div>
                     <div>
