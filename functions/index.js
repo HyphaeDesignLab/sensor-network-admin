@@ -14,7 +14,7 @@ const cors = require("cors")({origin: (process.env.CORS_URLS ? process.env.CORS_
 // connections open between function invocations
 const agent = new http.Agent({keepAlive: true});
 
-
+// docs: https://node-postgres.com/api/result
 const { Client } = require("pg");
 const connectionString = `postgres://${process.env.PG_USER}:${process.env.PG_PASS}@${process.env.PG_HOST}:${process.env.PG_PORT}/${process.env.PG_DB}`;
 
@@ -209,6 +209,25 @@ testApp.get("/ip/db/client", (request, response) => {
             pgClient.query(`insert into ${process.env.PG_PROJECT_NAME}.client_test (ip, host, now, tz) values (inet_client_addr(), 'localhost', now(), extract(timezone from now())/3600)`).then(() => {
                 pgClient.end().then(() => {
                     resolve("entered ip");
+                }).catch((e) => reject("cannot end query" + e));
+            }).catch((e) => reject("cannot query" + e));
+        }).catch((e) => reject("cannot connect: " + e));
+    }).then(r => {
+        pgClient.end();
+        response.send(JSON.stringify(r));
+    }).catch(e => {
+        pgClient.end();
+        response.send(JSON.stringify(e));
+    });
+}); //
+
+testApp.get("/ip/db/client/count", (request, response) => {
+    const pgClient = new Client({connectionString});
+    return new Promise((resolve, reject) => { //
+        pgClient.connect().then(() => {
+            pgClient.query(`select count(*) from ${process.env.PG_PROJECT_NAME}.client_test`).then(queryResult => {
+                pgClient.end().then(() => {
+                    resolve(queryResult.rows);
                 }).catch((e) => reject("cannot end query" + e));
             }).catch((e) => reject("cannot query" + e));
         }).catch((e) => reject("cannot connect: " + e));
