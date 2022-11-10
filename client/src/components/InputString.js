@@ -73,6 +73,8 @@ export default function InputString({value=null, path, onSave, type='text',
                 return;
             }
             setNewValue(value);
+        } else if (type === 'longtext') {
+            setNewValue(String(e.target.value).replaceAll("\n", '~'));
         } else {
             setNewValue(String(e.target.value));
         }
@@ -89,6 +91,9 @@ export default function InputString({value=null, path, onSave, type='text',
     const measureTextLengthElRef = useRef(null);
     const [inputLength, setInputLength] = useState('auto');
     useEffect(() => {
+        if (type === 'longtext') {
+            return;
+        }
         let width = parseInt(window.getComputedStyle(measureTextLengthElRef.current).width) * 1.1;
         setInputLength(width+'px');
     }, [newValue]);
@@ -98,6 +103,13 @@ export default function InputString({value=null, path, onSave, type='text',
         <WrappingTag>
             {hasLabel && !!path && <strong>{humanReadableTitle(path)}: </strong>}
             {isEditable ?
+                type === 'longtext' ?
+                <textarea
+                    ref={inputRef}
+                    value={newValue.replaceAll('~', "\n")}
+                    onChange={handleChange}
+                    style={{minWidth: '350px', minHeight: '200px', ...inputStyle}}
+                ></textarea> :
                 <input type={type}
                        ref={inputRef}
                        value={newValue}
@@ -105,7 +117,9 @@ export default function InputString({value=null, path, onSave, type='text',
                        onKeyUp={handleKeyUp}
                        style={{width: inputLength, minWidth: '60px', ...inputStyle}} />
                 :
-                <span onClick={handleEditClick} style={inputStyle}>{oldValue} <EditIcon /></span>
+                <span onClick={handleEditClick} style={{whiteSpace: 'pre', ...inputStyle}}>
+                    {!oldValue ? '--empty--' : (type === 'longtext' ? oldValue.replaceAll('~', "\n") : oldValue)} <EditIcon />
+                </span>
             }
             {isChanged && <span>&nbsp;<button onClick={handleSaveClick}>save</button></span>}
             {(isOnlyEditMode && isChanged) || (!isOnlyEditMode && isEditable) &&
