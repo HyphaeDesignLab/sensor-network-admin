@@ -15,6 +15,7 @@ if [ "$(stat -f '%c' ./src/keys/firebase/config.js)" = "$(stat -f '%c' ./src/key
 fi
 
 
+cp "./src/keys/client/$clientEnv.js" "./src/keys/client.js"
 echo $clientEnv > ./src/keys/firebase/env.txt
 
 envFile='.env'
