@@ -47,9 +47,8 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
     return onSave({...sensor, ids, has_all_ids: hasAllIds}); // spread the IDs into original object
   };
 
-  const handleTypeEdit = (e) => {
-    const type = e.target.value;
-    return onSave({...sensor, type}); // spread the IDs into original object
+  const handleFieldRawEdit = (e) => {
+    return onSave({...sensor, [e.target.name]: e.target.value});
   };
 
   const [isConfirmDeleteShown, setIsConfirmDeleteShown] = useState(false);
@@ -145,16 +144,29 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
     <h3>Sensor {!!sensor.id ? `"${sensor.name}" (id: ${sensor.id})` : '"New" (unsaved)'}</h3>
 
     <section>
-    <h4>Edit Name / Type</h4>
-    <h5>Name:</h5>
-    <InputString onSave={handleFieldEdit} value={sensor.name ? sensor.name : ''} path='name' type='string' isOnlyEditMode={!sensor.id} hasLabel={false}/>
-
+      <h4>Name</h4>
+      <InputString onSave={handleFieldEdit} value={sensor.name ? sensor.name : ''} path='name' type='string' isOnlyEditMode={!sensor.id} hasLabel={false}/>
+    </section>
     {/*<div>Generate name from Type abbreviation</div>*/}
 
-    <h5>Elevation</h5>
-      <InputString onSave={handleFieldEdit} value={sensor.elevation ? sensor.elevation : ''} path='elevation' type='number' isOnlyEditMode={!sensor.id} hasLabel={false}/>
+    <section>
+      <h4>Type</h4>
+      <div>
+        <select onChange={handleFieldRawEdit} value={sensor.type} name={'type'}>
+          <option>--select type--</option>
+          {sensorTypes.map(type => <option key={type.id} value={type.id} title={type.description}>{type.name}</option>)}
+        </select></div>
+    </section>
 
-    <h5>Site</h5>
+    <section>
+      <h4>Notes</h4>
+      <div>
+        <InputString onSave={handleFieldEdit} value={sensor.notes ? sensor.notes : ''} path='notes' type='longtext' isOnlyEditMode={!sensor.id} hasLabel={false}/>
+      </div>
+    </section>
+
+    <section>
+      <h5>Site</h5>
       {!!Object.keys(sensorSites).length && <div style={{position: 'relative'}}>
         <button type='button' className='link' onClick={() => setShowSitesList(true)}>Pick sites from other sensors</button>
         {showSitesList && <button type='button' onClick={() => setShowSitesList(false)}>(x) close</button>}
@@ -175,13 +187,6 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
       <InputString onSave={handleSiteEdit} value={(!!sensor.site && !!sensor.site.name) ? sensor.site.name : ''} path='name' type='string' isOnlyEditMode={!sensor.id} />
       <InputString onSave={handleSiteEdit} value={(!!sensor.site && !!sensor.site.description) ? sensor.site.description : ''} path='description' type='string' isOnlyEditMode={!sensor.id} />
       <InputString onSave={handleSiteEdit} value={(!!sensor.site && !!sensor.site.type) ? sensor.site.type : ''} path='type' type='string' isOnlyEditMode={!sensor.id} />
-
-    <h5>Type</h5>
-    <div>
-      <select onChange={handleTypeEdit} value={sensor.type}>
-      <option>--select type--</option>
-      {sensorTypes.map(type => <option key={type.id} value={type.id} title={type.description}>{type.name}</option>)}
-    </select></div>
     </section>
 
     <section>
@@ -226,6 +231,11 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
     </div> :
       <GeoLocator onDone={handleLocationSet} initalCoordinates={location} onCancel={handleLocationEditCancel}/>
     }
+    </section>
+
+    <section>
+      <h4>Elevation</h4>
+      <InputString onSave={handleFieldEdit} value={sensor.elevation ? sensor.elevation : ''} path='elevation' type='number' isOnlyEditMode={!sensor.id} hasLabel={false}/> meters
     </section>
 
     <section>
