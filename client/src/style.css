@@ -188,3 +188,22 @@ button.number-control {
     line-height: 10px;
     height: 30px;
 }
+
+.more-info-on-hover {
+    cursor: help;
+    position: relative;
+}
+.more-info-on-hover span {
+    display: none;
+    position: absolute;
+    top: 100%;
+    border: 1px dashed grey;
+    padding: 5px;
+    background: lightyellow;
+    font-size: 70%;
+    border-radius: 5px;
+}
+
+.more-info-on-hover:hover span, .more-info-on-hover:focus, .more-info-on-hover:active span {
+    display: inherit;
+}

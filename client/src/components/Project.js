@@ -32,6 +32,8 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                 const sensor = doc.data();
                 sensor.id = doc.id;
                 sensors_.push(sensor);
+                sensor.time_added = sensor.time_added ? new Date(sensor.time_added.seconds * 1000) : null;
+                sensor.time_updated = sensor.time_updated ? new Date(sensor.time_updated.seconds * 1000) : null;
                 if (sensor.site && sensor.site.name && sensor.site.type
                     && !sensorSites[`${sensor.site.name}___${sensor.site.type}`]) {
                     sensorSites[`${sensor.site.name}___${sensor.site.type}`] = sensor.site;
@@ -63,6 +65,8 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
             setSensorSites({...sensorSites, [`${sensor.site.name}___${sensor.site.type}`]: sensor.site});
         }
         if (!sensor.id) {
+            sensor.time_added = new Date();
+            sensor.time_updated = new Date();
             return addDoc(collection(firebaseApp.db, "sensors"), sensor).then(docRef => {
                 console.log("Sensor written with ID: ", docRef.id);
                 sensor.id = docRef.id;
@@ -72,6 +76,10 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                 console.error("Error adding sensor: ", e);
             });
         } else {
+            if (!sensor.time_added) {
+                sensor.time_added = new Date();
+            }
+            sensor.time_updated = new Date();
             const sensorDoc = doc(firebaseApp.db, "sensors", sensor.id);
             return updateDoc(sensorDoc, sensor).then(response => {
                 const sensorsCopy = sensors.map(s => s.id === sensor.id ? {...sensor}:s);
@@ -218,7 +226,26 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                         <button type='button' onClick={addNewSensor} className='link'>Add New Sensor</button>
                     </div>
                     {sensors && sensors.map(sensor =>
-                        <div key={sensor.id}>{sensor.name} (id: {sensor.id.substr(0,7)})<a href='#edit' onClick={setSensorToEdit.bind(null, sensor)}>edit</a></div>
+                        <div key={sensor.id}>
+                            {sensor.name}
+                            {' '}
+                            (id: {sensor.id.substr(0,7)})
+                            {' '}
+                            {sensor.time_updated &&
+                                <span style={{cursor: 'help'}} className='more-info-on-hover'>
+                                    <span>last updated on {sensor.time_updated.toLocaleString()}</span>
+                                    {sensor.time_updated.toLocaleDateString()}
+                                </span>
+                            }
+                            {sensor.time_updated && sensor.time_added && <span style={{color: 'grey', fontWeight: 'bold', fontSize: '120%'}}>/</span>}
+                            {sensor.time_added &&
+                                <span className='more-info-on-hover'>
+                                    <span>added on {sensor.time_added.toLocaleString()}</span>
+                                    {sensor.time_added.toLocaleDateString()}
+                                </span>
+                            }
+                            {' '}
+                            <a href='#edit' onClick={setSensorToEdit.bind(null, sensor)}>edit</a></div>
                     )}
                 </section>}
 
