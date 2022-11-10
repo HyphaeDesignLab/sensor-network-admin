@@ -18,6 +18,28 @@ const agent = new http.Agent({keepAlive: true});
 const { Client } = require("pg");
 const connectionString = `postgres://${process.env.PG_USER}:${process.env.PG_PASS}@${process.env.PG_HOST}:${process.env.PG_PORT}/${process.env.PG_DB}`;
 
+const pgQuery = (query) => {
+    const pgClientProps = {connectionString};
+    if (parseInt(process.env.PG_SSL)) {
+        pgClientProps.ssl = { rejectUnauthorized: false };
+    }
+    const pgClient = new Client(pgClientProps);
+    return new Promise((resolve, reject) => {
+        pgClient.connect().then(() => {
+            pgClient.query(query).then(queryResult => {
+                pgClient.end().then(() => {
+                    resolve(queryResult);
+                }).catch((e) => reject("cannot end query: " + e));
+            }).catch((e) => reject("cannot query: " + e));
+        }).catch((e) => reject("cannot connect: " + e));
+    }).then(queryResult => {
+        pgClient.end();
+        return queryResult;
+    }).catch(e => {
+        pgClient.end();
+        throw e;
+    });
+}
 
 // Express middleware that validates Firebase ID Tokens passed in the Authorization HTTP header.
 // The Firebase ID token needs to be passed as a Bearer token in the Authorization HTTP header like this:
@@ -85,24 +107,125 @@ sensorsApp.post("/register", (request, response) => {
 
 unauthedRoutes[sensorsAppBasePath+"/readings/latest"] = true;
 sensorsApp.get("/readings/latest", (request, response) => {
-    const pgClient = new Client({connectionString});
-    return new Promise((resolve, reject) => { //
-        pgClient.connect().then(() => {
-            pgClient.query(`select * from ${process.env.PG_PROJECT_NAME}.sensor_readings_latest`).then(res => {
-                pgClient.end().then(() => {
-                    resolve(res.rows);
-                }).catch((e) => reject("cannot end query" + e));
-            }).catch((e) => reject("cannot query" + e));
-        }).catch((e) => reject("cannot connect: " + e));
-    }).then(r => {
-        pgClient.end();
-        response.send(JSON.stringify(r));
+    return pgQuery(`select * from ${process.env.PG_PROJECT_NAME}.sensor_readings_latest`).then(r => {
+        response.send({status: "success", data: JSON.stringify(r.rows)});
     }).catch(e => {
-        pgClient.end();
-        response.send(JSON.stringify(e));
+        response.send({status: "error", error: JSON.stringify(e)});
     });
 }); //
 exports.sensors = functions.https.onRequest(sensorsApp);
+
+// transition sensors to having a UID
+//  0. add DB triggers where sensors are found by DEVEUI
+//  1. re-save sensors in Dashboard, so it triggers the DB trigger function to save to PG
+//  2. change condition in SQL to find sensor BY UID and NOT by DEVEUI + redeploy
+
+// context.eventType = String;
+//     // google.firestore.document.write
+//     // google.firestore.document.create
+//     // google.firestore.document.update
+//     // google.firestore.document.delete
+
+/**
+ *
+ * @param QueryDocumentSnapshot doc
+ * @returns {Promise<unknown>}
+ */
+const updateOrInsertSensorToPG = doc => {
+    const data = doc.data();
+    functions.logger.log(data);
+    if (!data.ids.deveui) {
+        functions.logger.log("Cannot sync sensor without IDs like dev_eui");
+        return;
+    }
+
+    const selectQuery = {
+        text: `select count(*) as "sensorCount" from ${process.env.PG_PROJECT_NAME}.sensors where device_eui=$1`,
+        values: [data.ids.deveui]
+    };
+
+    const insertQuery = {
+        text: `
+insert into ${process.env.PG_PROJECT_NAME}.sensors 
+(uid, 
+ device_eui, 
+ name, 
+ type, 
+ site, 
+ elevation,
+ lng,
+ lat
+ ) values ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        values: [
+            data.id,
+            data.ids.deveui.toLowerCase(),
+            data.name,
+            data.type,
+            data.site ? `${data.site.name}/${data.site.type} (${data.site.description}) ` : "",
+            data.elevation,
+            data.location ? data.location.lng : "",
+            data.location ? data.location.lat : ""
+        ]
+    };
+
+    const updateQuery = {
+        text: `
+update ${process.env.PG_PROJECT_NAME}.sensors 
+set 
+    name=$2,
+    type=$3,
+    site=$4,
+    elevation=$5,
+    lng=$6,
+    lat=$7,
+    uid=$8
+where device_eui=$1`,
+        values: [
+            data.ids.deveui.toLowerCase(),
+            data.name,
+            data.type,
+            data.site ? `${data.site.name}/${data.site.type} (${data.site.description}) ` : "",
+            data.elevation,
+            data.location ? data.location.lng : "",
+            data.location ? data.location.lat : "",
+            data.id
+        ]
+    };
+
+
+    return pgQuery(selectQuery).then(r => {
+        const isExists = parseInt(r.rows[0].sensorCount) > 0;
+        let query = isExists ? updateQuery : insertQuery;
+        return pgQuery(query).then(r2 => {
+            functions.logger.log(r2.rowCount ? `sensor ${data.id} ${isExists ? "updated":"added"}`:`no sensor ${isExists ? "updated":"added"}`);
+        });
+    }).catch((e) => {
+        functions.logger.log(e);
+    });
+};
+
+exports.onSensorTypeCreate = functions.firestore
+    .document("sensors/{id}")
+    .onCreate((doc) => updateOrInsertSensorToPG(doc));
+
+exports.onSensorTypeUpdate = functions.firestore
+    .document("sensors/{id}")
+    .onUpdate((change) => updateOrInsertSensorToPG(change.after));
+
+exports.onSensorTypeDelete = functions.firestore
+    .document("sensors/{id}")
+    .onDelete((doc) => {
+        const data = doc.data();
+        let query = {
+            text: `delete from ${process.env.PG_PROJECT_NAME}.sensors where uid=$1`,
+            values: [data.id]
+        }
+        pgQuery(query).then(r => {
+            functions.logger.log(r.rowCount ? `sensor ${data.id} deleted`:"no sensor deleted");
+        }).catch((e) => {
+            functions.logger.log(e);
+        });
+    });
 
 // Export-import app
 const eximportApp = express();
