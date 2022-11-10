@@ -30,7 +30,7 @@ const pgQuery = (query) => {
                 pgClient.end().then(() => {
                     resolve(queryResult);
                 }).catch((e) => reject("cannot end query: " + e));
-            }).catch((e) => reject("cannot query: " + e));
+            }).catch((e) => reject("cannot query " + JSON.stringify(query) + " :: " + e));
         }).catch((e) => reject("cannot connect: " + e));
     }).then(queryResult => {
         pgClient.end();
@@ -131,7 +131,7 @@ exports.sensors = functions.https.onRequest(sensorsApp);
  * @param QueryDocumentSnapshot doc
  * @returns {Promise<unknown>}
  */
-const updateOrInsertSensorToPG = doc => {
+const updateOrInsertSensorToPG = (doc) => {
     const data = doc.data();
     functions.logger.log(data);
     if (!data.ids.deveui) {
@@ -141,7 +141,7 @@ const updateOrInsertSensorToPG = doc => {
 
     const selectQuery = {
         text: `select count(*) as "sensorCount" from ${process.env.PG_PROJECT_NAME}.sensors where device_eui=$1`,
-        values: [data.ids.deveui]
+        values: [data.ids.deveui.toLowerCase()]
     };
 
     const insertQuery = {
@@ -161,10 +161,10 @@ insert into ${process.env.PG_PROJECT_NAME}.sensors
             data.ids.deveui.toLowerCase(),
             data.name,
             data.type,
-            data.site ? `${data.site.name}/${data.site.type} (${data.site.description}) ` : "",
-            data.elevation,
-            data.location ? data.location.lng : "",
-            data.location ? data.location.lat : ""
+            data.site ? `${data.site.name ? data.site.name : ""}/${data.site.type ? data.site.type:""} (${data.site.description ? data.site.description:""}) ` : "",
+            data.elevation ? data.elevation: null,
+            data.location ? data.location.lng : null,
+            data.location ? data.location.lat : null
         ]
     };
 
@@ -184,10 +184,10 @@ where device_eui=$1`,
             data.ids.deveui.toLowerCase(),
             data.name,
             data.type,
-            data.site ? `${data.site.name}/${data.site.type} (${data.site.description}) ` : "",
-            data.elevation,
-            data.location ? data.location.lng : "",
-            data.location ? data.location.lat : "",
+            data.site ? `${data.site.name ? data.site.name : ""}/${data.site.type ? data.site.type:""} (${data.site.description ? data.site.description:""}) ` : "",
+            data.elevation ? data.elevation : null,
+            data.location ? data.location.lng : null,
+            data.location ? data.location.lat : null,
             data.id
         ]
     };
