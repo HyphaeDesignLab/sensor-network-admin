@@ -196,6 +196,7 @@ button.number-control {
 .more-info-on-hover span {
     display: none;
     position: absolute;
+    z-index: 10;
     top: 100%;
     border: 1px dashed grey;
     padding: 5px;
@@ -204,6 +205,9 @@ button.number-control {
     border-radius: 5px;
 }
 
-.more-info-on-hover:hover span, .more-info-on-hover:focus, .more-info-on-hover:active span {
+.more-info-on-hover:hover span, .more-info-on-hover:focus span, .more-info-on-hover:active span {
     display: inherit;
+}
+.more-info-on-hover:hover, .more-info-on-hover:focus, .more-info-on-hover:active {
+    background-color: lightcyan;
 }
