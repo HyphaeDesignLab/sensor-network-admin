@@ -35,8 +35,8 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                 sensor.time_added = sensor.time_added ? new Date(sensor.time_added.seconds * 1000) : null;
                 sensor.time_updated = sensor.time_updated ? new Date(sensor.time_updated.seconds * 1000) : null;
                 if (sensor.site && sensor.site.name && sensor.site.type
-                    && !sensorSites[`${sensor.site.name}___${sensor.site.type}`]) {
-                    sensorSites[`${sensor.site.name}___${sensor.site.type}`] = sensor.site;
+                    && !sensorSites[`${sensor.site.name.toLowerCase().trim()}___${sensor.site.type.toLowerCase().trim()}`]) {
+                    sensorSites[`${sensor.site.name.toLowerCase().trim()}___${sensor.site.type.toLowerCase().trim()}`] = sensor.site;
                 }
             });
             setSensors(sensors_);
@@ -62,7 +62,7 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
     const saveSensor = (sensor) => {
         sensor.network = project.id;
         if (sensor.site && sensor.site.name && sensor.site.type) {
-            setSensorSites({...sensorSites, [`${sensor.site.name}___${sensor.site.type}`]: sensor.site});
+            setSensorSites({...sensorSites, [`${sensor.site.name.toLowerCase().trim()}___${sensor.site.type.toLowerCase().trim()}`]: sensor.site});
         }
         if (!sensor.id) {
             sensor.time_added = new Date();
@@ -199,6 +199,31 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
         });
     };
 
+    const sensorsOrderFields = {name: 'Name', time_added: 'Date Added', time_updated: 'Date Updated'};
+    const [sensorsOrder, setSensorsOrder] = useState({field: 'name', direction: 'asc'}); // -1 asc, 1, desc
+    const [sensorsSorted, setSensorsSorted] = useState([]);
+    useEffect(() => {
+        if (sensors.length) {
+            setSensorsSorted(sensors.sort((a,b) => {
+                let order = 0;
+                if (typeof a[sensorsOrder.field] !== 'string' && typeof b[sensorsOrder.field] !== 'string') {
+                    order = a[sensorsOrder.field] < b[sensorsOrder.field] ? -1 : 1;
+                } else {
+                    order = String(a[sensorsOrder.field]).toLowerCase() < String(b[sensorsOrder.field]).toLowerCase() ? -1 : 1;
+                }
+                return order * (sensorsOrder.direction === 'asc' ? 1 : -1);
+            }));
+        }
+    }, [sensors, sensorsOrder]);
+
+    const handleSortClicked = (fieldId) => {
+        const direction = sensorsOrder.field === fieldId ? // if field is SAME,
+            (sensorsOrder.direction === 'asc' ? 'desc':'asc') // toggle ASC DESC
+            : 'asc'; // else default
+
+        setSensorsOrder({field: fieldId, direction});
+    }
+
     return <section>
         <div><a href='#' onClick={closeProject}>&lt;&lt; all Projects</a></div>
         <h2>Project "{!project.id ? 'Untitled' : project.name}"</h2>
@@ -225,13 +250,20 @@ const Project = ({firebaseApp, project, saveProject, deleteProject, setCurrentPr
                         }
                         <button type='button' onClick={addNewSensor} className='link'>Add New Sensor</button>
                     </div>
-                    {sensors && sensors.map(sensor =>
+                    <div>Sort by: {Object.keys(sensorsOrderFields).map(fieldId =>
+                        <span
+                            key={fieldId}
+                            onClick={() => handleSortClicked(fieldId)}
+                            style={{cursor: 'pointer', fontWeight: sensorsOrder.field === fieldId ? 'bold':'' }}
+                        >{sensorsOrderFields[fieldId]} </span>
+                    )}</div>
+                    {sensorsSorted && sensorsSorted.length && sensorsSorted.map(sensor =>
                         <div key={sensor.id}>
                             {sensor.name}
                             {' '}
                             (id: {sensor.id.substr(0,7)})
                             {' '}
-                            {sensor.time_updated &&
+                            {sensor.time_updated && (!sensor.time_added || sensor.time_added.getTime() !== sensor.time_updated.getTime()) &&
                                 <span style={{cursor: 'help'}} className='more-info-on-hover'>
                                     <span>last updated on {sensor.time_updated.toLocaleString()}</span>
                                     {sensor.time_updated.toLocaleDateString()}
