@@ -173,7 +173,7 @@ const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCance
         {isSiteFromListSaving && <span><div className='spinning-loader' style={{display: 'inline-block'}}></div> Saving</span>}
         {showSitesList && <div style={{position: 'absolute', maxHeight: '400px', width: '300px', overflowY: 'scroll', overflowX: 'hidden', border: '2px dashed grey', borderRadius: '5px', background: '#ccc'}}>
 
-          {Object.keys(sensorSites).map((k,i) =>
+          {Object.keys(sensorSites).sort().map((k,i) =>
               <div key={k}
                    style={{borderTop: !!i ? '1px dotted black' : 'none', padding: '5px', cursor: 'pointer' }}
                    title='Click to select site name/type/description'
