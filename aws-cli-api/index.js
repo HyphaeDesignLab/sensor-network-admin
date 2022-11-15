@@ -64,11 +64,11 @@ app.get('/sensors/get', function (req, res) {
         result.rows.forEach(row => {
            sensors.push({
                deveui: !!row.ids ? row.ids.deveui : null,
-               lng: row.location.lng ?? null,
-               lat: row.location.lat ?? null,
-               type: row.type ?? null,
-               elevation: row.elevation ?? null,
-               site: row.site ?? null
+               lng: row.location && row.location.lng ? row.location.lng : null,
+               lat: row.location && row.location.lat ? row.location.lat : null,
+               type: row.type ? row.type : null,
+               elevation: row.elevation ? row.elevation : null,
+               site: row.site ? row.site : null
            });
         });
         res.send(JSON.stringify(sensors));
