@@ -63,9 +63,9 @@ app.get('/sensors/get', function (req, res) {
         const sensors = [];
         result.rows.forEach(row => {
            sensors.push({
-               deveui: !!row.ids ? row.ids.deveui : null,
-               lng: row.location && row.location.lng ? row.location.lng : null,
-               lat: row.location && row.location.lat ? row.location.lat : null,
+               deveui: !!row.device_eui ? row.device_eui : null,
+               lng: row.lng ? row.lng : null,
+               lat: row.lat ? row.lat : null,
                type: row.type ? row.type : null,
                elevation: row.elevation ? row.elevation : null,
                site: row.site ? row.site : null
