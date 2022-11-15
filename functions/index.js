@@ -113,6 +113,50 @@ sensorsApp.get("/readings/latest", (request, response) => {
         response.send({status: "error", error: JSON.stringify(e)});
     });
 }); //
+
+unauthedRoutes[sensorsAppBasePath+"/get"] = true;
+sensorsApp.get("/get", (request, response) => {
+    const projectsCollRef = db.collection("sensor_networks");
+    return projectsCollRef.where("uid", "==", process.env.PG_PROJECT_NAME).get()
+        .then(projectSnapshot => {
+            if (projectSnapshot.empty) {
+                response.send({status: "error", error: "no sensors for project "+process.env.PG_PROJECT_NAME});
+                return;
+            }
+
+            const sensorsCollRef = db.collection("sensors");
+            let projectId = null
+
+            projectSnapshot.forEach(project => {
+                if (projectId) {
+                    return;
+                }
+                projectId = project.id;
+            });
+            return sensorsCollRef.where("network", "==", projectId).get()
+                .then(snapshot => {
+                    functions.logger.log(snapshot);
+                    if (snapshot.empty) {
+                        response.send({status: "error", error: "no sensors for project "+process.env.PG_PROJECT_NAME});
+                    } else {
+                        const sensors = [];
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            if (data.photos) {
+                                delete data.photos;
+                            }
+                            sensors.push(data);
+                        })
+                        response.send({status: "success", data: sensors});
+                    }
+                });
+        })
+        .catch(e => {
+            response.send({status: "error", error: "error fetching sensors for project "+process.env.PG_PROJECT_NAME + " " + e.message});
+        });
+
+}); //
+
 exports.sensors = functions.https.onRequest(sensorsApp);
 
 // transition sensors to having a UID
