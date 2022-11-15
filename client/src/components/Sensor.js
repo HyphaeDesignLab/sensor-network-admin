@@ -7,6 +7,12 @@ import SensorIds from "./sensors/SensorIds";
 import ConfirmDialog from "./ConfirmDialog";
 
 const Sensor = ({sensor, onSave, onDelete, onSaveToAws, onDeleteFromAws, onCancel, sensorTypes, sensorSites}) => {
+  useEffect(() => {
+    window.scrollTo(0,0); // always make sure to scroll when init
+    return () => {
+      window.scrollTo(0,0); // always make sure to scroll after dismounting
+    }
+  }, []);
 
   const [location, setLocation] = useState(sensor.location);
   const [isEditLocation, setEditLocation] = useState(false);
