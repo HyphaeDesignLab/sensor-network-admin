@@ -57,6 +57,26 @@ app.get('/sensors/readings/last', function (req, res) {
     });
 });
 
+app.get('/sensors/get', function (req, res) {
+    pgQuery(`select * from ${env.project}.sensors`)
+    .then(result => {
+        const sensors = [];
+        result.rows.forEach(row => {
+           sensors.push({
+               deveui: !!row.ids ? row.ids.deveui : null,
+               lng: row.location.lng ?? null,
+               lat: row.location.lat ?? null,
+               type: row.type ?? null,
+               elevation: row.elevation ?? null,
+               site: row.site ?? null
+           });
+        });
+        res.send(JSON.stringify(sensors));
+    }).catch(e => {
+        res.send(JSON.stringify(e));
+    });
+});
+
 app.get('/sensors/sync', function (req, res) {
     pgQuery(`select now()`)
     .then(result => {
