@@ -77,6 +77,44 @@ app.get('/sensors/get', function (req, res) {
     });
 });
 
+
+app.get('/sensors/geojson', function (req, res) {
+    pgQuery(`select * from ${env.project}.sensors`)
+        .then(result => {
+            const geojson = {
+                "type": "FeatureCollection",
+                "features": []
+            };
+
+            result.rows.forEach(row => {
+                if (!row.lng || !row.lat) {
+                    return;
+                }
+
+                geojson.features.push({
+                    "type": "Feature",
+                    "properties": {
+                        deveui: !!row.device_eui ? row.device_eui : null,
+                        type: row.type ? row.type : null,
+                        name: row.name ? row.name : null,
+                        elevation: row.elevation ? row.elevation : null,
+                        site: row.site ? row.site : null
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            row.lng ? row.lng : null,
+                            row.lat ? row.lat : null,
+                        ]
+                    }
+                });
+            });
+            res.send(JSON.stringify(geojson));
+        }).catch(e => {
+        res.send(JSON.stringify(e));
+    });
+});
+
 app.get('/sensors/sync', function (req, res) {
     pgQuery(`select now()`)
     .then(result => {
