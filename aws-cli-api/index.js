@@ -97,7 +97,7 @@ app.get('/sensors/readings', function (req, res) {
     const endDate = req.query.end ? req.query.end.replace(/[^\d\-]/g, '') : endDateObj.getUTCFullYear()+'-'+(endDateObj.getUTCMonth()+1)+'-'+endDateObj.getUTCDate();
     console.log(startDate, endDate);
 
-    $sql = `
+    const sql = `
 SELECT concat_ws('~', 'reading', time, reading, id) as "d" from (SELECT
     time_bucket('15 minutes', reading_ts) as time,
     avg(${field}) as "reading",
