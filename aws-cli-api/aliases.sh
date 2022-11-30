@@ -39,21 +39,7 @@ function sensors-api {
   fi
 }
 
-function sensor-api-help {
-  echo
-      echo " Sample Usage"
-      echo
-      echo "    sensors-api"
-      echo "         git init"
-      echo "         git update"
-      echo "         start "
-      echo "         start bg"
-      echo "         stop"
-      echo "         status"
-      echo
-}
-
 echo "Available Commands: "
-echo "    sensor-api-help"
-echo "    sensor-api cmd1 cmd2 cmd3"
+echo "    sensors-api"
+echo "    sensors-api cmd1 cmd2 cmd3"
 echo
