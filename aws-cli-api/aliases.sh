@@ -52,3 +52,8 @@ function sensor-api-help {
       echo "         status"
       echo
 }
+
+echo "Available Commands: "
+echo "    sensor-api-help"
+echo "    sensor-api cmd1 cmd2 cmd3"
+echo
