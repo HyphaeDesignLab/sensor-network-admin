@@ -91,7 +91,7 @@ app.get('/sensors/readings', function (req, res) {
     }
 
     const now = new Date();
-    const endDateObj = new Date(now - 24*3600*1000);
+    const endDateObj = new Date(now + 24*3600*1000);
 
     const startDate = req.query.start ? req.query.start.replace(/[^\d\-]/g, '') : now.getUTCFullYear()+'-'+(now.getUTCMonth()+1)+'-'+now.getUTCDate();
     const endDate = req.query.end ? req.query.end.replace(/[^\d\-]/g, '') : endDateObj.getUTCFullYear()+'-'+(endDateObj.getUTCMonth()+1)+'-'+endDateObj.getUTCDate();
