@@ -95,7 +95,6 @@ app.get('/sensors/readings', function (req, res) {
 
     const startDate = req.query.start ? req.query.start.replace(/[^\d\-]/g, '') : now.getUTCFullYear()+'-'+(now.getUTCMonth()+1)+'-'+now.getUTCDate();
     const endDate = req.query.end ? req.query.end.replace(/[^\d\-]/g, '') : endDateObj.getUTCFullYear()+'-'+(endDateObj.getUTCMonth()+1)+'-'+endDateObj.getUTCDate();
-    console.log(startDate, endDate);
 
     const sql = `
 SELECT concat_ws('~', 'reading', time, reading, id) as "d" from (SELECT
@@ -110,14 +109,13 @@ GROUP BY reading_ts, id
 ORDER BY time, id) "subq"
 UNION select concat_ws('~', 'sensor', device_eui, name, lng, lat) as "d" from ${env.project}.sensors
 order by "d"`;
-    console.log(sql)
     pgQuery(sql)
     .then(result => {
         const readings = {};
         const sensors = {};
         console.log(result.rows);
         result.rows.forEach(row => {
-            const rowValues = row.split('~');
+            const rowValues = row.d.split('~');
             if (rowValues[0] === 'reading') {
                 const [rowType, readingTime, readingValue, sensorId ] = rowValues;
                 readings[sensorId] = {value: readingValue, time: readingTime, id: sensorId};
