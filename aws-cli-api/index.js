@@ -57,6 +57,78 @@ app.get('/sensors/readings/last', function (req, res) {
     });
 });
 
+/*
+
+feature:
+[
+  lng, lat
+  shape: point
+
+  properties:
+    field: temperature
+
+]
+
+
+ */
+app.get('/sensors/readings', function (req, res) {
+    const typeMap = {
+        "globetemp": "mrt_dragino_d22",
+        "temphum": "temphum_dragino_sm31",
+        "wind": "wind_barani_meteowind_iot_pro"
+    };
+
+
+    const field = req.query.field ?  req.query.field.replace(/\W/g, '') : '';
+    if (!field) {
+        res.send(JSON.stringify({error: 'field cannot be empty'}));
+        return;
+    }
+    const type = req.query.type ?  req.query.type.replace(/\W/g, '') : '';
+    if (!type || !typeMap[type]) {
+        res.send(JSON.stringify({error: `type is empty or does not exist: ${type}`}));
+        return;
+    }
+
+    const now = new Date();
+    const startDateObj = new Date(now - 3600*1000);
+
+    console.log(now.toString());
+    const startDate = req.query.start ? req.query.start.replace(/[^\d\-]/g, '') : startDateObj.getUTCFullYear()+'-'+(startDateObj.getUTCMonth()+1)+'-'+startDateObj.getUTCDate();
+    const endDate = req.query.end ? req.query.end.replace(/[^\d\-]/g, '') : startDateObj.getUTCFullYear()+'-'+(startDateObj.getUTCMonth()+1)+'-'+startDateObj.getUTCDate();
+
+    pgQuery(`
+SELECT concat_ws('~', 'reading', time, reading, id) as "d" from (SELECT
+    time_bucket('15 minutes', reading_ts) as time,
+    avg(${field}) as "reading",
+    device_eui as id
+FROM
+    ${env.project}.data__${typeMap[type]}
+WHERE
+    reading_ts between '${startDate}' and '${endDate}'
+GROUP BY reading_ts, id
+ORDER BY time, id) "subq"
+UNION select concat_ws('~', 'sensor', device_eui, name, lng, lat) as "d" from ${env.project}.sensors
+order by "d"`)
+    .then(result => {
+        const readings = {};
+        const sensors = {};
+        result.rows.forEach(row => {
+            const rowValues = row.split('~');
+            if (rowValues[0] === 'reading') {
+                const [rowType, readingTime, readingValue, sensorId ] = rowValues;
+                readings[sensorId] = {value: readingValue, time: readingTime, id: sensorId};
+            } else {
+                const [rowType, id, name, lng, lat ] = rowValues;
+                sensors[id] = {id, name, lng, lat};
+            }
+        });
+        res.send(JSON.stringify({sensors, readings}));
+    }).catch(e => {
+        res.send(JSON.stringify(e));
+    });
+});
+
 app.get('/sensors/get', function (req, res) {
     pgQuery(`select * from ${env.project}.sensors`)
     .then(result => {
