@@ -93,9 +93,9 @@ app.get('/sensors/readings', function (req, res) {
     const now = new Date();
     const startDateObj = new Date(now - 3600*1000);
 
-    console.log(now.toString());
     const startDate = req.query.start ? req.query.start.replace(/[^\d\-]/g, '') : startDateObj.getUTCFullYear()+'-'+(startDateObj.getUTCMonth()+1)+'-'+startDateObj.getUTCDate();
     const endDate = req.query.end ? req.query.end.replace(/[^\d\-]/g, '') : startDateObj.getUTCFullYear()+'-'+(startDateObj.getUTCMonth()+1)+'-'+startDateObj.getUTCDate();
+    console.log(startDate, endDate);
 
     pgQuery(`
 SELECT concat_ws('~', 'reading', time, reading, id) as "d" from (SELECT
