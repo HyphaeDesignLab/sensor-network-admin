@@ -113,7 +113,6 @@ order by "d"`;
     .then(result => {
         const readings = {};
         const sensors = {};
-        console.log(result.rows);
         result.rows.forEach(row => {
             const rowValues = row.d.split('~');
             if (rowValues[0] === 'reading') {
