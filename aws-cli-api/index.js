@@ -106,7 +106,7 @@ FROM
 WHERE
     reading_ts between '${startDate}' and '${endDate}'
 GROUP BY reading_ts, id
-ORDER BY time, id) "subq"
+ORDER BY id, time) "subq"
 UNION select concat_ws('~', 'sensor', device_eui, name, lng, lat) as "d" from ${env.project}.sensors
 order by "d"`;
     pgQuery(sql)
@@ -117,7 +117,10 @@ order by "d"`;
             const rowValues = row.d.split('~');
             if (rowValues[0] === 'reading') {
                 const [rowType, readingTime, readingValue, sensorId ] = rowValues;
-                readings[sensorId] = {value: readingValue, time: readingTime, id: sensorId};
+                if (!readings[sensorId]) {
+                    readings[sensorId] = [];
+                }
+                readings[sensorId].push({value: readingValue, time: readingTime});
             } else {
                 const [rowType, id, name, lng, lat ] = rowValues;
                 sensors[id] = {id, name, lng, lat};
