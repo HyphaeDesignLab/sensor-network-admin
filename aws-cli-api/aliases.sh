@@ -35,11 +35,19 @@ function sensors-api {
     cd ~/aws_cli_api/
     ./check_node_running.sh .
   else
-    sensor-api-help;
+    echo
+    echo " Sample Usage"
+    echo
+    echo "    sensors-api"
+    echo "         git init"
+    echo "         git update"
+    echo "         start "
+    echo "         start bg"
+    echo "         stop"
+    echo "         status"
+    echo
   fi
 }
 
-echo "Available Commands: "
-echo "    sensors-api"
-echo "    sensors-api cmd1 cmd2 cmd3"
-echo
+sensors-api;
+
