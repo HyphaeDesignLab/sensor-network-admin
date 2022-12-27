@@ -9,6 +9,7 @@ module.exports = {
   */
   entry: {
     'dashboard':  { import: `${SRC_DIR}/index.jsx`, filename: `dashboard.bundle.js` },
+    'echart-embedder':  { import: `${SRC_DIR}/echart-embedder.jsx`, filename: `echart-embedder.bundle.js` },
     // TESTS:
     //'sensor': { import: `${SRC_DIR}/tests/sensors/index.jsx`, filename: 'tests/sensor.bundle.js'},
     // 'pg': { import: `${SRC_DIR}/tests/pg/index.jsx`, filename: 'tests/pg.bundle.js'},
