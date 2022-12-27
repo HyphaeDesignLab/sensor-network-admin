@@ -74,3 +74,6 @@ _notes/
 tmp
 
 firebase-emulator-export/
+
+# Certs
+*.pem
