@@ -19,5 +19,9 @@ service cloud.firestore {
     match /sensor_types/{uid} {
       allow create, read, update, delete: if request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
+
+    match /echart_embeds/{uid} {
+      allow create, read, update, delete: if request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
   }
 }
