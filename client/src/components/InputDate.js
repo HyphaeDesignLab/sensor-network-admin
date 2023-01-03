@@ -203,8 +203,10 @@ export default function InputDate({value=null, path, onSave,
                         <span style={{
                             position: 'absolute',
                             left: 0, top: '100%',
+                            zIndex: 100,
                             width: '300px',
-                            borderRadius: '5px', border: '1px dashed grey'}}>* time will appear as 1 hour later, this date falls in "daylight savings" months</span>
+                            borderRadius: '5px', border: '1px dashed grey',
+                            backgroundColor: 'white'}}>* time will appear as 1 hour later, this date falls in "daylight savings" months</span>
                     }{isDaylightSavings && <span style={{cursor: 'help'}} onClick={() => showDaylightSavings(s => !s)}>(?)</span>}
                     <select
                        value={hourValue}
