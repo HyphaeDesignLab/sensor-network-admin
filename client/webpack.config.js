@@ -11,6 +11,7 @@ module.exports = {
     'dashboard':  { import: `${SRC_DIR}/index.jsx`, filename: `dashboard.bundle.js` },
     'echart-embedder':  { import: `${SRC_DIR}/echart-embedder.jsx`, filename: `echart-embedder.bundle.js` },
     // TESTS:
+    // 'date-input': { import: `${SRC_DIR}/tests/date-input/index.jsx`, filename: 'tests/date-input.bundle.js'},
     //'sensor': { import: `${SRC_DIR}/tests/sensors/index.jsx`, filename: 'tests/sensor.bundle.js'},
     // 'pg': { import: `${SRC_DIR}/tests/pg/index.jsx`, filename: 'tests/pg.bundle.js'},
     // 'image-crop': { import: `${SRC_DIR}/tests/image-crop/index.jsx`, filename: 'tests/image-crop.bundle.js'},
