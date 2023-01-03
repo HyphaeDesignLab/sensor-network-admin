@@ -7,7 +7,7 @@ const EditIcon = () => {
     </svg>;
 };
 
-const getDaylightSavingsOffset = (date, timezone) => {
+const isDateInDaylightSavings = (date, timezone) => {
     const year = date.getFullYear();
     var january = new Date(`${year}-01-01 12:00:00 ${timezone}`);
     var july = new Date(`${year}-07-01 12:00:00 ${timezone}`);
@@ -22,7 +22,7 @@ const isLeapYear = year => {
 const getMonthsDaysOfYear = year => [31, isLeapYear(year) ? 29:28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 const timezones = ['PST', 'MST', 'CST', 'EST'];
-const timezonesOffset = ['-8 hrs', '- 7 hrs', '- 6 hrs', ' -5 hrs'];
+const timezonesOffset = ['-8 hrs', '-7 hrs', '-6 hrs', '-5 hrs'];
 
 const hoursAmPm = [12,1,2,3,4,5,6,7,8,9,10,11,12,1,2,3,4,5,6,7,8,9,10,11];
 const hours = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
@@ -48,6 +48,8 @@ export default function InputDate({value=null, path, onSave,
     const [hourValue, setHourValue] = useState(value.getHours());
     const [minuteValue, setMinuteValue] = useState(value.getMinutes());
     const [timezoneValue, setTimezoneValue] = useState(timezones[0]);
+    const [isDaylightSavings, setDaylightSavings] = useState(isDateInDaylightSavings(value, timezones[0]));
+    const [isShowDaylightSavings, showDaylightSavings] = useState(false);
 
     useEffect(() => {
         setOldValue(value);
@@ -85,7 +87,9 @@ export default function InputDate({value=null, path, onSave,
     }, [yearValue, monthValue]);
 
     useEffect(() => {
-        setNewValue(new Date(`${yearValue}-${monthValue+1}-${dateValue} ${hourValue}:${minuteValue}:00 ${timezoneValue}`));
+        const date = new Date(`${yearValue}-${monthValue+1}-${dateValue} ${hourValue}:${minuteValue}:00 ${timezoneValue}`)
+        setDaylightSavings(isDateInDaylightSavings(date, timezoneValue))
+        setNewValue(date);
     }, [yearValue, monthValue, dateValue, hourValue, minuteValue, timezoneValue]);
 
 
@@ -194,14 +198,23 @@ export default function InputDate({value=null, path, onSave,
                         <option value={day} key={day}>{day}</option>)}
                 </select>
                     &nbsp;
-                <select
+                <span style={{position: 'relative', color: isDaylightSavings ? 'red':'inherit'}}>
+                    {isDaylightSavings && isShowDaylightSavings &&
+                        <span style={{
+                            position: 'absolute',
+                            left: 0, top: '100%',
+                            width: '300px',
+                            borderRadius: '5px', border: '1px dashed grey'}}>* time will appear as 1 hour later, this date falls in "daylight savings" months</span>
+                    }{isDaylightSavings && <span style={{cursor: 'help'}} onClick={() => showDaylightSavings(s => !s)}>(?)</span>}
+                    <select
                        value={hourValue}
                        onChange={handleHourChange}
                        onKeyUp={handleKeyUp}
+                       style={{color: 'inherit'}}
                 >
                     {Object.keys(hours).map(hour =>
                         <option value={hour} key={hour}>{hoursAmPm[hour]}</option>)}
-                </select>
+                </select></span>
 
                 <select
                        value={minuteValue}
@@ -221,14 +234,14 @@ export default function InputDate({value=null, path, onSave,
                 >
                     &nbsp;
                     {timezones.map((timezone,i) =>
-                        <option value={timezone} key={timezone}>{timezone} ({timezonesOffset[i]}</option>)}
+                        <option value={timezone} key={timezone}>{timezone} ({timezonesOffset[i]})</option>)}
                 </select>
                 </React.Fragment>
                 :
                 <React.Fragment>
                     <span onClick={handleEditClick} style={{whiteSpace: 'pre', ...inputStyle}}>
                         {value.toLocaleString('en-US', {timeZone: timezoneValue, dateStyle: 'medium', timeStyle: 'long'})}
-                        {getDaylightSavingsOffset(value, timezoneValue) > 0 ? ' (daylight savings)' : ''} <EditIcon />
+                        {isDateInDaylightSavings(value, timezoneValue) > 0 ? ' (daylight savings)' : ''} <EditIcon />
                     </span>
                     &nbsp;
                     <span style={{textDecoration: 'underline', cursor: 'pointer'}} onClick={() => setShowUTCTime(c => !c)}>utc{isShowUTCTime ? ':':'?'}</span>
