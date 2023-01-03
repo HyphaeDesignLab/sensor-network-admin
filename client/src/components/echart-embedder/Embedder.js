@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { collection, getDocs, addDoc, doc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 
-import Project from './../Project';
-import SensorTypes from './../SensorTypes';
-import firebaseConfig from "./../../keys/firebase/config";
+import Embed from './Embed';
 
 const Embedder = ({firebaseApp}) => {
     const [embeds, setEmbeds] = useState([]);
     const [embedsError, setEmbedsError] = useState(false);
     const [isEmbedsLoading, setEmbedsLoading] = useState(false);
     const [currentEmbed, setCurrentEmbed] = useState(null);
-    const currentEmbedTextRef = useRef('');
+
 
     useEffect(() => {
         setEmbedsLoading(true);
@@ -29,6 +27,8 @@ const Embedder = ({firebaseApp}) => {
                     querySnapshot.forEach((doc) => {
                         let docData = doc.data();
                         docData.id = doc.id;
+                        docData.time_start = docData.time_start.toDate();
+                        docData.time_end = docData.time_end.toDate();
                         list.push(docData);
                     })
                     setEmbeds(list);
@@ -62,7 +62,7 @@ const Embedder = ({firebaseApp}) => {
             return;
         }
 
-        deleteDoc(doc(firebaseApp.db, "sensor_networks", id))
+        deleteDoc(doc(firebaseApp.db, "echart_embeds", id))
             .then(() => {
                 setEmbeds(embeds.filter(p => p.id !== id));
             })
@@ -85,8 +85,8 @@ const Embedder = ({firebaseApp}) => {
             return;
         }
 
-        const docRef = doc(firebaseApp.db, "sensor_networks", currentEmbed.id);
-        updateDoc(docRef, embedFragment)
+        const docRef = doc(firebaseApp.db, "echart_embeds", currentEmbed.id);
+        return updateDoc(docRef, embedFragment)
             .then(response => {
                 const embedsCopy = [...embeds];
                 const index = embedsCopy.findIndex(p => p.id === currentEmbed.id);
@@ -109,18 +109,6 @@ const Embedder = ({firebaseApp}) => {
         setCurrentEmbed(embed);
     }
 
-    useEffect(() => {
-        if (!currentEmbed) {
-            return;
-        }
-        currentEmbedTextRef.current.value =
-            `<div style="width: 100%; height: 80%;"
-                 data-data-url="${currentEmbed.data_url}&start=${currentEmbed.time_start}&end=${currentEmbed.time_end}"
-                 data-echart
-                 data-echart-type="${currentEmbed.type}"
-            ></div>`;
-    }, [currentEmbed]);
-
 
     const handleAddEmbed = (e) => {
         e.preventDefault();
@@ -128,10 +116,6 @@ const Embedder = ({firebaseApp}) => {
         setCurrentEmbed({});
     }
 
-    const handleSelectAndCopyEmbed = () => {
-        currentEmbedTextRef.current.select();
-        navigator.clipboard.writeText(currentEmbedTextRef.current.value);
-    };
 
     return <section>
         <h2>Embeds</h2>
@@ -141,9 +125,7 @@ const Embedder = ({firebaseApp}) => {
             <div key={embed.id}>
                 <a href='#edit' onClick={e => editEmbed(embed, e)}>{embed.name}</a>
                 {!!currentEmbed && currentEmbed.id === embed.id && <div>
-                    {embed.name}
-                    <textarea onClick={handleSelectAndCopyEmbed} ref={currentEmbedTextRef}>
-                    </textarea>
+                <Embed model={currentEmbed} onChange={saveEmbed}/>
                 </div>}
             </div>
         )}
