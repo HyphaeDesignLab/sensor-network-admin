@@ -122,7 +122,7 @@ const Embedder = ({firebaseApp}) => {
         {isEmbedsLoading && <div className='spinning-loader'></div>}
         {!!embedsError && <div>{embedsError}</div>}
         {embeds.map(embed =>
-            <div key={embed.id}>
+            <div className='embed' key={embed.id}>
                 <a href='#edit' onClick={e => editEmbed(embed, e)}>{embed.name}</a>
                 {!!currentEmbed && currentEmbed.id === embed.id && <div>
                 <Embed model={currentEmbed} onChange={saveEmbed}/>

@@ -69,7 +69,7 @@ const Embed = ({model, onChange}) => {
         });
     };
 
-    return <div>
+    return <div className='embed-editor'>
         {model.name}
         <InputDate path={'date'} onSave={handleSaveStartDate} value={startDate}/>
         <InputDate path={'date'} onSave={handleSaveEndDate} value={endDate} />
