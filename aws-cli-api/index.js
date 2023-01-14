@@ -96,7 +96,20 @@ app.get('/sensors/readings', function (req, res) {
     const startDate = req.query.start ? req.query.start.replace(/[^\d\-]/g, '') : now.getUTCFullYear()+'-'+(now.getUTCMonth()+1)+'-'+now.getUTCDate();
     const endDate = req.query.end ? req.query.end.replace(/[^\d\-]/g, '') : endDateObj.getUTCFullYear()+'-'+(endDateObj.getUTCMonth()+1)+'-'+endDateObj.getUTCDate();
 
-    const sql = `
+    let subQuery = '';
+    if (req.query.queryType === 'by_hour_and_day_of_week') {
+        subQuery = `
+SELECT concat_ws('~', 'reading_by_hour_and_day_of_week', dow, hour, reading) as "d" from 
+(SELECT dow, hour, avg(${field}) as reading from 
+(select 
+    reading_ts, 
+    ${field}, 
+    extract(dow from reading_ts) as dow, 
+    extract(hour from reading_ts) as hour from ${env.project}.data__${typeMap[type]} ) "q1"
+group by dow, hour
+order by dow, hour) "q2"`;
+    } else {
+        subQuery = `
 SELECT concat_ws('~', 'reading', time, reading, id) as "d" from (SELECT
     time_bucket('15 minutes', reading_ts) as time,
     avg(${field}) as "reading",
@@ -107,6 +120,10 @@ WHERE
     reading_ts between '${startDate}' and '${endDate}'
 GROUP BY reading_ts, id
 ORDER BY id, time) "subq"
+`;
+    }
+    const sql = `
+${subQuery}
 UNION select concat_ws('~', 'sensor', device_eui, name, lng, lat) as "d" from ${env.project}.sensors
 order by "d"`;
     pgQuery(sql)
@@ -121,6 +138,9 @@ order by "d"`;
                     readings[sensorId] = [];
                 }
                 readings[sensorId].push({value: readingValue, time: readingTime});
+            } else if (rowValues[0] === 'reading_by_hour_and_day_of_week') {
+                const [rowType, dow, hour, readingValue ] = rowValues;
+                readings.push({value: readingValue, dow, hour});
             } else {
                 const [rowType, id, name, lng, lat ] = rowValues;
                 sensors[id] = {id, name, lng, lat};
