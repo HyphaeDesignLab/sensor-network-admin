@@ -140,7 +140,7 @@ order by "d"`;
                 readings[sensorId].push({value: readingValue, time: readingTime});
             } else if (rowValues[0] === 'reading_by_hour_and_day_of_week') {
                 const [rowType, dow, hour, readingValue ] = rowValues;
-                readings.push({value: readingValue, dow, hour});
+                readings.push({cellValue: readingValue, radiusValue: dow, circleValue: hour});
             } else {
                 const [rowType, id, name, lng, lat ] = rowValues;
                 sensors[id] = {id, name, lng, lat};
