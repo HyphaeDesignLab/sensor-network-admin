@@ -128,7 +128,8 @@ UNION select concat_ws('~', 'sensor', device_eui, name, lng, lat) as "d" from ${
 order by "d"`;
     pgQuery(sql)
     .then(result => {
-        const readings = {};
+        const readings = req.query.queryType === 'by_hour_and_day_of_week' ? [] : {};
+        const readingsByDayOfWeekAndHour = [];
         const sensors = {};
         result.rows.forEach(row => {
             const rowValues = row.d.split('~');
@@ -140,7 +141,7 @@ order by "d"`;
                 readings[sensorId].push({value: readingValue, time: readingTime});
             } else if (rowValues[0] === 'reading_by_hour_and_day_of_week') {
                 const [rowType, dow, hour, readingValue ] = rowValues;
-                readings.push({value: readingValue, dow, hour});
+                readingsByDayOfWeekAndHour.push({value: readingValue, dow, hour});
             } else {
                 const [rowType, id, name, lng, lat ] = rowValues;
                 sensors[id] = {id, name, lng, lat};
