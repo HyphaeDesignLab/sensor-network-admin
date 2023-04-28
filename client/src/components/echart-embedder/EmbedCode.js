@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import InputDate from "../InputDate";
 import './embed.css';
 
-const Embed = ({model, onChange}) => {
+const EmbedCode = ({model, onChange}) => {
 
     // the embed text area element reference, as we will use it to "select all" and attempt to "copy" programmatically
     const embedTextRef = useRef('');
@@ -76,4 +76,4 @@ const Embed = ({model, onChange}) => {
     </div>;
 };
 
-export default Embed;
+export default EmbedCode;

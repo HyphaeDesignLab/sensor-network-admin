@@ -123,14 +123,19 @@ const Embedder = ({firebaseApp}) => {
         {!!embedsError && <div>{embedsError}</div>}
         {embeds.map(embed =>
             <div className='embed' key={embed.id}>
-                <a href='#edit' onClick={e => editEmbed(embed, e)}>{embed.name}</a>
+                <a href='#edit' onClick={e => editEmbed(embed, e)}>{embed.name} ({embed.type}, {embed.data_type})</a>
                 {!!currentEmbed && currentEmbed.id === embed.id && <div>
                 <Embed model={currentEmbed} onChange={saveEmbed}/>
                 </div>}
             </div>
         )}
-        <div><button className='link' onClick={handleAddEmbed}>+ Add Embed</button></div>
+        <div>
+            <button className='link' onClick={handleAddEmbed}>+ Add Embed</button>
+            <EmbedCreator />
+        </div>
     </section>;
+
+    //https://sensordashapi.hyphae.net:3001/sensors/readings?field=globe_temperature&type=globetemp
 };
 
 export default Embedder;
