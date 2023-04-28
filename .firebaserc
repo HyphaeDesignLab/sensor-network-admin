@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "geo-dashboard-347901"
+    "default": "geo-dashboard-347901",
+    "sensor-dash": "sensor-admin-dash",
+    "sensor-dash-dev": "sensor-admin-dash-dev"
   }
 }
