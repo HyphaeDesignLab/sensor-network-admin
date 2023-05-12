@@ -280,6 +280,46 @@ eximportApp.use(cors);
 const eximportAppBasePath = "eximport"; // must match the property <path> in exports.<path> below
 eximportApp.use((req, res, next) => checkAuth(eximportAppBasePath, req, res, next));
 
+eximportApp.post("/all", (request, response) => {
+    if (!parseInt(process.env.IMPORT_EXPORT_ALLOWED)) {
+        response.status(500).send("action not enabled");
+        return;
+    }
+
+    const collectionIds = ["sensors", "sensor_networks"];
+    return Promise.all(collectionIds.map(id => {
+        return db.collection(id).get().then(querySnapshot => {
+            const data = []
+            querySnapshot.forEach(doc => {
+                const docData = doc.data();
+                if (id === "sensors") {
+                    delete docData.photos;
+                }
+                data.push(docData);
+            });
+            return [id, data]
+        });
+    })).then((promisedData) => {
+        const data = {};
+        promisedData.forEach((dataWrapper) => {
+            data[dataWrapper[0]] = dataWrapper[1];
+        })
+        const jsonString = JSON.stringify(data);
+        const timestamp = new Date().getTime()/1000
+        response.status(200)
+            .header("content-type", "application/json")
+            .header("content-disposition", `attachment; filename="sensors-dash-export-${timestamp}.json"`)
+            //.header("content-transfer-encoding", `8bit`)
+            .header("content-length", jsonString.length)
+            .header("cache-control", "private")
+            .header("pragma", "private")
+            .header("expires", "Mon, 26 Jul 1997 05:00:00 GMT")
+            .send(jsonString);
+    }).catch(e => {
+        response.status(500).send(e.message);
+    });
+
+});
 
 eximportApp.post("/sensors/export/:projectId", (request, response) => {
     if (!parseInt(process.env.IMPORT_EXPORT_ALLOWED)) {
