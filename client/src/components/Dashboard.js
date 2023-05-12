@@ -4,6 +4,7 @@ import { collection, getDocs, addDoc, doc, getDoc, deleteDoc, updateDoc } from '
 import Project from './Project';
 import SensorTypes from './SensorTypes';
 import firebaseConfig from "./../keys/firebase/config";
+import {saveDataAsFile} from "../helpers";
 
 const Dashboard = ({firebaseApp}) => {
     const [sensorTypes, setSensorTypes] = useState([]);
@@ -175,6 +176,29 @@ const Dashboard = ({firebaseApp}) => {
         });
     };
 
+    const [isExportingAll, setIsExportingAll] = useState(false);
+    const [exportingAllError, setExportingAllError] = useState('');
+    const handleExportAll = () => {
+        setIsExportingAll(true);
+        setExportingAllError('');
+        firebaseApp.auth.currentUser.getIdToken().then(token => {
+            fetch(firebaseConfig.functionsUrl + '/eximport/all', {
+                method: 'post',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                    token
+                })
+            })
+                .then(r => r.text())
+                .then(text => saveDataAsFile(`exports-${new Date().getTime()/1000}.json`, text))
+                .catch(e => setExportingAllError(e.message))
+                .finally(()=> setIsExportingAll(false))
+        });
+    }
+
+
     return <section>
         {step === 'projects' && <div>
             <h2>Projects</h2>
@@ -187,6 +211,11 @@ const Dashboard = ({firebaseApp}) => {
             )}
             <div><button className='link' onClick={handleAddProject}>+ Add Project</button></div>
             <div><button className='link' onClick={handleImportShow}>-&gt; Import Project</button></div>
+            <div>
+                <button className='link' onClick={handleExportAll}>-&gt; Export Everything in Dashboard</button>
+                {!!exportingAllError && <div className='error'>{exportingAllError}</div>}
+                {isExportingAll && <div className='spinning-loader'></div>}
+            </div>
 
             <h2>Other Settings</h2>
             <div><button className='link' onClick={handleManageSensorTypes}>Manage Sensor Types</button></div>
