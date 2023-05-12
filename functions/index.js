@@ -1,3 +1,6 @@
+// IMPORTANT:
+//   make sure that the AWS VM security rules allow the us-central IP ranges
+//    https://www.gstatic.com/ipranges/cloud.json
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp();
@@ -57,7 +60,7 @@ const checkAuth =  (appBasePath, req, res, next) => {
         return;
     }
     if (!req.body || ((req.body instanceof Object) && Object.keys(req.body).length === 0)) {
-        res.status(403).send({error: "need some parameters", body: req.body});
+        res.status(403).send({error: "need some auth parameters", body: req.body});
         return;
     }
 
@@ -248,15 +251,15 @@ where device_eui=$1`,
     });
 };
 
-exports.onSensorTypeCreate = functions.firestore
+exports.onSensorCreate = functions.firestore
     .document("sensors/{id}")
     .onCreate((doc) => updateOrInsertSensorToPG(doc));
 
-exports.onSensorTypeUpdate = functions.firestore
+exports.onSensorUpdate = functions.firestore
     .document("sensors/{id}")
     .onUpdate((change) => updateOrInsertSensorToPG(change.after));
 
-exports.onSensorTypeDelete = functions.firestore
+exports.onSensorDelete = functions.firestore
     .document("sensors/{id}")
     .onDelete((doc) => {
         const data = doc.data();
@@ -340,31 +343,6 @@ eximportApp.post("/sync", (request, response) => {
     });
 }); //
 
-// WILDCARD
-// Listen for changes in all documents in the 'users' collection
-exports.onSensorCreate = functions.firestore
-    .document("sensors/{sensorId}")
-    .onCreate((doc, context) => {
-        const d = doc.data();
-        functions.logger.log(JSON.stringify(["created", context.params.sensorId, d]));
-        return d;
-    })
-
-exports.onSensorUpdate = functions.firestore
-    .document("sensors/{sensorId}")
-    .onUpdate((doc, context) => {
-        const d = doc.after.data();
-        functions.logger.log(JSON.stringify(["updated", context.params.sensorId, d]));
-        return d;
-    })
-
-exports.onSensorDelete = functions.firestore
-    .document("sensors/{sensorId}")
-    .onDelete((doc, context) => {
-        const d = doc.data();
-        functions.logger.log(JSON.stringify(["deleted", context.params.sensorId, d]));
-        return d;
-    })
 
 exports.eximport = functions.https.onRequest(eximportApp);
 
