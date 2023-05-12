@@ -286,7 +286,7 @@ eximportApp.post("/all", (request, response) => {
         return;
     }
 
-    const collectionIds = ["sensors", "sensor_networks"];
+    const collectionIds = ["sensors", "sensor_networks", "sensor_types"];
     return Promise.all(collectionIds.map(id => {
         return db.collection(id).get().then(querySnapshot => {
             const data = []
